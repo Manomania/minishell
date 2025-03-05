@@ -30,20 +30,23 @@
 
 typedef enum e_token_type
 {
-	TOK_COMMAND,
-	TOK_REDIR_FROM,
-	TOK_REDIR_TO,
-	TOK_HERE_DOC_FROM,
-	TOK_HERE_DOC_TO,
-	TOK_PIPE,
-	TOK_ENV,
-	TOK_AND,
-	TOK_OR,
+	TOK_WORD,			// Commands, args, filename
+	TOK_REDIR_FROM,		// <
+	TOK_REDIR_TO,		// >
+	TOK_HERE_DOC_FROM,	// <<
+	TOK_HERE_DOC_TO,	// >>
+	TOK_PIPE,			// |
+	TOK_ENV,			// $
+	TOK_AND,			// &&
+	TOK_OR,				// ||
+	TOK_NEW_LINE,		// \n
+	TOK_EOF,			// '\0'
 }	t_token_type;
 
 typedef struct s_token
 {
 	t_token_type	type;
+	struct s_token	*next;
 	char			*value;
 }					t_token;
 
@@ -62,4 +65,16 @@ typedef struct s_ctx
 *                             Function Prototypes                              *
 *******************************************************************************/
 
+// init_parsing.c
+t_lexer		*create_lexer(char *input);
+t_token		*create_token(t_token_type type, char *value);
+
+// token_utils.c
+void		free_token(t_token *token);
+void		free_all_token(t_token *token);
+
+// lexer_utils.c
+char		get_lexer(t_lexer *lexer);
+void		advance_lexer(t_lexer *lexer);
+void		skip_whitespace_lexer(t_lexer *lexer);
 #endif

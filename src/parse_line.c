@@ -12,68 +12,66 @@
 
 #include "minishell.h"
 
-t_lexer *create_lexer(char* input)
+/**
+ * @brief				Reads a quoted string from the lexer input stream
+ * @param	lexer		Pointer to lexer structure
+ * @param	quote_char	The quote delimiter character
+ * @return				Newly allocated string without quotes or NULL on error
+ * @note				Caller must free the returned string
+ */
+char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 {
-	t_lexer *lexer;
-
-	lexer = malloc(sizeof(t_lexer));
-	if (!lexer)
-		return (NULL);
-	lexer->input = input;
-	lexer->position = 0;
-	lexer->length = (int)ft_strlen(input);
-	return (lexer);
-}
-
-char	get_lexer(t_lexer *lexer)
-{
-	if (lexer->position >= lexer->length)
-		return ('\0');
-	return (lexer->input[lexer->position]);
-}
-
-void	advance_lexer(t_lexer *lexer)
-{
-	if (lexer->position < lexer->length)
-		lexer->position++;
-}
-
-void	skip_whitespace_lexer(t_lexer *lexer)
-{
-	while (get_lexer(lexer) == ' ' || get_lexer(lexer) == '\t')
-		advance_lexer(lexer);
-}
-
-char	*read_quoted_string(t_lexer *lexer, char quote_char)
-{
-	int	start;
+	int		length;
+	int		start;
+	int		end;
+	char	*content;
 
 	start = lexer->position + 1;
-
-}
-
-
-
-
-void	free_token(t_token *token)
-{
-	if (token)
+	advance_lexer(lexer);
+	while (get_lexer(lexer) != '\0' && get_lexer(lexer) != quote_char)
+		advance_lexer(lexer);
+	if (get_lexer(lexer) == '\0')
 	{
-		free(token->value);
-		free(token);
+		ft_printf(RED"Error:\nUnclosed quote\n"RESET);
+		return (NULL);
 	}
+	end = lexer->position;
+	advance_lexer(lexer);
+	length = end - start;
+	content = malloc(length + 1);
+	if (!content)
+		return (NULL);
+	ft_strlcpy(content, lexer->input + start, length);
+	content[length] = '\0';
+	return (content);
 }
 
-t_token	*create_token(t_token_type type, char *value)
+/**
+ * @brief				Extract a word from lexer input
+ * @param	lexer		Pointer to lexer structure
+ * @return				Newly allocated string containing the word or NULL on error
+ * @note				Caller must free the returned string
+ */
+char	*read_word_lexer(t_lexer *lexer)
 {
-	t_token *token;
+	int		start;
+	int		length;
+	char	*word;
 
-	token = malloc(sizeof(t_token));
-	if (!token)
+	start = lexer->position;
+	while (get_lexer(lexer) != '\0' && get_lexer(lexer) != ' '
+		&& get_lexer(lexer) != '\t' && get_lexer(lexer) != '\n'
+		&& get_lexer(lexer) != '|' && get_lexer(lexer) != '<'
+		&& get_lexer(lexer) != '>' && get_lexer(lexer) != '&'
+		&& get_lexer(lexer) != '"' && get_lexer(lexer) != '$')
+		advance_lexer(lexer);
+	length = lexer->position - start;
+	word = malloc(length + 1);
+	if (!word)
 		return (NULL);
-	token->type = type;
-	token->value = value;
-	return (token);
+	ft_strlcpy(word, lexer->input + start, length);
+	word[length] = '\0';
+	return (word);
 }
 
 

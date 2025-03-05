@@ -1,3 +1,7 @@
 SRC_F				=	ctx_init \
 						main \
-						parse_line
+						init_parsing \
+						lexer_utils \
+						token_utils \
+						parse_line \
+						debug
