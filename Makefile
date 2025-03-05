@@ -1,27 +1,53 @@
 ########################################################################################################################
 #                                                      VARIABLES                                                       #
-########################################################################################################################\
+########################################################################################################################
 
-AUTHOR				=	maximart && elagouch
-NAME				=	minishell
+AUTHOR				:=	maximart && elagouch
+NAME				:=	minishell
 HEADER				=	$(INC_DIR)minishell.h
-CC 					= 	cc
-CFLAGS 				= 	-Wall -Wextra -Werror
-AR					=	ar rcs
-RM					=	rm -f
+CC 					?= 	cc
+# Standard compilation checks
+CFLAGS 				:= 	-Wall -Wextra -Werror
+# Compability checks
+CFLAGS				+= -Wpedantic
+# Dependency management
+CFLAGS				+= -MD -MP
+# Warns when a variable declaration shadows another variable
+CFLAGS				+= -Wshadow
+# More thorough than -Wunused-result
+CFLAGS				+= -Wunused-result
+# Implicit conversions that may change value
+CFLAGS				+= -Wconversion
+# Implicit conversions between signed and unsigned
+CFLAGS				+= -Wsign-conversion
+# Disables pointer arithmetics
+# (no `*ptr++`)
+CFLAGS				+= -Wpointer-arith
+# Catches more printf/scanf format mismatches
+CFLAGS				+= -Wformat=2
+# Warns about == for floats which is sus
+CFLAGS				+= -Wfloat-equal
+# Makes strings const char*
+CFLAGS				+= -Wwrite-strings
+# Keeps the frame pointer in registers
+# Minor performance cost
+CFLAGS				+= -fno-omit-frame-pointer
+AR					:=	ar rcs
+RM					:=	rm -f
 
 include files.mk
 
 SRC					=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRC_F)))
 OBJ 				= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC_F)))
+DEP 				= 	$(addprefix $(OBJ_DIR), $(addsuffix .d, $(SRC_F)))
 
 ########################################################################################################################
 #                                                      DIRECTORY                                                       #
 ########################################################################################################################
 
-SRC_DIR				=	src/
-OBJ_DIR				=	obj/
-INC_DIR				=	include/
+SRC_DIR				:=	src/
+OBJ_DIR				:=	obj/
+INC_DIR				:=	include/
 
 ########################################################################################################################
 #                                                       TARGETS                                                        #
@@ -68,25 +94,25 @@ $(OBJ_DIR)%.o: 			$(SRC_DIR)%.c $(HEADER)
 #                                                       COLOURS                                                        #
 ########################################################################################################################
 
-DEF_COLOR			=	\033[0;39m
-ORANGE				=	\033[0;33m
-GRAY				=	\033[0;90m
-RED					=	\033[0;91m
-GREEN				=	\033[1;92m
-YELLOW				=	\033[1;93m
-BLUE				=	\033[0;94m
-MAGENTA				=	\033[0;95m
-CYAN				=	\033[0;96m
-WHITE				=	\033[0;97m
+DEF_COLOR			:=	\033[0;39m
+ORANGE				:=	\033[0;33m
+GRAY				:=	\033[0;90m
+RED					:=	\033[0;91m
+GREEN				:=	\033[1;92m
+YELLOW				:=	\033[1;93m
+BLUE				:=	\033[0;94m
+MAGENTA				:=	\033[0;95m
+CYAN				:=	\033[0;96m
+WHITE				:=	\033[0;97m
 
 ########################################################################################################################
 #                                                       DISPLAY                                                        #
 ########################################################################################################################
 
-SPACEMENT			=	-41
-COMPILED_SRCS		=	0
-FRAMES				=	⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏
-SLEEP_FRAME			=	0.001
+SPACEMENT			:=	-41
+COMPILED_SRCS		:=	0
+FRAMES				:=	⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏
+SLEEP_FRAME			:=	0.001
 
 SRCS_TO_COMPILE		=	$(shell find $(SRC_DIR) -type f -name "*.c" -newer $(NAME) 2>/dev/null | wc -l)
 ifeq ($(SRCS_TO_COMPILE),0)
@@ -130,3 +156,5 @@ define	BUILD
 						@printf "%-47b%b" "$(GREEN)CC:$(DEF_COLOR)" "$(CC)\n";
 						@printf "%-47b%b" "$(GREEN)FLAGS:$(DEF_COLOR)" "$(CFLAGS)\n";
 endef
+
+-include $(DEP)
