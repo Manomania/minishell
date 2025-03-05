@@ -50,6 +50,13 @@ OBJ_DIR				:=	obj/
 INC_DIR				:=	include/
 
 ########################################################################################################################
+#                                                         LIB                                                          #
+########################################################################################################################
+
+LIBFT_DIR			:=	libft/
+LIBFT				:=	$(LIBFT_DIR)libft.a
+
+########################################################################################################################
 #                                                       TARGETS                                                        #
 ########################################################################################################################
 
@@ -62,12 +69,20 @@ INC_DIR				:=	include/
 all:					.print_header $(NAME)
 
 clean:					.print_header
+							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
+							@$(MAKE) --silent -C $(LIBFT_DIR) clean
+							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
+							@printf "\n"
 							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(OBJ_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
 							@rm -rf $(OBJ_DIR)
 							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
 							$(call SEPARATOR)
 
 fclean: 				clean
+							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
+							@$(MAKE) --silent -C $(LIBFT_DIR) fclean
+							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
+							@printf "\n"
 							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(NAME)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
 							@$(RM) $(NAME)
 							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
@@ -86,7 +101,7 @@ $(NAME):				$(OBJ)
 
 $(OBJ_DIR)%.o: 			$(SRC_DIR)%.c $(HEADER)
 							@mkdir -p $(OBJ_DIR)
-							@$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
+							@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -c $< -o $@
 							$(call PROGRESS_BAR_PERCENTAGE)
 							$(if $(filter $(COMPILED_SRCS),$(SRCS_TO_COMPILE)),$(call SEPARATOR))
 

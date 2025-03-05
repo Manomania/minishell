@@ -13,22 +13,22 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+# include "libft.h"
+# include <stdlib.h>
 /*******************************************************************************
- *                                    Macros
- *
- *******************************************************************************/
+*                                    Macros                                    *
+*******************************************************************************/
 
-# define RESET "\033[039m"
-# define RED "\033[091m"
-# define GREEN "\033[092m"
-# define YELLOW "\033[093m"
+# define RESET	"\033[039m"
+# define RED	"\033[091m"
+# define GREEN	"\033[092m"
+# define YELLOW	"\033[093m"
 
 /*******************************************************************************
- *                                  Structures
- *
- *******************************************************************************/
+*                                  Structures                                  *
+*******************************************************************************/
 
-typedef enum e_token
+typedef enum e_token_type
 {
 	TOK_COMMAND,
 	TOK_REDIR_FROM,
@@ -39,22 +39,27 @@ typedef enum e_token
 	TOK_ENV,
 	TOK_AND,
 	TOK_OR,
-}			t_token;
+}	t_token_type;
 
-typedef struct s_tok_limit
+typedef struct s_token
 {
-	t_token	type;
-	int		start;
-	int		end;
-}			t_tok_limit;
+	t_token_type	type;
+	char			*value;
+}					t_token;
+
+typedef struct s_lexer
+{
+	char	*input;
+	int		position;
+	int		length;
+}			t_lexer;
 
 typedef struct s_ctx
 {
 }			t_ctx;
 
 /*******************************************************************************
- *                             Function Prototypes
- *
- *******************************************************************************/
+*                             Function Prototypes                              *
+*******************************************************************************/
 
 #endif
