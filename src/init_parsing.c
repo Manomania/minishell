@@ -31,6 +31,13 @@ t_lexer *create_lexer(char *input)
 	return (lexer);
 }
 
+/**
+ * @brief			Creates and initializes a new token
+ * @param	type	Token type enumeration
+ * @param	value	String value of the token
+ * @return			New token pointer or NULL if allocation fails
+ * @note			Caller must free the returned token
+ */
 t_token	*create_token(t_token_type type, char *value)
 {
 	t_token *token;

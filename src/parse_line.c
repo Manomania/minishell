@@ -13,11 +13,12 @@
 #include "minishell.h"
 
 /**
- * @brief				Reads a quoted string from the lexer input stream
- * @param	lexer		Pointer to lexer structure
- * @param	quote_char	The quote delimiter character
- * @return				Newly allocated string without quotes or NULL on error
- * @note				Caller must free the returned string
+ * @brief Reads a quoted string from the lexer input stream
+ *
+ * @param lexer Pointer to lexer structure
+ * @param quote_char The quote delimiter character
+ * @return Newly allocated string without quotes or NULL on error
+ * @note Caller must free the returned string
  */
 char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 {
@@ -47,10 +48,11 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 }
 
 /**
- * @brief				Extract a word from lexer input
- * @param	lexer		Pointer to lexer structure
- * @return				Newly allocated string containing the word or NULL on error
- * @note				Caller must free the returned string
+ * @brief Extract a word from lexer input
+ *
+ * @param lexer Pointer to lexer structure
+ * @return Newly allocated string containing the word or NULL on error
+ * @note Caller must free the returned string
  */
 char	*read_word_lexer(t_lexer *lexer)
 {
@@ -74,7 +76,113 @@ char	*read_word_lexer(t_lexer *lexer)
 	return (word);
 }
 
+/**
+ * @brief Extract a word from lexer input
+ *
+ * @param lexer Pointer to lexer structure
+ * @return Newly allocated string containing the word or NULL on error
+ * @note Caller must free the returned string
+ */
+t_token	*next_token_lexer(t_lexer *lexer)
+{
+	char	*word;
+	char	*content;
+	char	current;
+	char	quote;
 
+	skip_whitespace_lexer(lexer);
+	current = get_lexer(lexer);
+	if (current == '\0')
+		return (create_token(TOK_EOF, NULL));
+	if (current == '\n')
+	{
+		advance_lexer(lexer);
+		return (create_token(TOK_NEW_LINE, "\n"));
+	}
+	if (current == '|')
+	{
+		advance_lexer(lexer);
+		if (get_lexer(lexer) == '|')
+		{
+			advance_lexer(lexer);
+			return (create_token(TOK_OR, "||"));
+		}
+		return (create_token(TOK_PIPE, "|"));
+	}
+	if (current == '&')
+	{
+		advance_lexer(lexer);
+		if (get_lexer(lexer) == '&')
+		{
+			advance_lexer(lexer);
+			return (create_token(TOK_AND, "&&"));
+		}
+		ft_printf(RED"Error:\nUnexpected '&'\n");
+		return (create_token(TOK_EOF, NULL));
+	}
+	if (current == '<')
+	{
+		advance_lexer(lexer);
+		if (get_lexer(lexer) == '<')
+		{
+			advance_lexer(lexer);
+			return (create_token(TOK_HERE_DOC_FROM, "<<"));
+		}
+		return (create_token(TOK_REDIR_FROM, "<"));
+	}
+	if (current == '>')
+	{
+		advance_lexer(lexer);
+		if (get_lexer(lexer) == '>')
+		{
+			advance_lexer(lexer);
+			return (create_token(TOK_HERE_DOC_TO, ">>"));
+		}
+		return (create_token(TOK_REDIR_TO, ">"));
+	}
+	if (current == '"' || current == '\'')
+	{
+		quote = current;
+		content = read_quoted_string_lexer(lexer, quote);
+		if (!content)
+			return (create_token(TOK_EOF, NULL));
+		return (create_token(TOK_WORD, content));
+	}
+	word = read_word_lexer(lexer);
+	return (create_token(TOK_WORD, word));
+}
+
+t_token	*tokenize(char *input)
+{
+	t_lexer	*lexer;
+	t_token	*token;
+	t_token	*head;
+	t_token	*current;
+
+	lexer = create_lexer(input);
+	if (!lexer)
+		return (NULL);
+	head = NULL;
+	current = NULL;
+	while (1)
+	{
+		token = next_token_lexer(lexer);
+		if (!head)
+		{
+			head = token;
+			current = token;
+		}
+		else
+		{
+			current->next = token;
+			current = token;
+		}
+		if (token->type == TOK_EOF)
+			break ;
+	}
+	free(lexer);
+	return (head);
+}
 
 int	main(int argc, char **argv)
 {
@@ -83,7 +191,7 @@ int	main(int argc, char **argv)
 	lexer = malloc(sizeof(t_lexer));
 	if (!lexer)
 		return (1);
-	// printf(YELLOW"DEBUG: \n"RESET, lexer);
+
 }
 
 t_token	*parse_line(t_ctx ctx, char *line)
