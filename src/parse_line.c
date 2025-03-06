@@ -39,10 +39,10 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 	end = lexer->position;
 	advance_lexer(lexer);
 	length = end - start;
-	content = malloc(length + 1);
+	content = malloc((unsigned long)length + 1);
 	if (!content)
 		return (NULL);
-	ft_strlcpy(content, lexer->input + start, length);
+	ft_strlcpy(content, lexer->input + start, (size_t)length + 1);
 	content[length] = '\0';
 	return (content);
 }
@@ -65,13 +65,14 @@ char	*read_word_lexer(t_lexer *lexer)
 		&& get_lexer(lexer) != '\t' && get_lexer(lexer) != '\n'
 		&& get_lexer(lexer) != '|' && get_lexer(lexer) != '<'
 		&& get_lexer(lexer) != '>' && get_lexer(lexer) != '&'
-		&& get_lexer(lexer) != '"' && get_lexer(lexer) != '$')
+		&& get_lexer(lexer) != '"' && get_lexer(lexer) != '$'
+		&& get_lexer(lexer) != '\'')
 		advance_lexer(lexer);
 	length = lexer->position - start;
-	word = malloc(length + 1);
+	word = malloc((unsigned long)length + 1);
 	if (!word)
 		return (NULL);
-	ft_strlcpy(word, lexer->input + start, length);
+	ft_strlcpy(word, lexer->input + start, (size_t)length + 1);
 	word[length] = '\0';
 	return (word);
 }
@@ -97,7 +98,7 @@ t_token	*next_token_lexer(t_lexer *lexer)
 	if (current == '\n')
 	{
 		advance_lexer(lexer);
-		return (create_token(TOK_NEW_LINE, "\n"));
+		return (create_token(TOK_NEW_LINE, ft_strdup("\n")));
 	}
 	if (current == '|')
 	{
@@ -105,9 +106,9 @@ t_token	*next_token_lexer(t_lexer *lexer)
 		if (get_lexer(lexer) == '|')
 		{
 			advance_lexer(lexer);
-			return (create_token(TOK_OR, "||"));
+			return (create_token(TOK_OR, ft_strdup("||")));
 		}
-		return (create_token(TOK_PIPE, "|"));
+		return (create_token(TOK_PIPE, ft_strdup("|")));
 	}
 	if (current == '&')
 	{
@@ -115,7 +116,7 @@ t_token	*next_token_lexer(t_lexer *lexer)
 		if (get_lexer(lexer) == '&')
 		{
 			advance_lexer(lexer);
-			return (create_token(TOK_AND, "&&"));
+			return (create_token(TOK_AND, ft_strdup("&&")));
 		}
 		ft_printf(RED"Error:\nUnexpected '&'\n");
 		return (create_token(TOK_EOF, NULL));
@@ -126,9 +127,9 @@ t_token	*next_token_lexer(t_lexer *lexer)
 		if (get_lexer(lexer) == '<')
 		{
 			advance_lexer(lexer);
-			return (create_token(TOK_HERE_DOC_FROM, "<<"));
+			return (create_token(TOK_HERE_DOC_FROM, ft_strdup("<<")));
 		}
-		return (create_token(TOK_REDIR_FROM, "<"));
+		return (create_token(TOK_REDIR_FROM, ft_strdup("<")));
 	}
 	if (current == '>')
 	{
@@ -136,9 +137,16 @@ t_token	*next_token_lexer(t_lexer *lexer)
 		if (get_lexer(lexer) == '>')
 		{
 			advance_lexer(lexer);
-			return (create_token(TOK_HERE_DOC_TO, ">>"));
+			return (create_token(TOK_HERE_DOC_TO, ft_strdup(">>")));
 		}
-		return (create_token(TOK_REDIR_TO, ">"));
+		return (create_token(TOK_REDIR_TO, ft_strdup(">")));
+	}
+	if (current == '$')
+	{
+		advance_lexer(lexer);
+		word = read_word_lexer(lexer);
+		if (word)
+			return (create_token(TOK_ENV, word));
 	}
 	if (current == '"' || current == '\'')
 	{
@@ -184,61 +192,51 @@ t_token	*tokenize(char *input)
 	return (head);
 }
 
-int	main(int argc, char **argv)
-{
-	t_lexer	*lexer;
-
-	lexer = malloc(sizeof(t_lexer));
-	if (!lexer)
-		return (1);
-
-}
-
-t_token	*parse_line(t_ctx ctx, char *line)
-{
-
-}
-
-/*
-// Redirections
-<
->
-
-// Here_doc
-<<
->>
-
-// Pipes
-|
-
-// Env
-$ENV
-$?
-
-// Logical operations
-&&
-||
-
-// Wildcards (no glob)
-*
-hello/*
-hello*
-
-// Le reste: tokens de programme
-echo hello
-echo "hello|"
-
-// Example
-```sh
-bash-5.1$ echo "hello 'world "shrek" swamp' bitch"
-hello 'world shrek swamp' bitch
-bash-5.1$ echo "hello 'world "sh|rek" swamp' bitch"
-bash: rek swamp' bitch: command not found
-bash-5.1$ echo "hello 'worl|d "shrek" swamp' bitch"
-hello 'worl|d shrek swamp' bitch
-```
-
-// La regle d'or:
-- Quand on rentre dans un simple/double quote, on attend la fin
-du simple/double quote, c'est tout.
-*/
+// // t_token	*parse_line(t_ctx ctx, char *line)
+// // {
+// //
+// // }
+//
+// /*
+// // Redirections
+// <
+// >
+//
+// // Here_doc
+// <<
+// >>
+//
+// // Pipes
+// |
+//
+// // Env
+// $ENV
+// $?
+//
+// // Logical operations
+// &&
+// ||
+//
+// // Wildcards (no glob)
+// *
+// hello/*
+// hello*
+//
+// // Le reste: tokens de programme
+// echo hello
+// echo "hello|"
+//
+// // Example
+// ```sh
+// bash-5.1$ echo "hello 'world "shrek" swamp' bitch"
+// hello 'world shrek swamp' bitch
+// bash-5.1$ echo "hello 'world "sh|rek" swamp' bitch"
+// bash: rek swamp' bitch: command not found
+// bash-5.1$ echo "hello 'worl|d "shrek" swamp' bitch"
+// hello 'worl|d shrek swamp' bitch
+// ```
+//
+// // La regle d'or:
+// - Quand on rentre dans un simple/double quote, on attend la fin
+// du simple/double quote, c'est tout.
+// */

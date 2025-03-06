@@ -15,6 +15,11 @@
 
 # include "libft.h"
 # include <stdlib.h>
+# include <string.h>
+# include <stdio.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+
 /*******************************************************************************
 *                                    Macros                                    *
 *******************************************************************************/
@@ -57,9 +62,9 @@ typedef struct s_lexer
 	int		length;
 }			t_lexer;
 
-typedef struct s_ctx
-{
-}			t_ctx;
+// typedef struct s_ctx
+// {
+// }			t_ctx;
 
 /*******************************************************************************
 *                             Function Prototypes                              *
@@ -77,4 +82,14 @@ void		free_all_token(t_token *token);
 char		get_lexer(t_lexer *lexer);
 void		advance_lexer(t_lexer *lexer);
 void		skip_whitespace_lexer(t_lexer *lexer);
+
+// parse_line.c
+char		*read_quoted_string_lexer(t_lexer *lexer, char quote_char);
+char		*read_word_lexer(t_lexer *lexer);
+t_token		*next_token_lexer(t_lexer *lexer);
+t_token		*tokenize(char *input);
+
+// debug.c
+void		print_tokens(t_token *tokens);
+
 #endif

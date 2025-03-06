@@ -13,9 +13,10 @@
 #include "minishell.h"
 
 /**
- * @brief			Return current character at lexer position
- * @param	lexer	Pointer to lexer structure
- * @return			Current character or '\0' if at end of input
+ * @brief Return current character at lexer position
+ *
+ * @param lexer Pointer to lexer structure
+ * @return Current character or '\0' if at end of input
  */
 char	get_lexer(t_lexer *lexer)
 {
@@ -25,8 +26,9 @@ char	get_lexer(t_lexer *lexer)
 }
 
 /**
- * @brief			Advance lexer position by one character
- * @param	lexer	Pointer to lexer structure
+ * @brief Advance lexer position by one character
+ *
+ * @param lexer Pointer to lexer structure
  */
 void	advance_lexer(t_lexer *lexer)
 {
@@ -35,8 +37,9 @@ void	advance_lexer(t_lexer *lexer)
 }
 
 /**
- * @brief			Skip whitespaces characters in lexer input
- * @param	lexer	Pointer to lexer structure
+ * @brief Skip whitespaces characters in lexer input
+ *
+ * @param lexer Pointer to lexer structure
  */
 void	skip_whitespace_lexer(t_lexer *lexer)
 {
