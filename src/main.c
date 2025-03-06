@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/04 17:19:34 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/06 14:54:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,19 @@
 
 int	main(void)
 {
+	t_ctx	*ctx;
+	char	*input;
 
-	return (0);
+	ctx = ctx_init();
+	while (1)
+	{
+		input = readline("maxishell$> ");
+		if (!input)
+			break ;
+		ctx->tokens = tokenize(input);
+		print_tokens_list(ctx->tokens);
+		free_all_token(ctx->tokens);
+	}
+	ctx_clear(ctx);
+	return (EXIT_SUCCESS);
 }

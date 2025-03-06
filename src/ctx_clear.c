@@ -1,36 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   token_utils.c                                      :+:      :+:    :+:   */
+/*   ctx_clear.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 19:19:16 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/06 14:52:47 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/06 14:33:03 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/06 14:54:26 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	free_token(t_token *token)
+void	ctx_clear(t_ctx *ctx)
 {
-	if (token)
-	{
-		free(token->value);
-		free(token);
-	}
-}
-
-void	free_all_token(t_token *token)
-{
-	t_token	*current;
-	t_token	*next;
-
-	current = token;
-	while (current)
-	{
-		next = current->next;
-		free_token(current);
-		current = next;
-	}
+	if (ctx->tokens)
+		free_all_token(ctx->tokens);
+	clear_history();
+	rl_clear_history();
+	rl_free_line_state();
+	rl_cleanup_after_signal();
+	free(ctx);
 }
