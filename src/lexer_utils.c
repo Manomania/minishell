@@ -1,0 +1,48 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lexer_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/05 19:17:06 by maximart          #+#    #+#             */
+/*   Updated: 2025/03/05 19:17:08 by maximart         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
+/**
+ * @brief Return current character at lexer position
+ *
+ * @param lexer Pointer to lexer structure
+ * @return Current character or '\0' if at end of input
+ */
+char	get_lexer(t_lexer *lexer)
+{
+	if (lexer->position >= lexer->length)
+		return ('\0');
+	return (lexer->input[lexer->position]);
+}
+
+/**
+ * @brief Advance lexer position by one character
+ *
+ * @param lexer Pointer to lexer structure
+ */
+void	advance_lexer(t_lexer *lexer)
+{
+	if (lexer->position < lexer->length)
+		lexer->position++;
+}
+
+/**
+ * @brief Skip whitespaces characters in lexer input
+ *
+ * @param lexer Pointer to lexer structure
+ */
+void	skip_whitespace_lexer(t_lexer *lexer)
+{
+	while (get_lexer(lexer) == ' ' || get_lexer(lexer) == '\t')
+		advance_lexer(lexer);
+}
