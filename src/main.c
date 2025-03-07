@@ -23,6 +23,8 @@ int	main(void)
 		input = readline("maxishell$> ");
 		if (!input)
 			break ;
+		if (input[0] != '\0')
+			add_history(input);
 		ctx->tokens = tokenize(input);
 		print_tokens_list(ctx->tokens);
 		free_all_token(ctx->tokens);
