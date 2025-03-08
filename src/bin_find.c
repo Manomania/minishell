@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 15:04:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 15:37:24 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ static t_bool	is_path(const char *str)
 }
 
 /**
- * @brief Finds a binary in the PATH variable or in the current directory
+ * @brief Finds a binary in the PATH variable or in the current directory.
+ * This handles errors.
  *
  * @param bin The binary to search for
  * @return A full path to the binary if it is found and executable, or NULL.
@@ -62,6 +63,6 @@ char	*bin_find(t_ctx *ctx, char *bin)
 	if (!bin)
 		return (NULL);
 	if (is_path(bin))
-		return (bin_find_path(ctx, (char *)"./", bin));
+		return (bin_find_path(ctx, (char *)".", bin));
 	return (env_find_bin(ctx, bin));
 }

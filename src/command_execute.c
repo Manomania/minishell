@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 15:03:28 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 15:46:59 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ int	command_execute(t_ctx *ctx, t_command *cmd)
 	if (builtins_try(ctx, cmd))
 		return (0);
 	cmd->cmd = bin_find(ctx, cmd->cmd);
-	ft_printf("COMMAND: %s\n", cmd->cmd);
+	if (!cmd->cmd)
+		ctx_error(ERR_CMD_NOT_FOUND);
 	return (0);
 }

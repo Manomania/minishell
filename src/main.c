@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 14:31:59 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 16:04:01 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,12 @@ static t_bool	main_loop(t_ctx *ctx)
 	if (!ctx->cmd)
 		ctx_error(ERR_UNIMPLEMENTED);
 	else
-	{
 		command_execute(ctx, ctx->cmd);
-		command_free(ctx->cmd);
-		ctx->cmd = NULL;
-	}
+	free(input);
+	command_free(ctx->cmd);
+	ctx->cmd = NULL;
 	free_all_token(ctx->tokens);
+	ctx->tokens = NULL;
 	return (false);
 }
 

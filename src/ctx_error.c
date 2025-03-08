@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:13:34 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 14:48:36 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 15:54:32 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 /**
  * @brief Gets the error table object
  *
- * @return t_error_info* the error table map
+ * @return t_error_info* The error table map
  */
 static t_error_info	*get_error_table(void)
 {
 	t_error_info	*error_table;
 
-	error_table = malloc(sizeof(t_error_info));
+	error_table = malloc(6 * sizeof(t_error_info));
 	error_table[ERR_NONE] = (t_error_info){0, "Success", false};
 	error_table[ERR_CMD_NOT_FOUND] = (t_error_info){ENOENT, "Command not found",
 		false};
@@ -37,19 +37,22 @@ static t_error_info	*get_error_table(void)
 /**
  * @brief Displays an error and gets an exit code
  *
- * @param err error type
- * @return int exit code
+ * @param err Error type
+ * @return int Exit code
  */
 int	ctx_error(t_error_type err)
 {
 	t_error_info	*info;
 	t_error_info	*error_table;
+	int				code;
 
 	error_table = get_error_table();
 	info = &error_table[err];
 	if (info->use_perror)
 		perror(info->message);
 	else
-		ft_putstr_fd(ft_strjoin("Error: ", info->message), 2);
-	return (info->code);
+		ft_printf("Error: %s\n", info->message);
+	code = info->code;
+	free(error_table);
+	return (code);
 }
