@@ -6,21 +6,23 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 16:04:01 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 17:51:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Main loop of the app
+ * @brief Processes input and executes commands
  *
- * @param ctx Context
- * @return t_bool Whether to break the loop or not
+ * @param ctx Context containing environment and state
+ * @return t_bool true if the loop should exit, false otherwise
  */
 static t_bool	main_loop(t_ctx *ctx)
 {
-	char	*input;
+	char		*input;
+	t_pipeline	*pipeline;
+	int			status;
 
 	input = readline("$> ");
 	if (!input)
@@ -28,14 +30,23 @@ static t_bool	main_loop(t_ctx *ctx)
 	if (input[0] != '\0')
 		add_history(input);
 	ctx->tokens = tokenize(input);
-	ctx->cmd = command_parse(ctx);
-	if (!ctx->cmd)
-		ctx_error(ERR_UNIMPLEMENTED);
-	else
-		command_execute(ctx, ctx->cmd);
+	if (!ctx->tokens)
+	{
+		free(input);
+		return (false);
+	}
+	pipeline = pipeline_parse(ctx);
+	if (!pipeline)
+	{
+		free(input);
+		free_all_token(ctx->tokens);
+		ctx->tokens = NULL;
+		return (false);
+	}
+	status = pipeline_execute(ctx, pipeline);
+	ft_printf("Return code: '%d'\n", status);
 	free(input);
-	command_free(ctx->cmd);
-	ctx->cmd = NULL;
+	pipeline_free(pipeline);
 	free_all_token(ctx->tokens);
 	ctx->tokens = NULL;
 	return (false);

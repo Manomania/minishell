@@ -1,32 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipeline_new.c                                     :+:      :+:    :+:   */
+/*   pipeline_add.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 13:51:47 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 17:46:14 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 17:47:35 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 17:47:52 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Creates a new pipeline structure
+ * @brief Adds a command to a pipeline
  *
- * @return t_pipeline* New initialized pipeline or NULL if allocation fails
+ * @param pipeline Pipeline to add the command to
+ * @param cmd Command to add
  */
-t_pipeline	*pipeline_new(void)
+void	pipeline_add_command(t_pipeline *pipeline, t_command *cmd)
 {
-	t_pipeline	*pipeline;
+	t_command	*current;
 
-	pipeline = (t_pipeline *)malloc(sizeof(t_pipeline));
-	if (!pipeline)
-		return (NULL);
-	pipeline->commands = NULL;
-	pipeline->next = NULL;
-	pipeline->prev = NULL;
-	pipeline->operator = TOK_EOF;
-	return (pipeline);
+	if (!pipeline->commands)
+	{
+		pipeline->commands = cmd;
+		return ;
+	}
+	current = pipeline->commands;
+	while (current->next)
+		current = current->next;
+	current->next = cmd;
+	cmd->prev = current;
 }

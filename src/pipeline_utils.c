@@ -1,32 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipeline_new.c                                     :+:      :+:    :+:   */
+/*   pipeline_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 13:51:47 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 17:46:14 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 17:35:48 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 17:35:58 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Creates a new pipeline structure
+ * @brief Counts the number of commands in a linked list
  *
- * @return t_pipeline* New initialized pipeline or NULL if allocation fails
+ * @param commands Head of the command linked list
+ * @return int Number of commands
  */
-t_pipeline	*pipeline_new(void)
+int	count_commands(t_command *commands)
 {
-	t_pipeline	*pipeline;
+	int			count;
+	t_command	*current;
 
-	pipeline = (t_pipeline *)malloc(sizeof(t_pipeline));
-	if (!pipeline)
-		return (NULL);
-	pipeline->commands = NULL;
-	pipeline->next = NULL;
-	pipeline->prev = NULL;
-	pipeline->operator = TOK_EOF;
-	return (pipeline);
+	count = 0;
+	current = commands;
+	while (current)
+	{
+		count++;
+		current = current->next;
+	}
+	return (count);
 }

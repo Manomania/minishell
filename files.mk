@@ -13,12 +13,20 @@ SRC_F				=	init_parsing \
 						command_add \
 						command_new \
 						command_free \
+						command_redirections \
 						debug_utils \
 						builtins_try \
-						pipeline_new \
 						bin_find \
 						bin_find_path \
 						env_find \
 						env_find_bin \
 						free_2d_array \
+						pipeline \
+						pipeline_free \
+						pipeline_new \
+						pipeline_add \
+						pipeline_parse \
+						pipeline_wait \
+						pipeline_utils \
+						pipeline_execute \
 						main

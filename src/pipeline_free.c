@@ -1,32 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipeline_new.c                                     :+:      :+:    :+:   */
+/*   pipeline_free.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 13:51:47 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 17:46:14 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 17:44:40 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 17:44:55 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Creates a new pipeline structure
+ * @brief Frees a pipeline structure and all its resources
  *
- * @return t_pipeline* New initialized pipeline or NULL if allocation fails
+ * @param pipeline Pipeline to free
  */
-t_pipeline	*pipeline_new(void)
+void	pipeline_free(t_pipeline *pipeline)
 {
-	t_pipeline	*pipeline;
+	t_command	*cmd;
+	t_command	*next_cmd;
 
-	pipeline = (t_pipeline *)malloc(sizeof(t_pipeline));
 	if (!pipeline)
-		return (NULL);
-	pipeline->commands = NULL;
-	pipeline->next = NULL;
-	pipeline->prev = NULL;
-	pipeline->operator = TOK_EOF;
-	return (pipeline);
+		return ;
+	cmd = pipeline->commands;
+	while (cmd)
+	{
+		next_cmd = cmd->next;
+		command_free(cmd);
+		cmd = next_cmd;
+	}
+	free(pipeline);
 }

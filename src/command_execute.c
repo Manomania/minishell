@@ -6,47 +6,57 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 15:46:59 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 17:39:28 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// /**
-//  * @brief Get the first token that is a word
-//  *
-//  * @param ctx Context
-//  * @return t_token* First word token, or NULL
-//  */
-// static t_token	*get_first_word(t_ctx *ctx)
-// {
-// 	t_token	*tok;
-
-// 	tok = ctx->tokens;
-// 	while (tok)
-// 	{
-// 		if (tok->type == TOK_WORD)
-// 			break ;
-// 		tok = tok->next;
-// 	}
-// 	return (tok);
-// }
-
 /**
- * @brief Executes a command structure
+ * @brief Handles the execution of a command in a pipeline
  *
  * @param ctx Context
  * @param cmd Command to execute
- * @return int Exit status
+ * @param pipes Array of pipe file descriptors
+ * @param cmd_index Index of the command in the pipeline
+ * @param cmd_count Total number of commands in the pipeline
+ * @return void Function doesn't return if successful
+ */
+void	execute_command_in_pipeline(t_ctx *ctx, t_command *cmd, int pipes[2][2],
+		int cmd_index, int cmd_count)
+{
+	if (cmd_index > 0)
+		dup2(pipes[0][0], STDIN_FILENO);
+	if (cmd_index < cmd_count - 1)
+		dup2(pipes[1][1], STDOUT_FILENO);
+	close_all_pipes(pipes);
+	if (builtins_try(ctx, cmd))
+		exit(0);
+	command_execute(ctx, cmd);
+	exit(1);
+}
+
+/**
+ * @brief Executes a command with execve
+ *
+ * @param ctx Context containing environment
+ * @param cmd Command to execute
+ * @return int 0 on success, -1 on error
  */
 int	command_execute(t_ctx *ctx, t_command *cmd)
 {
+	char	*bin_path;
+
 	if (!cmd->cmd)
-		return (0);
+		return (-1);
 	if (builtins_try(ctx, cmd))
 		return (0);
-	cmd->cmd = bin_find(ctx, cmd->cmd);
-	if (!cmd->cmd)
+	bin_path = bin_find(ctx, cmd->cmd);
+	if (!bin_path)
+		return (ctx_error(ERR_CMD_NOT_FOUND));
+	if (handle_redirections(cmd->redirections) != 0)
+		return (-1);
+	if (execve(bin_path, cmd->args, ctx->envp) == -1)
 		ctx_error(ERR_CMD_NOT_FOUND);
-	return (0);
+	return (-1);
 }

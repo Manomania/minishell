@@ -6,8 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 15:06:34 by elagouch         ###   ########.fr       */
-/*   Updated: 2025/03/08 14:31:56 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 17:50:41 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +20,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
+# include <sys/wait.h>
 
 // *************************************************************************** #
 //                                   Macros                                    #
@@ -184,6 +184,7 @@ void						ctx_exit(t_ctx *ctx);
 // Commands
 int							command_add_redirection(t_command *cmd,
 								t_token_type type, int fd, char *filename);
+int							handle_redirections(t_redirection *redirections);
 int							command_add_argument(t_command *cmd, char *arg);
 int							command_execute(t_ctx *ctx, t_command *cmd);
 void						command_free(t_command *cmd);
@@ -210,5 +211,23 @@ char						*bin_find(t_ctx *ctx, char *bin);
 
 // Memory
 void						free_2d_array(void **ptrs);
+
+// Pipelines
+void						execute_command_in_pipeline(t_ctx *ctx,
+								t_command *cmd, int pipes[2][2], int cmd_index,
+								int cmd_count);
+void						pipeline_add_command(t_pipeline *pipeline,
+								t_command *cmd);
+int							create_pipes(int pipes[2][2], int cmd_index,
+								int cmd_count);
+void						close_previous_pipe(int pipes[2][2], int cmd_index);
+int							pipeline_execute(t_ctx *ctx, t_pipeline *pipeline);
+int							wait_for_commands(pid_t *pids, int cmd_count);
+int							count_commands(t_command *commands);
+void						pipeline_free(t_pipeline *pipeline);
+void						close_all_pipes(int pipes[2][2]);
+void						swap_pipes(int pipes[2][2]);
+t_pipeline					*pipeline_parse(t_ctx *ctx);
+t_pipeline					*pipeline_new(void);
 
 #endif
