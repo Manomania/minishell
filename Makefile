@@ -7,7 +7,7 @@ NAME				:=	minishell
 HEADER				=	$(INC_DIR)minishell.h
 CC 					?= 	cc
 # Standard compilation checks
-CFLAGS 				:= 	-Wall -Wextra -Werror
+CFLAGS 				:= 	-Wall -Wextra -Werror -g3
 ## Compability checks
 #CFLAGS				+= -Wpedantic
 ## Dependency management

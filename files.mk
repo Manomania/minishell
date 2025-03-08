@@ -16,4 +16,9 @@ SRC_F				=	init_parsing \
 						debug_utils \
 						builtins_try \
 						pipeline_new \
+						bin_find \
+						bin_find_path \
+						env_find \
+						env_find_bin \
+						free_2d_array \
 						main
