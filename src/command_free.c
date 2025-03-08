@@ -6,11 +6,32 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:49:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 13:49:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 18:38:15 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+/**
+ * @brief Frees all memory associated with command redirections
+ *
+ * @param redirections Redirections linked list
+ */
+static void	free_redirections(t_redirection *redirections)
+{
+	t_redirection	*current;
+	t_redirection	*next;
+
+	current = redirections;
+	while (current)
+	{
+		next = current->next;
+		if (current->filename)
+			free(current->filename);
+		free(current);
+		current = next;
+	}
+}
 
 /**
  * @brief Frees a command structure and all its resources
@@ -19,9 +40,7 @@
  */
 void	command_free(t_command *cmd)
 {
-	t_redirection	*redir;
-	t_redirection	*next_redir;
-	int				i;
+	int	i;
 
 	if (!cmd)
 		return ;
@@ -38,14 +57,6 @@ void	command_free(t_command *cmd)
 		}
 		free(cmd->args);
 	}
-	redir = cmd->redirections;
-	while (redir)
-	{
-		next_redir = redir->next;
-		if (redir->filename)
-			free(redir->filename);
-		free(redir);
-		redir = next_redir;
-	}
+	free_redirections(cmd->redirections);
 	free(cmd);
 }

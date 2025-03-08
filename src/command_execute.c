@@ -6,11 +6,23 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 18:23:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 18:37:56 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+/**
+ * @brief Child cleanup - frees all resources in child process
+ *
+ * @param ctx Context to clean up
+ * @param error_code Exit code to use
+ */
+static void	child_cleanup_exit(t_ctx *ctx, int error_code)
+{
+	ctx_clear(ctx);
+	exit(error_code);
+}
 
 /**
  * @brief Handles the execution of a command in a pipeline
@@ -31,10 +43,10 @@ void	execute_command_in_pipeline(t_ctx *ctx, t_command *cmd, int pipes[2][2],
 		dup2(pipes[1][1], STDOUT_FILENO);
 	close_all_pipes(pipes);
 	if (builtins_try(ctx, cmd))
-		exit(0);
-	if (command_execute(ctx, cmd) != 0)
-		exit(1);
-	exit(0);
+		child_cleanup_exit(ctx, EXIT_SUCCESS);
+	if (command_execute(ctx, cmd) != EXIT_SUCCESS)
+		child_cleanup_exit(ctx, EXIT_FAILURE);
+	child_cleanup_exit(ctx, EXIT_SUCCESS);
 }
 
 /**
@@ -99,10 +111,7 @@ int	command_execute(t_ctx *ctx, t_command *cmd)
 		free(bin_path);
 		return (-1);
 	}
-	if (execve(bin_path, cmd->args, ctx->envp) == -1)
-	{
-		free(bin_path);
-		return (ctx_error(ERR_CMD_NOT_FOUND));
-	}
-	return (0);
+	execve(bin_path, cmd->args, ctx->envp);
+	free(bin_path);
+	return (ctx_error(ERR_CMD_NOT_FOUND));
 }
