@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:13:34 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/06 17:17:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 12:18:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ static t_error_info	*get_error_table(void)
 	error_table[ERR_NO_PERMISSION] = (t_error_info){EACCES, "Permission denied",
 		true};
 	error_table[ERR_IO_ERROR] = (t_error_info){EIO, "Input/output error", true};
+	error_table[ERR_UNIMPLEMENTED] = (t_error_info){ENOSYS,
+		"Not implemented yet", true};
 	return (error_table);
 }
 

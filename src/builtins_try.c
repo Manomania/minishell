@@ -1,28 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctx_clear.c                                        :+:      :+:    :+:   */
+/*   builtins_try.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/06 14:33:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 12:09:47 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 12:19:14 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 12:23:08 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Clears the context
+ * @brief Tries the token against all builtins commands
  *
- * @param ctx context
+ * @param ctx Context
+ * @param tok Token
+ * @return t_bool Whether a command was successfully executed or not
  */
-void	ctx_clear(t_ctx *ctx)
+t_bool	builtins_try(t_ctx *ctx, t_token *tok)
 {
-	if (ctx->tokens)
-		free_all_token(ctx->tokens);
-	clear_history();
-	rl_free_line_state();
-	rl_cleanup_after_signal();
-	free(ctx);
+	if (ft_strncmp(tok->value, "exit", __INT_MAX__) == 0)
+		ctx_exit(ctx);
+	return (false);
 }

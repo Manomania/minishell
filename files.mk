@@ -9,4 +9,5 @@ SRC_F				=	init_parsing \
 						ctx_exit \
 						cmds_handle \
 						debug_utils \
+						builtins_try \
 						main

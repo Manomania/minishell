@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 11:16:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 12:21:39 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ typedef enum e_error_type
 	ERR_CMD_NOT_FOUND,
 	ERR_NO_PERMISSION,
 	ERR_IO_ERROR,
+	ERR_UNIMPLEMENTED,
 }					t_error_type;
 
 typedef struct s_error_info
@@ -129,5 +130,8 @@ void				print_tokens_list(t_token *tokens);
 // ctx_error*.c
 void				ctx_error_exit(t_ctx *ctx, t_error_type err);
 int					ctx_error(t_error_type err);
+
+// Builtins
+t_bool				builtins_try(t_ctx *ctx, t_token *tok);
 
 #endif
