@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:13:34 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 12:18:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 14:48:36 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ static t_error_info	*get_error_table(void)
 	error_table[ERR_IO_ERROR] = (t_error_info){EIO, "Input/output error", true};
 	error_table[ERR_UNIMPLEMENTED] = (t_error_info){ENOSYS,
 		"Not implemented yet", true};
+	error_table[ERR_ALLOC] = (t_error_info){ENOMEM, "Allocation failed", true};
 	return (error_table);
 }
 

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 14:31:56 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 15:06:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ typedef enum e_error_type
 	ERR_NO_PERMISSION,
 	ERR_IO_ERROR,
 	ERR_UNIMPLEMENTED,
+	ERR_ALLOC,
 }							t_error_type;
 
 typedef struct s_error_info
@@ -197,5 +198,16 @@ int							ctx_error(t_error_type err);
 
 // Builtins
 t_bool						builtins_try(t_ctx *ctx, t_command *cmd);
+
+// Env vars
+char						*env_find(t_ctx *ctx, char *bin);
+char						*env_find_bin(t_ctx *ctx, char *bin);
+
+// Paths manipulation
+char						*bin_find_path(t_ctx *ctx, char *dir, char *bin);
+char						*bin_find(t_ctx *ctx, char *bin);
+
+// Memory
+void						free_2d_array(void **ptrs);
 
 #endif
