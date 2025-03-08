@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 12:21:39 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 14:31:56 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ typedef enum e_bool
 {
 	false,
 	true,
-}					t_bool;
+}							t_bool;
 
 typedef enum e_error_type
 {
@@ -47,14 +47,14 @@ typedef enum e_error_type
 	ERR_NO_PERMISSION,
 	ERR_IO_ERROR,
 	ERR_UNIMPLEMENTED,
-}					t_error_type;
+}							t_error_type;
 
 typedef struct s_error_info
 {
-	int				code;
-	const char		*message;
-	t_bool			use_perror;
-}					t_error_info;
+	int						code;
+	const char				*message;
+	t_bool					use_perror;
+}							t_error_info;
 
 typedef enum e_token_type
 {
@@ -69,69 +69,133 @@ typedef enum e_token_type
 	TOK_OR,            // ||
 	TOK_NEW_LINE,      // \n
 	TOK_EOF,           // '\0'
-}					t_token_type;
+}							t_token_type;
 
 typedef struct s_token
 {
-	t_token_type	type;
-	struct s_token	*next;
-	char			*value;
-}					t_token;
+	t_token_type			type;
+	struct s_token			*next;
+	char					*value;
+}							t_token;
 
 typedef struct s_lexer
 {
-	char			*input;
-	int				position;
-	int				length;
-}					t_lexer;
+	char					*input;
+	int						position;
+	int						length;
+}							t_lexer;
 
+/**
+ * @brief Represents a command redirection (input/output)
+ */
+typedef struct s_redirection
+{
+	// File descriptor (0 for input, 1 for output)
+	int						fd;
+	// Target filename
+	char					*filename;
+	// Redirection type (< > << >>)
+	t_token_type			type;
+	// Next redirection in the list
+	struct s_redirection	*next;
+}							t_redirection;
+
+/**
+ * @brief Represents a single command with its arguments and redirections
+ */
+typedef struct s_command
+{
+	// Command name
+	char					*cmd;
+	// Array of arguments (including command as [0])
+	char					**args;
+	// Number of arguments
+	int						arg_count;
+	// Linked list of redirections
+	t_redirection			*redirections;
+	// Next command in pipeline
+	struct s_command		*next;
+	// Previous command in pipeline
+	struct s_command		*prev;
+}							t_command;
+
+/**
+ * @brief Represents a pipeline of commands
+ */
+typedef struct s_pipeline
+{
+	// First command in pipeline
+	t_command				*commands;
+	// Next pipeline (for && or || operators)
+	struct s_pipeline		*next;
+	// Previous pipeline
+	struct s_pipeline		*prev;
+	// Connecting operator type (AND, OR, none)
+	t_token_type			operator;
+}							t_pipeline;
+
+/**
+ * @brief Represents a parsed token
+ */
 typedef struct s_ctx
 {
-	t_token			*tokens;
-}					t_ctx;
+	int						argc;
+	char					**argv;
+	char					**envp;
+	t_token					*tokens;
+	t_command				*cmd;
+}							t_ctx;
 
 // *************************************************************************** #
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
 // init_parsing.c
-t_lexer				*create_lexer(char *input);
-t_token				*create_token(t_token_type type, char *value);
+t_lexer						*create_lexer(char *input);
+t_token						*create_token(t_token_type type, char *value);
 
-// token_utils.c
-void				free_token(t_token *token);
-void				free_all_token(t_token *token);
+// Token
+t_bool						token_is_redirection(t_token_type type);
+void						free_token(t_token *token);
+void						free_all_token(t_token *token);
 
 // lexer_utils.c
-char				get_lexer(t_lexer *lexer);
-void				advance_lexer(t_lexer *lexer);
-void				skip_whitespace_lexer(t_lexer *lexer);
+char						get_lexer(t_lexer *lexer);
+void						advance_lexer(t_lexer *lexer);
+void						skip_whitespace_lexer(t_lexer *lexer);
 
 // parse_line.c
-char				*read_quoted_string_lexer(t_lexer *lexer, char quote_char);
-char				*read_word_lexer(t_lexer *lexer);
-t_token				*next_token_lexer(t_lexer *lexer);
-t_token				*tokenize(char *input);
+char						*read_quoted_string_lexer(t_lexer *lexer,
+								char quote_char);
+char						*read_word_lexer(t_lexer *lexer);
+t_token						*next_token_lexer(t_lexer *lexer);
+t_token						*tokenize(char *input);
 
 // debug.c
-void				print_tokens(t_token *tokens);
+void						print_tokens(t_token *tokens);
 
 // ctx_*.c
-void				ctx_clear(t_ctx *ctx);
-void				ctx_exit(t_ctx *ctx);
-t_ctx				*ctx_init(void);
+t_ctx						*ctx_init(int argc, char **argv, char **envp);
+void						ctx_clear(t_ctx *ctx);
+void						ctx_exit(t_ctx *ctx);
 
 // Commands
-void				cmds_handle(t_ctx *ctx);
+int							command_add_redirection(t_command *cmd,
+								t_token_type type, int fd, char *filename);
+int							command_add_argument(t_command *cmd, char *arg);
+int							command_execute(t_ctx *ctx, t_command *cmd);
+void						command_free(t_command *cmd);
+t_command					*command_parse(t_ctx *ctx);
+t_command					*command_new(void);
 
 // Debug
-void				print_tokens_list(t_token *tokens);
+void						print_tokens_list(t_token *tokens);
 
 // ctx_error*.c
-void				ctx_error_exit(t_ctx *ctx, t_error_type err);
-int					ctx_error(t_error_type err);
+void						ctx_error_exit(t_ctx *ctx, t_error_type err);
+int							ctx_error(t_error_type err);
 
 // Builtins
-t_bool				builtins_try(t_ctx *ctx, t_token *tok);
+t_bool						builtins_try(t_ctx *ctx, t_command *cmd);
 
 #endif

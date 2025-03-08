@@ -1,34 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctx_init.c                                         :+:      :+:    :+:   */
+/*   pipeline_new.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 14:31:08 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 13:51:47 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 13:52:19 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Initializes the context
+ * @brief Creates a new pipeline structure
  *
- * @param argc Arguments count
- * @param argv Arguments
- * @param envp Environment variables
- * @return t_ctx* Context
+ * @return t_pipeline* New initialized pipeline or NULL if allocation fails
  */
-t_ctx	*ctx_init(int argc, char **argv, char **envp)
+t_pipeline	*create_pipeline(void)
 {
-	t_ctx	*ctx;
+	t_pipeline	*pipeline;
 
-	ctx = malloc(sizeof(t_ctx));
-	ctx->tokens = NULL;
-	ctx->cmd = NULL;
-	ctx->argc = argc;
-	ctx->argv = argv;
-	ctx->envp = envp;
-	return (ctx);
+	pipeline = (t_pipeline *)malloc(sizeof(t_pipeline));
+	if (!pipeline)
+		return (NULL);
+	pipeline->commands = NULL;
+	pipeline->next = NULL;
+	pipeline->prev = NULL;
+	pipeline->operator = TOK_EOF;
+	return (pipeline);
 }
