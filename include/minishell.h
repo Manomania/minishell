@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/06 14:53:52 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 11:16:26 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MINISHELL_H
 
 # include "libft.h"
+# include <errno.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <stdio.h>
@@ -32,6 +33,27 @@
 // *************************************************************************** #
 //                                 Structures                                  #
 // *************************************************************************** #
+
+typedef enum e_bool
+{
+	false,
+	true,
+}					t_bool;
+
+typedef enum e_error_type
+{
+	ERR_NONE = 0,
+	ERR_CMD_NOT_FOUND,
+	ERR_NO_PERMISSION,
+	ERR_IO_ERROR,
+}					t_error_type;
+
+typedef struct s_error_info
+{
+	int				code;
+	const char		*message;
+	t_bool			use_perror;
+}					t_error_info;
 
 typedef enum e_token_type
 {
@@ -64,7 +86,7 @@ typedef struct s_lexer
 
 typedef struct s_ctx
 {
-	t_token *tokens;
+	t_token			*tokens;
 }					t_ctx;
 
 // *************************************************************************** #
@@ -95,9 +117,17 @@ void				print_tokens(t_token *tokens);
 
 // ctx_*.c
 void				ctx_clear(t_ctx *ctx);
+void				ctx_exit(t_ctx *ctx);
 t_ctx				*ctx_init(void);
+
+// Commands
+void				cmds_handle(t_ctx *ctx);
 
 // Debug
 void				print_tokens_list(t_token *tokens);
+
+// ctx_error*.c
+void				ctx_error_exit(t_ctx *ctx, t_error_type err);
+int					ctx_error(t_error_type err);
 
 #endif

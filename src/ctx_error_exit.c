@@ -1,33 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ctx_error_exit.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 11:16:00 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/06 17:07:35 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/06 17:11:28 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	main(void)
+/**
+ * @brief Frees context, displays an error and quits with the corresponding
+ * exit code
+ *
+ * @param ctx context
+ * @param err error code
+ */
+void	ctx_error_exit(t_ctx *ctx, t_error_type err)
 {
-	t_ctx	*ctx;
-	char	*input;
-
-	ctx = ctx_init();
-	while (1)
-	{
-		input = readline("$> ");
-		if (!input)
-			break ;
-		ctx->tokens = tokenize(input);
-		cmds_handle(ctx);
-		// print_tokens_list(ctx->tokens);
-		free_all_token(ctx->tokens);
-	}
-	ctx_clear(ctx);
-	return (EXIT_SUCCESS);
+	if (ctx)
+		ctx_clear(ctx);
+	errno = ctx_error(err);
+	exit(errno);
 }

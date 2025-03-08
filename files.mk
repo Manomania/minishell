@@ -4,5 +4,9 @@ SRC_F				=	init_parsing \
 						parse_line \
 						ctx_init \
 						ctx_clear \
+						ctx_error \
+						ctx_error_exit \
+						ctx_exit \
+						cmds_handle \
 						debug_utils \
 						main

@@ -1,33 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   cmds_handle.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 11:16:00 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 11:18:39 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	main(void)
+void	cmds_handle(t_ctx *ctx)
 {
-	t_ctx	*ctx;
-	char	*input;
-
-	ctx = ctx_init();
-	while (1)
-	{
-		input = readline("$> ");
-		if (!input)
-			break ;
-		ctx->tokens = tokenize(input);
-		cmds_handle(ctx);
-		// print_tokens_list(ctx->tokens);
-		free_all_token(ctx->tokens);
-	}
-	ctx_clear(ctx);
-	return (EXIT_SUCCESS);
+	if (!ctx || !ctx->tokens)
+		ctx_error_exit(ctx, ERR_NONE);
+	if (ctx->tokens->type == TOK_WORD && ft_strncmp(ctx->tokens->value, "exit",
+			__INT_MAX__) == 0)
+		ctx_exit(ctx);
 }
