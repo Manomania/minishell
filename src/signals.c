@@ -1,32 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctx_clear.c                                        :+:      :+:    :+:   */
+/*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/06 14:33:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 17:57:49 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 17:58:55 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 17:59:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Clears the context and frees all allocated resources
- *
- * @param ctx context
+ * @brief Sets up signal handlers for interactive mode
  */
-void	ctx_clear(t_ctx *ctx)
+void	setup_signals(void)
 {
-	if (!ctx)
-		return ;
-	if (ctx->tokens)
-		free_all_token(ctx->tokens);
-	if (ctx->cmd)
-		command_free(ctx->cmd);
-	clear_history();
-	rl_free_line_state();
-	rl_cleanup_after_signal();
-	free(ctx);
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+}
+
+/**
+ * @brief Resets signal handlers for child processes
+ */
+void	reset_signals(void)
+{
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 }

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 17:39:28 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 18:00:19 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 void	execute_command_in_pipeline(t_ctx *ctx, t_command *cmd, int pipes[2][2],
 		int cmd_index, int cmd_count)
 {
+	reset_signals();
 	if (cmd_index > 0)
 		dup2(pipes[0][0], STDIN_FILENO);
 	if (cmd_index < cmd_count - 1)

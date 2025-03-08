@@ -21,6 +21,11 @@ void	free_token(t_token *token)
 	}
 }
 
+/**
+ * @brief Frees all tokens in a linked list
+ * 
+ * @param token Head of the token list
+ */
 void	free_all_token(t_token *token)
 {
 	t_token	*current;
@@ -30,7 +35,9 @@ void	free_all_token(t_token *token)
 	while (current)
 	{
 		next = current->next;
-		free_token(current);
+		if (current->value)
+			free(current->value);
+		free(current);
 		current = next;
 	}
 }

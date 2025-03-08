@@ -29,4 +29,5 @@ SRC_F				=	init_parsing \
 						pipeline_wait \
 						pipeline_utils \
 						pipeline_execute \
+						signals \
 						main

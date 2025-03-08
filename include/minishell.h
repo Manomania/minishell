@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 17:50:41 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 17:59:45 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <errno.h>
 # include <readline/history.h>
 # include <readline/readline.h>
+# include <signal.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
@@ -229,5 +230,9 @@ void						close_all_pipes(int pipes[2][2]);
 void						swap_pipes(int pipes[2][2]);
 t_pipeline					*pipeline_parse(t_ctx *ctx);
 t_pipeline					*pipeline_new(void);
+
+// Signals
+void						setup_signals(void);
+void						reset_signals(void);
 
 #endif

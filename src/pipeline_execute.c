@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:41:30 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 17:50:17 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 18:05:17 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,16 @@ int	pipeline_execute(t_ctx *ctx, t_pipeline *pipeline)
 	pid_t		*pids;
 	t_command	*current;
 
-	pipes[0][0] = -1;
-	pipes[0][1] = -1;
-	pipes[1][0] = -1;
-	pipes[1][1] = -1;
 	cmd_count = count_commands(pipeline->commands);
 	pids = malloc(sizeof(pid_t) * cmd_count);
 	if (!pids)
 		return (ctx_error(ERR_ALLOC));
 	i = 0;
 	current = pipeline->commands;
+	pipes[0][0] = -1;
+	pipes[0][1] = -1;
+	pipes[1][0] = -1;
+	pipes[1][1] = -1;
 	while (current)
 	{
 		if (create_pipes(pipes, i, cmd_count) == -1)
@@ -51,10 +51,6 @@ int	pipeline_execute(t_ctx *ctx, t_pipeline *pipeline)
 		current = current->next;
 		i++;
 	}
-	if (pipes[0][0] != -1)
-	{
-		close(pipes[0][0]);
-		close(pipes[0][1]);
-	}
+	close_all_pipes(pipes);
 	return (wait_for_commands(pids, cmd_count));
 }

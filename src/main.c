@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 17:51:48 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 18:11:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ static t_bool	main_loop(t_ctx *ctx)
 {
 	char		*input;
 	t_pipeline	*pipeline;
+	t_command	*cmd;
 	int			status;
 
 	input = readline("$> ");
@@ -30,25 +31,29 @@ static t_bool	main_loop(t_ctx *ctx)
 	if (input[0] != '\0')
 		add_history(input);
 	ctx->tokens = tokenize(input);
+	free(input);
 	if (!ctx->tokens)
-	{
-		free(input);
 		return (false);
-	}
 	pipeline = pipeline_parse(ctx);
 	if (!pipeline)
 	{
-		free(input);
 		free_all_token(ctx->tokens);
 		ctx->tokens = NULL;
 		return (false);
 	}
+	cmd = pipeline->commands;
+	if (cmd && cmd->cmd && ft_strncmp(cmd->cmd, "exit", __INT_MAX__) == 0)
+	{
+		pipeline_free(pipeline);
+		free_all_token(ctx->tokens);
+		ctx->tokens = NULL;
+		return (true);
+	}
 	status = pipeline_execute(ctx, pipeline);
-	ft_printf("Return code: '%d'\n", status);
-	free(input);
 	pipeline_free(pipeline);
 	free_all_token(ctx->tokens);
 	ctx->tokens = NULL;
+	ft_printf("Return code: '%d'\n", status);
 	return (false);
 }
 
@@ -65,6 +70,7 @@ int	main(int argc, char **argv, char **envp)
 	t_ctx	*ctx;
 
 	ctx = ctx_init(argc, argv, envp);
+	setup_signals();
 	while (1)
 		if (main_loop(ctx))
 			break ;

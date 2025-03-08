@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:33:36 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 17:35:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 17:57:05 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	create_pipes(int pipes[2][2], int cmd_index, int cmd_count)
 }
 
 /**
- * @brief Closes previous pipe file descriptors
+ * @brief Closes previous pipe file descriptors if they are valid
  *
  * @param pipes Array of pipe file descriptors
  * @param cmd_index Index of the current command
@@ -41,8 +41,10 @@ void	close_previous_pipe(int pipes[2][2], int cmd_index)
 {
 	if (cmd_index > 0)
 	{
-		close(pipes[0][0]);
-		close(pipes[0][1]);
+		if (pipes[0][0] >= 0)
+			close(pipes[0][0]);
+		if (pipes[0][1] >= 0)
+			close(pipes[0][1]);
 	}
 }
 
@@ -59,15 +61,19 @@ void	swap_pipes(int pipes[2][2])
 }
 
 /**
- * @brief Closes all pipe file descriptors
+ * @brief Closes all pipe file descriptors if they are valid
  *
  * @param pipes Array of pipe file descriptors
  * @return void
  */
 void	close_all_pipes(int pipes[2][2])
 {
-	close(pipes[0][0]);
-	close(pipes[0][1]);
-	close(pipes[1][0]);
-	close(pipes[1][1]);
+	if (pipes[0][0] >= 0)
+		close(pipes[0][0]);
+	if (pipes[0][1] >= 0)
+		close(pipes[0][1]);
+	if (pipes[1][0] >= 0)
+		close(pipes[1][0]);
+	if (pipes[1][1] >= 0)
+		close(pipes[1][1]);
 }

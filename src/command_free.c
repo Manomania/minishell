@@ -31,14 +31,19 @@ void	command_free(t_command *cmd)
 	{
 		i = 0;
 		while (i < cmd->arg_count)
-			free(cmd->args[i++]);
+		{
+			if (cmd->args[i])
+				free(cmd->args[i]);
+			i++;
+		}
 		free(cmd->args);
 	}
 	redir = cmd->redirections;
 	while (redir)
 	{
 		next_redir = redir->next;
-		free(redir->filename);
+		if (redir->filename)
+			free(redir->filename);
 		free(redir);
 		redir = next_redir;
 	}
