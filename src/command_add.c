@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:48:41 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 13:49:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 16:14:15 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ int	command_add_redirection(t_command *cmd, t_token_type type, int fd,
 	redir->type = type;
 	redir->fd = fd;
 	redir->filename = ft_strdup(filename);
+	if (!redir->filename)
+		return (free(redir), -1);
 	redir->next = NULL;
 	if (!cmd->redirections)
 		cmd->redirections = redir;
