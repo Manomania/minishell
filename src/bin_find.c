@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 15:37:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 18:24:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,6 @@
 
 /**
  * @brief Checks if a string is a path and not just a command
- *
- * This function determines whether the input string represents a path
- * by checking for directory-related characters like slashes and dots.
  *
  * @param str The string to check
  * @return t_bool true if the string is a path, false if it's just a command
@@ -52,17 +49,37 @@ static t_bool	is_path(const char *str)
 }
 
 /**
- * @brief Finds a binary in the PATH variable or in the current directory.
- * This handles errors.
+ * @brief Tries to execute file directly if it's a path
  *
+ * @param bin Binary path to check
+ * @return char* strdup of bin if executable, NULL otherwise
+ */
+static char	*try_direct_path(char *bin)
+{
+	if (access(bin, X_OK) == 0)
+		return (ft_strdup(bin));
+	return (NULL);
+}
+
+/**
+ * @brief Finds a binary in the PATH or current directory
+ *
+ * @param ctx Context
  * @param bin The binary to search for
- * @return A full path to the binary if it is found and executable, or NULL.
+ * @return char* Path to binary if found, NULL otherwise
  */
 char	*bin_find(t_ctx *ctx, char *bin)
 {
+	char	*path;
+
 	if (!bin)
 		return (NULL);
 	if (is_path(bin))
-		return (bin_find_path(ctx, (char *)".", bin));
+	{
+		path = try_direct_path(bin);
+		if (path)
+			return (path);
+		return (bin_find_path(ctx, ".", bin));
+	}
 	return (env_find_bin(ctx, bin));
 }

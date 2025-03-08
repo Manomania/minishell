@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 18:00:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 18:23:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@
  * @param pipes Array of pipe file descriptors
  * @param cmd_index Index of the command in the pipeline
  * @param cmd_count Total number of commands in the pipeline
- * @return void Function doesn't return if successful
  */
 void	execute_command_in_pipeline(t_ctx *ctx, t_command *cmd, int pipes[2][2],
 		int cmd_index, int cmd_count)
@@ -33,8 +32,43 @@ void	execute_command_in_pipeline(t_ctx *ctx, t_command *cmd, int pipes[2][2],
 	close_all_pipes(pipes);
 	if (builtins_try(ctx, cmd))
 		exit(0);
-	command_execute(ctx, cmd);
-	exit(1);
+	if (command_execute(ctx, cmd) != 0)
+		exit(1);
+	exit(0);
+}
+
+/**
+ * @brief Ensure command has arguments array properly initialized
+ *
+ * @param cmd Command to initialize arguments for
+ * @return int 0 on success, -1 on error
+ */
+static int	ensure_arguments(t_command *cmd)
+{
+	if (!cmd->cmd)
+		return (-1);
+	if (!cmd->args)
+	{
+		cmd->args = malloc(sizeof(char *) * 2);
+		if (!cmd->args)
+			return (-1);
+		cmd->args[0] = ft_strdup(cmd->cmd);
+		if (!cmd->args[0])
+		{
+			free(cmd->args);
+			cmd->args = NULL;
+			return (-1);
+		}
+		cmd->args[1] = NULL;
+		cmd->arg_count = 1;
+	}
+	else if (cmd->args[0] == NULL)
+	{
+		cmd->args[0] = ft_strdup(cmd->cmd);
+		if (!cmd->args[0])
+			return (-1);
+	}
+	return (0);
 }
 
 /**
@@ -55,9 +89,20 @@ int	command_execute(t_ctx *ctx, t_command *cmd)
 	bin_path = bin_find(ctx, cmd->cmd);
 	if (!bin_path)
 		return (ctx_error(ERR_CMD_NOT_FOUND));
+	if (ensure_arguments(cmd) != 0)
+	{
+		free(bin_path);
+		return (ctx_error(ERR_ALLOC));
+	}
 	if (handle_redirections(cmd->redirections) != 0)
+	{
+		free(bin_path);
 		return (-1);
+	}
 	if (execve(bin_path, cmd->args, ctx->envp) == -1)
-		ctx_error(ERR_CMD_NOT_FOUND);
-	return (-1);
+	{
+		free(bin_path);
+		return (ctx_error(ERR_CMD_NOT_FOUND));
+	}
+	return (0);
 }

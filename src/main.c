@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 18:11:34 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 18:19:09 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,10 @@ static t_bool	main_loop(t_ctx *ctx)
 	t_pipeline	*pipeline;
 	t_command	*cmd;
 	int			status;
+	t_bool		should_exit;
 
-	input = readline("$> ");
+	should_exit = false;
+	input = readline("$ ");
 	if (!input)
 		return (true);
 	if (input[0] != '\0')
@@ -43,18 +45,16 @@ static t_bool	main_loop(t_ctx *ctx)
 	}
 	cmd = pipeline->commands;
 	if (cmd && cmd->cmd && ft_strncmp(cmd->cmd, "exit", __INT_MAX__) == 0)
+		should_exit = true;
+	if (!should_exit)
 	{
-		pipeline_free(pipeline);
-		free_all_token(ctx->tokens);
-		ctx->tokens = NULL;
-		return (true);
+		status = pipeline_execute(ctx, pipeline);
+		ft_printf("Return code: '%d'\n", status);
 	}
-	status = pipeline_execute(ctx, pipeline);
 	pipeline_free(pipeline);
 	free_all_token(ctx->tokens);
 	ctx->tokens = NULL;
-	ft_printf("Return code: '%d'\n", status);
-	return (false);
+	return (should_exit);
 }
 
 /**

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 14:03:42 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/08 18:25:14 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,32 @@ static int	handle_redirection(t_command *cmd, t_token *token,
 }
 
 /**
+ * @brief Initialize command arguments with first arg as command name
+ *
+ * @param cmd Command structure to initialize
+ * @return int 0 on success, -1 on failure
+ */
+static int	init_command_args(t_command *cmd)
+{
+	if (!cmd->args && cmd->cmd)
+	{
+		cmd->args = malloc(sizeof(char *) * 2);
+		if (!cmd->args)
+			return (-1);
+		cmd->args[0] = ft_strdup(cmd->cmd);
+		if (!cmd->args[0])
+		{
+			free(cmd->args);
+			cmd->args = NULL;
+			return (-1);
+		}
+		cmd->args[1] = NULL;
+		cmd->arg_count = 1;
+	}
+	return (0);
+}
+
+/**
  * @brief Parses tokens into a command structure
  *
  * @param ctx Context containing tokens
@@ -63,11 +89,14 @@ t_command	*command_parse(t_ctx *ctx)
 		}
 		else if (token_is_redirection(current->type))
 		{
-			handle_redirection(cmd, current, current->next);
+			if (handle_redirection(cmd, current, current->next) == -1)
+				return (command_free(cmd), NULL);
 			current = current->next;
 		}
 		if (current)
 			current = current->next;
 	}
+	if (cmd->cmd && init_command_args(cmd) == -1)
+		return (command_free(cmd), NULL);
 	return (cmd);
 }
