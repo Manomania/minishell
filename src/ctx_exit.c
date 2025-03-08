@@ -1,35 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ctx_exit.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 11:16:00 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/06 17:15:04 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/06 17:16:10 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	main(void)
+/**
+ * @brief Clears the context and exits the app gracefully
+ *
+ * @param ctx context
+ */
+void	ctx_exit(t_ctx *ctx)
 {
-	t_ctx	*ctx;
-	char	*input;
-
-	ctx = ctx_init();
-	while (1)
-	{
-		input = readline("$> ");
-		if (!input)
-			break ;
-		if (input[0] != '\0')
-			add_history(input);
-		ctx->tokens = tokenize(input);
-		cmds_handle(ctx);
-		// print_tokens_list(ctx->tokens);
-		free_all_token(ctx->tokens);
-	}
 	ctx_clear(ctx);
-	return (EXIT_SUCCESS);
+	exit(EXIT_SUCCESS);
 }

@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "*.astro": "astro",
+    "minishell.h": "c",
+    "errno.h": "c",
+    "error_t.h": "c"
+  }
+}
