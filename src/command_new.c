@@ -1,34 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctx_init.c                                         :+:      :+:    :+:   */
+/*   command_new.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 14:31:08 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 13:48:09 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 13:48:20 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Initializes the context
+ * @brief Creates a new command structure
  *
- * @param argc Arguments count
- * @param argv Arguments
- * @param envp Environment variables
- * @return t_ctx* Context
+ * @return t_command* New initialized command or NULL if allocation fails
  */
-t_ctx	*ctx_init(int argc, char **argv, char **envp)
+t_command	*command_new(void)
 {
-	t_ctx	*ctx;
+	t_command	*cmd;
 
-	ctx = malloc(sizeof(t_ctx));
-	ctx->tokens = NULL;
-	ctx->cmd = NULL;
-	ctx->argc = argc;
-	ctx->argv = argv;
-	ctx->envp = envp;
-	return (ctx);
+	cmd = (t_command *)malloc(sizeof(t_command));
+	if (!cmd)
+		return (NULL);
+	cmd->cmd = NULL;
+	cmd->args = NULL;
+	cmd->arg_count = 0;
+	cmd->redirections = NULL;
+	cmd->next = NULL;
+	cmd->prev = NULL;
+	return (cmd);
 }

@@ -1,34 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctx_init.c                                         :+:      :+:    :+:   */
+/*   token_is.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 14:31:08 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 13:58:39 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 14:03:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Initializes the context
+ * @brief Checks if a token is a redirection token
  *
- * @param argc Arguments count
- * @param argv Arguments
- * @param envp Environment variables
- * @return t_ctx* Context
+ * @param tok Token type to check
+ * @return t_bool true if token is a redirection, false otherwise
  */
-t_ctx	*ctx_init(int argc, char **argv, char **envp)
+t_bool	token_is_redirection(t_token_type type)
 {
-	t_ctx	*ctx;
-
-	ctx = malloc(sizeof(t_ctx));
-	ctx->tokens = NULL;
-	ctx->cmd = NULL;
-	ctx->argc = argc;
-	ctx->argv = argv;
-	ctx->envp = envp;
-	return (ctx);
+	return (type == TOK_REDIR_FROM || type == TOK_REDIR_TO
+		|| type == TOK_HERE_DOC_FROM || type == TOK_HERE_DOC_TO);
 }

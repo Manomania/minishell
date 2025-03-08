@@ -1,34 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctx_init.c                                         :+:      :+:    :+:   */
+/*   builtins_try.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 14:31:08 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 12:19:14 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 13:57:06 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Initializes the context
+ * @brief Tries the token against all builtins commands
  *
- * @param argc Arguments count
- * @param argv Arguments
- * @param envp Environment variables
- * @return t_ctx* Context
+ * @param ctx Context
+ * @param tok Token
+ * @return t_bool Whether a command was successfully executed or not
  */
-t_ctx	*ctx_init(int argc, char **argv, char **envp)
+t_bool	builtins_try(t_ctx *ctx, t_command *cmd)
 {
-	t_ctx	*ctx;
-
-	ctx = malloc(sizeof(t_ctx));
-	ctx->tokens = NULL;
-	ctx->cmd = NULL;
-	ctx->argc = argc;
-	ctx->argv = argv;
-	ctx->envp = envp;
-	return (ctx);
+	if (ft_strncmp(cmd->cmd, "exit", __INT_MAX__) == 0)
+		ctx_exit(ctx);
+	return (false);
 }

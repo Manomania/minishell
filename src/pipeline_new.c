@@ -1,22 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cmds_handle.c                                      :+:      :+:    :+:   */
+/*   pipeline_new.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 11:18:39 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 13:51:47 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 13:52:19 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	cmds_handle(t_ctx *ctx)
+/**
+ * @brief Creates a new pipeline structure
+ *
+ * @return t_pipeline* New initialized pipeline or NULL if allocation fails
+ */
+t_pipeline	*create_pipeline(void)
 {
-	if (!ctx || !ctx->tokens)
-		ctx_error_exit(ctx, ERR_NONE);
-	if (ctx->tokens->type == TOK_WORD && ft_strncmp(ctx->tokens->value, "exit",
-			__INT_MAX__) == 0)
-		ctx_exit(ctx);
+	t_pipeline	*pipeline;
+
+	pipeline = (t_pipeline *)malloc(sizeof(t_pipeline));
+	if (!pipeline)
+		return (NULL);
+	pipeline->commands = NULL;
+	pipeline->next = NULL;
+	pipeline->prev = NULL;
+	pipeline->operator = TOK_EOF;
+	return (pipeline);
 }
