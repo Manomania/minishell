@@ -23,6 +23,8 @@ int	main(void)
 		input = readline("$> ");
 		if (!input)
 			break ;
+		if (input[0] != '\0')
+			add_history(input);
 		ctx->tokens = tokenize(input);
 		cmds_handle(ctx);
 		// print_tokens_list(ctx->tokens);

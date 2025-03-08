@@ -32,40 +32,40 @@ void	handle_signal(int sig)
 
 #include <signal.h>
 
-int	main(void)
-{
-	char	*input;
-	t_token	*tokens;
-
-	signal(SIGINT, handle_signal);
-	ft_printf(GREEN "=== Minishell Lexer/Tokenizer Tester ===\n" RESET);
-	ft_printf("Type 'exit' to quit\n\n");
-	while (1)
-	{
-		input = readline(YELLOW "minishell$ " RESET);
-		if (!input)
-		{
-			ft_printf("\nExiting...\n");
-			cleanup(NULL);
-			break ;
-		}
-		if (input[0] != '\0')
-			add_history(input);
-		if (strcmp(input, "exit") == 0)
-		{
-			free(input);
-			cleanup(NULL);
-			break ;
-		}
-		ft_printf(YELLOW "Input: \"%s\"\n" RESET, input);
-		tokens = tokenize(input);
-		if (tokens)
-		{
-			print_tokens_list(tokens);
-			free_all_token(tokens);
-		}
-		else
-			ft_printf(RED "ERROR: Tokenization failed\n" RESET);
-	}
-	return (0);
-}
+// int	main(void)
+// {
+// 	char	*input;
+// 	t_token	*tokens;
+//
+// 	signal(SIGINT, handle_signal);
+// 	ft_printf(GREEN "=== Minishell Lexer/Tokenizer Tester ===\n" RESET);
+// 	ft_printf("Type 'exit' to quit\n\n");
+// 	while (1)
+// 	{
+// 		input = readline(YELLOW "minishell$ " RESET);
+// 		if (!input)
+// 		{
+// 			ft_printf("\nExiting...\n");
+// 			cleanup(NULL);
+// 			break ;
+// 		}
+// 		if (input[0] != '\0')
+// 			add_history(input);
+// 		if (strcmp(input, "exit") == 0)
+// 		{
+// 			free(input);
+// 			cleanup(NULL);
+// 			break ;
+// 		}
+// 		ft_printf(YELLOW "Input: \"%s\"\n" RESET, input);
+// 		tokens = tokenize(input);
+// 		if (tokens)
+// 		{
+// 			print_tokens_list(tokens);
+// 			free_all_token(tokens);
+// 		}
+// 		else
+// 			ft_printf(RED "ERROR: Tokenization failed\n" RESET);
+// 	}
+// 	return (0);
+// }
