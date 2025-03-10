@@ -13,18 +13,16 @@
 #include "minishell.h"
 
 /**
- * @brief Extract a word from lexer input
+ * @brief Extracts the next token from the lexer
  *
  * @param lexer Pointer to lexer structure
- * @return Newly allocated string containing the word or NULL on error
- * @note Caller must free the returned string
+ * @return Next token or NULL on error
+ * @note Caller must free the returned token
  */
 t_token	*next_token_lexer(t_lexer *lexer)
 {
 	char	*word;
-	char	*content;
 	char	current;
-	char	quote;
 
 	skip_whitespace_lexer(lexer);
 	current = get_lexer(lexer);
@@ -53,7 +51,7 @@ t_token	*next_token_lexer(t_lexer *lexer)
 			advance_lexer(lexer);
 			return (create_token(TOK_AND, ft_strdup("&&")));
 		}
-		ft_printf(RED"Error:\nUnexpected '&'\n");
+		ft_printf(RED"Error:\nUnexpected '&'\n"RESET);
 		return (create_token(TOK_EOF, NULL));
 	}
 	if (current == '<')
@@ -82,18 +80,14 @@ t_token	*next_token_lexer(t_lexer *lexer)
 		word = read_word_lexer(lexer);
 		if (word)
 			return (create_token(TOK_ENV, word));
+		return (create_token(TOK_ENV, ft_strdup("")));
 	}
-	if (current == '"' || current == '\'')
-	{
-		quote = current;
-		content = read_quoted_string_lexer(lexer, quote);
-		if (!content)
-			return (create_token(TOK_EOF, NULL));
-		return (create_token(TOK_WORD, content));
-	}
-	word = read_word_lexer(lexer);
+	word = read_complex_word(lexer);
+	if (!word)
+		return (NULL);
 	return (create_token(TOK_WORD, word));
 }
+
 
 void	free_token(t_token *token)
 {
