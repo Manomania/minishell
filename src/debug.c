@@ -191,7 +191,6 @@ void	print_tokens(t_token *tokens)
 	ft_printf(YELLOW"=====================\n\n"RESET);
 }
 
-
 void cleanup(t_token *tokens)
 {
 	if (tokens)
