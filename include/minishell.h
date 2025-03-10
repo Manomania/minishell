@@ -26,6 +26,7 @@
 
 # define RESET	"\033[039m"
 # define RED	"\033[091m"
+# define BLUE	"\033[034m"
 # define GREEN	"\033[092m"
 # define YELLOW	"\033[093m"
 
@@ -62,34 +63,102 @@ typedef struct s_lexer
 	int		length;
 }			t_lexer;
 
-// typedef struct s_ctx
-// {
-// }			t_ctx;
+typedef struct s_redirection
+{
+	t_token_type			type;
+	struct s_redirection	*next;
+	char					*filename;
+}							t_redirection;
+
+typedef	struct s_command
+{
+	t_token_type		operator;
+	t_redirection		*redirection;
+	struct s_command	*next;
+	char				**args;
+	int					arg_count;
+}						t_command;
+
+typedef struct s_parse
+{
+	t_token	*token;
+	t_token	*current;
+}			t_parse;
+
+typedef struct s_env
+{
+	struct s_env	*next;
+	char			*key;
+	char			*value;
+}					t_env;
+
+typedef struct s_ctx
+{
+	t_env	*env_list;
+	int		exit_status;
+	int		interactive;
+}			t_ctx;
 
 /*******************************************************************************
 *                             Function Prototypes                              *
 *******************************************************************************/
 
-// init_parsing.c
-t_lexer		*create_lexer(char *input);
-t_token		*create_token(t_token_type type, char *value);
+// init.c
+t_ctx			*init_ctx(char **envp);
+t_env			*create_env_node(char *key, char *value);
+int				add_env_var(t_env **env_list, char *key, char *value);
 
-// token_utils.c
-void		free_token(t_token *token);
-void		free_all_token(t_token *token);
+// init_parse.c
+t_command		*create_command(void);
+t_lexer			*create_lexer(char *input);
+t_token			*create_token(t_token_type type, char *value);
+t_redirection	*create_redirection(t_token_type type, char *filename);
+void			init_parse_context(t_parse *parse, t_token *token);
 
 // lexer_utils.c
-char		get_lexer(t_lexer *lexer);
-void		advance_lexer(t_lexer *lexer);
-void		skip_whitespace_lexer(t_lexer *lexer);
+char			get_lexer(t_lexer *lexer);
+void			advance_lexer(t_lexer *lexer);
+void			skip_whitespace_lexer(t_lexer *lexer);
 
-// parse_line.c
-char		*read_quoted_string_lexer(t_lexer *lexer, char quote_char);
-char		*read_word_lexer(t_lexer *lexer);
-t_token		*next_token_lexer(t_lexer *lexer);
-t_token		*tokenize(char *input);
+// lexer_read.c
+t_token			*tokenize(char *input);
+char			*read_word_lexer(t_lexer *lexer);
+char			*read_quoted_string_lexer(t_lexer *lexer, char quote_char);
 
-// debug.c
-void		print_tokens(t_token *tokens);
+// lexer_token.c
+t_token			*next_token_lexer(t_lexer *lexer);
+void			free_token(t_token *token);
+void			free_all_token(t_token *token);
+
+//parser_utils.c
+void			advance_parse(t_parse *parse);
+char			*get_token_value(t_parse *parse);
+int				check_parse(t_parse *parse, t_token_type type);
+int				consume_parse(t_parse *parse, t_token_type type);
+int				check_token_type(t_parse *parse, t_token_type type);
+
+//parser_command.c
+int				add_argument(t_command *cmd, char *value);
+void			add_redirection(t_command *cmd, t_redirection *redirection);
+int				parse_redirection(t_parse *parse, t_command *cmd);
+t_command		*parse_command(t_parse *parse);
+t_command		*parse_token(t_token *token);
+
+//parser_pipeline.c
+t_command		*parse_pipeline(t_parse *parse);
+t_command		*parse_command_sequence(t_parse *parse);
+void			connect_commands(t_command *left_cmd, t_command *right_cmd, t_token_type op_type);
+
+// free.c
+void			free_redirection(t_redirection *redirection);
+void			free_all_redirection(t_redirection *redirection);
+void			free_command_pipeline(t_command *cmd);
+void			free_command(t_command *cmd);
+void			free_all_commands(t_command *cmd);
+
+// free_env.c
+void			free_env_list(t_env *env_list);
+int				parse_env_var(char *env_str, t_env **env_list);
+void			free_ctx(t_ctx *ctx);
 
 #endif
