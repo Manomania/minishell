@@ -1,6 +1,5 @@
 SRC_F				=	free/free \
 						free/free_env \
-						init/init \
 						init/init_ctx \
 						init/init_parse \
 						lexer/lexer_read \
