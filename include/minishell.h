@@ -123,6 +123,7 @@ void			skip_whitespace_lexer(t_lexer *lexer);
 // lexer_read.c
 t_token			*tokenize(char *input);
 char			*read_word_lexer(t_lexer *lexer);
+char			*read_complex_word(t_lexer *lexer);
 char			*read_quoted_string_lexer(t_lexer *lexer, char quote_char);
 
 // lexer_token.c
