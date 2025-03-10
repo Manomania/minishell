@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 18:19:09 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/10 11:11:06 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,10 @@
  */
 static t_bool	main_loop(t_ctx *ctx)
 {
-	char		*input;
-	t_pipeline	*pipeline;
-	t_command	*cmd;
-	int			status;
 	t_bool		should_exit;
+	char		*input;
+	int			status;
+	t_command	*cmd;
 
 	should_exit = false;
 	input = readline("$ ");
@@ -36,22 +35,20 @@ static t_bool	main_loop(t_ctx *ctx)
 	free(input);
 	if (!ctx->tokens)
 		return (false);
-	pipeline = pipeline_parse(ctx);
-	if (!pipeline)
+	cmd = command_parse(ctx->tokens);
+	if (!cmd)
 	{
-		free_all_token(ctx->tokens);
-		ctx->tokens = NULL;
-		return (false);
+		ctx_error(ERR_UNIMPLEMENTED);
+		should_exit = true;
 	}
-	cmd = pipeline->commands;
 	if (cmd && cmd->cmd && ft_strncmp(cmd->cmd, "exit", __INT_MAX__) == 0)
 		should_exit = true;
 	if (!should_exit)
 	{
-		status = pipeline_execute(ctx, pipeline);
+		status = command_execute(ctx, cmd);
 		ft_printf("Return code: '%d'\n", status);
 	}
-	pipeline_free(pipeline);
+	command_free(cmd);
 	free_all_token(ctx->tokens);
 	ctx->tokens = NULL;
 	return (should_exit);

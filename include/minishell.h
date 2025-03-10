@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 17:59:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/10 11:06:06 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,21 +123,6 @@ typedef struct s_command
 }							t_command;
 
 /**
- * @brief Represents a pipeline of commands
- */
-typedef struct s_pipeline
-{
-	// First command in pipeline
-	t_command				*commands;
-	// Next pipeline (for && or || operators)
-	struct s_pipeline		*next;
-	// Previous pipeline
-	struct s_pipeline		*prev;
-	// Connecting operator type (AND, OR, none)
-	t_token_type			operator;
-}							t_pipeline;
-
-/**
  * @brief Represents a parsed token
  */
 typedef struct s_ctx
@@ -189,7 +174,7 @@ int							handle_redirections(t_redirection *redirections);
 int							command_add_argument(t_command *cmd, char *arg);
 int							command_execute(t_ctx *ctx, t_command *cmd);
 void						command_free(t_command *cmd);
-t_command					*command_parse(t_ctx *ctx);
+t_command					*command_parse(t_token *tokens);
 t_command					*command_new(void);
 
 // Debug
@@ -217,19 +202,13 @@ void						free_2d_array(void **ptrs);
 void						execute_command_in_pipeline(t_ctx *ctx,
 								t_command *cmd, int pipes[2][2], int cmd_index,
 								int cmd_count);
-void						pipeline_add_command(t_pipeline *pipeline,
-								t_command *cmd);
 int							create_pipes(int pipes[2][2], int cmd_index,
 								int cmd_count);
 void						close_previous_pipe(int pipes[2][2], int cmd_index);
-int							pipeline_execute(t_ctx *ctx, t_pipeline *pipeline);
 int							wait_for_commands(pid_t *pids, int cmd_count);
 int							count_commands(t_command *commands);
-void						pipeline_free(t_pipeline *pipeline);
 void						close_all_pipes(int pipes[2][2]);
 void						swap_pipes(int pipes[2][2]);
-t_pipeline					*pipeline_parse(t_ctx *ctx);
-t_pipeline					*pipeline_new(void);
 
 // Signals
 void						setup_signals(void);

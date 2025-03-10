@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 18:25:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/10 11:10:32 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,10 +66,10 @@ static int	init_command_args(t_command *cmd)
 /**
  * @brief Parses tokens into a command structure
  *
- * @param ctx Context containing tokens
+ * @param tokens The tokens array to parse
  * @return t_command* Parsed command structure
  */
-t_command	*command_parse(t_ctx *ctx)
+t_command	*command_parse(t_token *tokens)
 {
 	t_command	*cmd;
 	t_token		*current;
@@ -77,7 +77,7 @@ t_command	*command_parse(t_ctx *ctx)
 	cmd = command_new();
 	if (!cmd)
 		return (NULL);
-	current = ctx->tokens;
+	current = tokens;
 	while (current && current->type != TOK_PIPE)
 	{
 		if (current->type == TOK_WORD)
