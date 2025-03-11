@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/10 13:39:09 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 10:31:07 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void	exec_cmda_parent(t_command **current_cmd, int *pipe_prev,
  * @param pipe_prev Previous pipe
  * @param pipe_curr Current pipe
  */
-static void	main_exec_loop(t_ctx ctx, t_command *current_cmd, int *pipe_prev,
+static void	main_exec_loop(t_ctx *ctx, t_command *current_cmd, int *pipe_prev,
 		int *pipe_curr)
 {
 	pid_t	pid;
@@ -84,19 +84,19 @@ static void	main_exec_loop(t_ctx ctx, t_command *current_cmd, int *pipe_prev,
  *
  * @param ctx Context
  */
-void	exec_cmdas(t_ctx ctx)
+void	exec_cmdas(t_ctx *ctx)
 {
 	t_command	*current_cmd;
 	int			pipe_prev[2];
 	int			pipe_curr[2];
 
-	current_cmd = ctx.cmd;
+	current_cmd = ctx->cmd;
 	null_pipes(pipe_prev, pipe_curr);
 	main_exec_loop(ctx, current_cmd, pipe_prev, pipe_curr);
-	if (ctx.fd_file_in != -1)
-		close(ctx.fd_file_in);
-	if (ctx.fd_file_out != -1)
-		close(ctx.fd_file_out);
+	if (ctx->fd_file_in != -1)
+		close(ctx->fd_file_in);
+	if (ctx->fd_file_out != -1)
+		close(ctx->fd_file_out);
 	while (wait(NULL) > 0)
 		;
 }

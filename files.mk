@@ -14,6 +14,7 @@ SRC_F				=	init_parsing \
 						command_new \
 						command_free \
 						command_redirections \
+						command_bin \
 						debug_utils \
 						builtins_try \
 						bin_find \

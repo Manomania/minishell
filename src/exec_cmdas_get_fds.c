@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 18:01:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/10 13:36:43 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 10:31:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@
  * @param cmd_index Index of the command
  * @return int File descriptor
  */
-int	get_fd_in(t_ctx ctx, t_list *fd_pipes, int cmd_index)
+int	get_fd_in(t_ctx *ctx, t_list *fd_pipes, int cmd_index)
 {
 	if (cmd_index == 0)
-		return (ctx.fd_file_in);
+		return (ctx->fd_file_in);
 	if (!fd_pipes || !fd_pipes->content)
 		return (-1);
 	return (((int *)fd_pipes->content)[0]);
@@ -38,10 +38,10 @@ int	get_fd_in(t_ctx ctx, t_list *fd_pipes, int cmd_index)
  * @param cmd_count Number of commands
  * @return int File descriptor
  */
-int	get_fd_out(t_ctx ctx, t_list *fd_pipes, int cmd_index, int cmd_count)
+int	get_fd_out(t_ctx *ctx, t_list *fd_pipes, int cmd_index, int cmd_count)
 {
 	if (cmd_index == cmd_count - 1)
-		return (ctx.fd_file_out);
+		return (ctx->fd_file_out);
 	if (!fd_pipes || !fd_pipes->content)
 		return (-1);
 	return (((int *)fd_pipes->content)[1]);

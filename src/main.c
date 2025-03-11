@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/10 11:11:06 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 10:44:33 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ static t_bool	main_loop(t_ctx *ctx)
 		should_exit = true;
 	if (!should_exit)
 	{
-		status = command_execute(ctx, cmd);
+		status = command_execute(ctx);
 		ft_printf("Return code: '%d'\n", status);
 	}
 	command_free(cmd);

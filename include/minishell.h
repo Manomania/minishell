@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/10 13:38:08 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 10:44:26 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,8 +176,8 @@ int							command_add_redirection(t_command *cmd,
 								t_token_type type, int fd, char *filename);
 int							handle_redirections(t_redirection *redirections);
 int							command_add_argument(t_command *cmd, char *arg);
-int							command_execute(t_ctx *ctx, t_command *cmd);
 void						command_free(t_command *cmd);
+int							command_execute(t_ctx *ctx);
 t_command					*command_parse(t_token *tokens);
 t_command					*command_new(void);
 
@@ -215,15 +215,16 @@ void						close_all_pipes(int pipes[2][2]);
 void						swap_pipes(int pipes[2][2]);
 
 // Execution
-int							get_fd_in(t_ctx ctx, t_list *fd_pipes,
+int							get_fd_in(t_ctx *ctx, t_list *fd_pipes,
 								int cmd_index);
-int							get_fd_out(t_ctx ctx, t_list *fd_pipes,
+int							get_fd_out(t_ctx *ctx, t_list *fd_pipes,
 								int cmd_index, int cmd_count);
-void						exec_cmda_child(t_ctx ctx, t_command *current_cmd,
+void						exec_cmda_child(t_ctx *ctx, t_command *current_cmd,
 								int *pipe_prev, int *pipe_curr);
 void						exec_cmda_parent(t_command **current_cmd,
 								int *pipe_prev, int *pipe_curr);
-void						exec_cmdas(t_ctx ctx);
+t_bool						command_bin(t_ctx *ctx);
+void						exec_cmdas(t_ctx *ctx);
 
 // Signals
 void						setup_signals(void);

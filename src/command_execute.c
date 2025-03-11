@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 18:37:56 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 10:43:57 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	execute_command_in_pipeline(t_ctx *ctx, t_command *cmd, int pipes[2][2],
 	close_all_pipes(pipes);
 	if (builtins_try(ctx, cmd))
 		child_cleanup_exit(ctx, EXIT_SUCCESS);
-	if (command_execute(ctx, cmd) != EXIT_SUCCESS)
+	if (command_execute(ctx) != EXIT_SUCCESS)
 		child_cleanup_exit(ctx, EXIT_FAILURE);
 	child_cleanup_exit(ctx, EXIT_SUCCESS);
 }
@@ -87,31 +87,28 @@ static int	ensure_arguments(t_command *cmd)
  * @brief Executes a command with execve
  *
  * @param ctx Context containing environment
- * @param cmd Command to execute
  * @return int 0 on success, -1 on error
  */
-int	command_execute(t_ctx *ctx, t_command *cmd)
+int	command_execute(t_ctx *ctx)
 {
-	char	*bin_path;
-
-	if (!cmd->cmd)
+	if (!ctx || !ctx->cmd || !ctx->cmd->cmd)
 		return (-1);
-	if (builtins_try(ctx, cmd))
+	if (builtins_try(ctx, ctx->cmd))
 		return (0);
-	bin_path = bin_find(ctx, cmd->cmd);
-	if (!bin_path)
+	if (!command_bin(ctx))
 		return (ctx_error(ERR_CMD_NOT_FOUND));
-	if (ensure_arguments(cmd) != 0)
+	exec_cmdas(ctx);
+	if (ensure_arguments(ctx->cmd) != 0)
 	{
-		free(bin_path);
+		free(ctx->cmd->cmd);
 		return (ctx_error(ERR_ALLOC));
 	}
-	if (handle_redirections(cmd->redirections) != 0)
+	if (handle_redirections(ctx->cmd->redirections) != 0)
 	{
-		free(bin_path);
+		free(ctx->cmd->cmd);
 		return (-1);
 	}
-	execve(bin_path, cmd->args, ctx->envp);
-	free(bin_path);
+	execve(ctx->cmd->cmd, ctx->cmd->args, ctx->envp);
+	free(ctx->cmd->cmd);
 	return (ctx_error(ERR_CMD_NOT_FOUND));
 }
