@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/10 11:06:06 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/10 13:38:08 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ typedef enum e_error_type
 	ERR_IO_ERROR,
 	ERR_UNIMPLEMENTED,
 	ERR_ALLOC,
+	ERR_PIPE,
+	ERR_CHILD,
 }							t_error_type;
 
 typedef struct s_error_info
@@ -132,6 +134,8 @@ typedef struct s_ctx
 	char					**envp;
 	t_token					*tokens;
 	t_command				*cmd;
+	int						fd_file_in;
+	int						fd_file_out;
 }							t_ctx;
 
 // *************************************************************************** #
@@ -209,6 +213,17 @@ int							wait_for_commands(pid_t *pids, int cmd_count);
 int							count_commands(t_command *commands);
 void						close_all_pipes(int pipes[2][2]);
 void						swap_pipes(int pipes[2][2]);
+
+// Execution
+int							get_fd_in(t_ctx ctx, t_list *fd_pipes,
+								int cmd_index);
+int							get_fd_out(t_ctx ctx, t_list *fd_pipes,
+								int cmd_index, int cmd_count);
+void						exec_cmda_child(t_ctx ctx, t_command *current_cmd,
+								int *pipe_prev, int *pipe_curr);
+void						exec_cmda_parent(t_command **current_cmd,
+								int *pipe_prev, int *pipe_curr);
+void						exec_cmdas(t_ctx ctx);
 
 // Signals
 void						setup_signals(void);

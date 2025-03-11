@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:13:34 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 15:54:32 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 10:26:39 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static t_error_info	*get_error_table(void)
 {
 	t_error_info	*error_table;
 
-	error_table = malloc(6 * sizeof(t_error_info));
+	error_table = malloc(32 * sizeof(t_error_info));
 	error_table[ERR_NONE] = (t_error_info){0, "Success", false};
 	error_table[ERR_CMD_NOT_FOUND] = (t_error_info){ENOENT, "Command not found",
 		false};
@@ -31,6 +31,8 @@ static t_error_info	*get_error_table(void)
 	error_table[ERR_UNIMPLEMENTED] = (t_error_info){ENOSYS,
 		"Not implemented yet", true};
 	error_table[ERR_ALLOC] = (t_error_info){ENOMEM, "Allocation failed", true};
+	error_table[ERR_PIPE] = (t_error_info){EPIPE, "Pipe error", false};
+	error_table[ERR_CHILD] = (t_error_info){ECHILD, "Fork error", false};
 	return (error_table);
 }
 

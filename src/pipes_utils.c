@@ -1,36 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctx_init.c                                         :+:      :+:    :+:   */
+/*   pipes_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/10 11:20:48 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/11 10:24:52 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/11 10:25:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Initializes the context
+ * @brief Closes all pipe file descriptors if they are valid
  *
- * @param argc Arguments count
- * @param argv Arguments
- * @param envp Environment variables
- * @return t_ctx* Context
+ * @param pipes Array of pipe file descriptors
+ * @return void
  */
-t_ctx	*ctx_init(int argc, char **argv, char **envp)
+void	close_all_pipes(int pipes[2][2])
 {
-	t_ctx	*ctx;
-
-	ctx = malloc(sizeof(t_ctx));
-	ctx->tokens = NULL;
-	ctx->cmd = NULL;
-	ctx->argc = argc;
-	ctx->argv = argv;
-	ctx->envp = envp;
-	ctx->fd_file_in = -1;
-	ctx->fd_file_out = -1;
-	return (ctx);
+	if (pipes[0][0] >= 0)
+		close(pipes[0][0]);
+	if (pipes[0][1] >= 0)
+		close(pipes[0][1]);
+	if (pipes[1][0] >= 0)
+		close(pipes[1][0]);
+	if (pipes[1][1] >= 0)
+		close(pipes[1][1]);
 }

@@ -21,13 +21,9 @@ SRC_F				=	init_parsing \
 						env_find \
 						env_find_bin \
 						free_2d_array \
-						pipeline \
-						pipeline_free \
-						pipeline_new \
-						pipeline_add \
-						pipeline_parse \
-						pipeline_wait \
-						pipeline_utils \
-						pipeline_execute \
 						signals \
+						exec_cmdas \
+						exec_cmda_child \
+						exec_cmdas_get_fds \
+						pipes_utils \
 						main
