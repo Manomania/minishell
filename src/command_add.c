@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:48:41 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 16:14:15 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 18:08:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 /**
  * @brief Adds an argument to a command
+ * Arguments are stored in args array starting at index 1
+ * args[0] is always the command name
  *
  * @param cmd Command to add argument to
  * @param arg Argument string to add
@@ -26,17 +28,23 @@ int	command_add_argument(t_command *cmd, char *arg)
 
 	if (!cmd || !arg)
 		return (-1);
-	new_args = malloc(sizeof(char *) * (cmd->arg_count + 2));
+	new_args = malloc(sizeof(char *) * (cmd->arg_count + 2 + 1));
 	if (!new_args)
 		return (-1);
+	new_args[0] = cmd->args[0];
 	i = 0;
 	while (i < cmd->arg_count)
 	{
-		new_args[i] = cmd->args[i];
+		new_args[i + 1] = cmd->args[i + 1];
 		i++;
 	}
-	new_args[i] = ft_strdup(arg);
-	new_args[i + 1] = NULL;
+	new_args[i + 1] = ft_strdup(arg);
+	if (!new_args[i + 1])
+	{
+		free(new_args);
+		return (-1);
+	}
+	new_args[i + 2] = NULL;
 	if (cmd->args)
 		free(cmd->args);
 	cmd->args = new_args;

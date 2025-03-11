@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/10 11:10:32 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 18:09:52 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,28 +39,29 @@ static int	handle_redirection(t_command *cmd, t_token *token,
 
 /**
  * @brief Initialize command arguments with first arg as command name
+ * Following the standard convention where args[0] is the command name
  *
  * @param cmd Command structure to initialize
- * @return int 0 on success, -1 on failure
+ * @return t_bool Whether the function succeeded or not
  */
-static int	init_command_args(t_command *cmd)
+static t_bool	init_command_args(t_command *cmd)
 {
 	if (!cmd->args && cmd->cmd)
 	{
 		cmd->args = malloc(sizeof(char *) * 2);
 		if (!cmd->args)
-			return (-1);
+			return (false);
 		cmd->args[0] = ft_strdup(cmd->cmd);
 		if (!cmd->args[0])
 		{
 			free(cmd->args);
 			cmd->args = NULL;
-			return (-1);
+			return (false);
 		}
 		cmd->args[1] = NULL;
-		cmd->arg_count = 1;
+		cmd->arg_count = 0;
 	}
-	return (0);
+	return (true);
 }
 
 /**
@@ -85,7 +86,11 @@ t_command	*command_parse(t_token *tokens)
 			if (!cmd->cmd)
 				cmd->cmd = ft_strdup(current->value);
 			else
+			{
+				if (!cmd->args && !init_command_args(cmd))
+					return (command_free(cmd), NULL);
 				command_add_argument(cmd, current->value);
+			}
 		}
 		else if (token_is_redirection(current->type))
 		{
@@ -96,7 +101,7 @@ t_command	*command_parse(t_token *tokens)
 		if (current)
 			current = current->next;
 	}
-	if (cmd->cmd && init_command_args(cmd) == -1)
+	if (cmd->cmd && !init_command_args(cmd))
 		return (command_free(cmd), NULL);
 	return (cmd);
 }

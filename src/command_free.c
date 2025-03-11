@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:49:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 18:38:15 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 18:10:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,10 +49,9 @@ void	command_free(t_command *cmd)
 	if (cmd->args)
 	{
 		i = 0;
-		while (i < cmd->arg_count)
+		while (cmd->args[i] != NULL)
 		{
-			if (cmd->args[i])
-				free(cmd->args[i]);
+			free(cmd->args[i]);
 			i++;
 		}
 		free(cmd->args);
