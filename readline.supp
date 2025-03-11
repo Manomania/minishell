@@ -1,16 +1,4 @@
 {
-   Readline_Leaks
-   Memcheck:Leak
-   ...
-   fun:readline
-}
-{
-   Readline_Leaks_AddHistory
-   Memcheck:Leak
-   ...
-   fun:add_history
-}
-{
    Readline_All_Functions
    Memcheck:Leak
    ...

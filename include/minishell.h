@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/11 10:44:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 13:20:41 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,7 +224,7 @@ void						exec_cmda_child(t_ctx *ctx, t_command *current_cmd,
 void						exec_cmda_parent(t_command **current_cmd,
 								int *pipe_prev, int *pipe_curr);
 t_bool						command_bin(t_ctx *ctx);
-void						exec_cmdas(t_ctx *ctx);
+t_bool						exec_cmdas(t_ctx *ctx);
 
 // Signals
 void						setup_signals(void);

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/11 10:31:07 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 13:26:41 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,11 +84,12 @@ static void	main_exec_loop(t_ctx *ctx, t_command *current_cmd, int *pipe_prev,
  *
  * @param ctx Context
  */
-void	exec_cmdas(t_ctx *ctx)
+t_bool	exec_cmdas(t_ctx *ctx)
 {
 	t_command	*current_cmd;
 	int			pipe_prev[2];
 	int			pipe_curr[2];
+	int			wstatus;
 
 	current_cmd = ctx->cmd;
 	null_pipes(pipe_prev, pipe_curr);
@@ -97,6 +98,7 @@ void	exec_cmdas(t_ctx *ctx)
 		close(ctx->fd_file_in);
 	if (ctx->fd_file_out != -1)
 		close(ctx->fd_file_out);
-	while (wait(NULL) > 0)
-		;
+	if (waitpid(0, &wstatus, 0) == -1)
+		return (-1);
+	return (wstatus);
 }

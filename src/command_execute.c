@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/11 10:43:57 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/11 13:23:06 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,13 +91,16 @@ static int	ensure_arguments(t_command *cmd)
  */
 int	command_execute(t_ctx *ctx)
 {
-	if (!ctx || !ctx->cmd || !ctx->cmd->cmd)
+	int	out;
+
+	if (!ctx || !ctx->cmd)
+		return (ctx_error(ERR_ALLOC), -1);
+	if (!ctx->cmd->cmd)
 		return (-1);
 	if (builtins_try(ctx, ctx->cmd))
 		return (0);
 	if (!command_bin(ctx))
 		return (ctx_error(ERR_CMD_NOT_FOUND));
-	exec_cmdas(ctx);
 	if (ensure_arguments(ctx->cmd) != 0)
 	{
 		free(ctx->cmd->cmd);
@@ -108,7 +111,8 @@ int	command_execute(t_ctx *ctx)
 		free(ctx->cmd->cmd);
 		return (-1);
 	}
-	execve(ctx->cmd->cmd, ctx->cmd->args, ctx->envp);
-	free(ctx->cmd->cmd);
-	return (ctx_error(ERR_CMD_NOT_FOUND));
+	out = exec_cmdas(ctx);
+	if (out == -1)
+		return (ctx_error(ERR_CMD_NOT_FOUND));
+	return (out);
 }
