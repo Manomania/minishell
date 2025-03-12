@@ -1,36 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctx_init.c                                         :+:      :+:    :+:   */
+/*   free_ctx.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/10 11:20:48 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/12 18:24:28 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/12 18:24:51 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Initializes the context
+ * @brief Clears the context and frees all allocated resources
  *
- * @param argc Arguments count
- * @param argv Arguments
- * @param envp Environment variables
- * @return t_ctx* Context
+ * @param ctx context
  */
-t_ctx	*ctx_init(int argc, char **argv, char **envp)
+void	ctx_clear(t_ctx *ctx)
 {
-	t_ctx	*ctx;
-
-	ctx = malloc(sizeof(t_ctx));
+	if (!ctx)
+		return ;
+	if (ctx->tokens)
+		free_all_token(ctx->tokens);
 	ctx->tokens = NULL;
+	if (ctx->cmd)
+		command_free(ctx->cmd);
 	ctx->cmd = NULL;
-	ctx->argc = argc;
-	ctx->argv = argv;
-	ctx->envp = envp;
-	ctx->fd_file_in = -1;
-	ctx->fd_file_out = -1;
-	return (ctx);
+	clear_history();
+	rl_free_line_state();
+	rl_cleanup_after_signal();
+	if (ctx->fd_file_in != -1)
+		close(ctx->fd_file_in);
+	if (ctx->fd_file_out != -1)
+		close(ctx->fd_file_out);
+	if (ctx->env_list)
+		free_env_list(ctx->env_list);
+	free(ctx);
 }

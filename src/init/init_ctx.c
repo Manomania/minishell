@@ -1,23 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctx_init.c                                         :+:      :+:    :+:   */
+/*   init_ctx.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/05 10:57:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/12 18:19:29 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_ctx	*init_ctx(char **envp)
+/**
+ * @brief Initializes the context
+ *
+ * @param argc Arguments count
+ * @param argv Arguments
+ * @param envp Environment variables
+ * @return t_ctx* Context
+ */
+t_ctx	*ctx_init(int argc, char **argv, char **envp)
 {
 	t_ctx	*ctx;
 	int		i;
 
-	ctx = (t_ctx *)malloc(sizeof(t_ctx));
+	ctx = malloc(sizeof(t_ctx));
 	if (!ctx)
 		return (NULL);
 	ctx->env_list = NULL;
@@ -33,6 +41,13 @@ t_ctx	*init_ctx(char **envp)
 		}
 		i++;
 	}
+	ctx->tokens = NULL;
+	ctx->cmd = NULL;
+	ctx->argc = argc;
+	ctx->argv = argv;
+	ctx->envp = envp;
+	ctx->fd_file_in = -1;
+	ctx->fd_file_out = -1;
 	return (ctx);
 }
 

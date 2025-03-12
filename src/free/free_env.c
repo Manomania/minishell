@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_env.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:42:24 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/10 14:42:26 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/12 18:24:54 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,18 +61,4 @@ int	parse_env_var(char *env_str, t_env **env_list)
 	result = add_env_var(env_list, key, value);
 	free(key);
 	return (result);
-}
-
-/**
- * @brief Frees all memory allocated for the shell context
- *
- * @param ctx Pointer to the context structure to free
- */
-void	free_ctx(t_ctx *ctx)
-{
-	if (!ctx)
-		return ;
-	if (ctx->env_list)
-		free_env_list(ctx->env_list);
-	free(ctx);
 }

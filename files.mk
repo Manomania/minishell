@@ -1,5 +1,8 @@
 SRC_F				=	free/free \
 						free/free_env \
+						free/free_2d_array \
+						free/free_ctx \
+						free/pipes_utils \
 						init/init_ctx \
 						init/init_parse \
 						lexer/lexer_read \
@@ -9,28 +12,24 @@ SRC_F				=	free/free \
 						parser/parser_command \
 						parser/parser_pipeline \
 						parser/parser_utils \
-						ctx_init \
-						ctx_clear \
-						ctx_error \
-						ctx_error_exit \
-						ctx_exit \
-						command_execute \
-						command_parse \
-						command_add \
-						command_new \
-						command_free \
-						command_redirections \
-						command_bin \
-						debug_utils \
-						builtins_try \
-						bin_find \
-						bin_find_path \
-						env_find \
-						env_find_bin \
-						free_2d_array \
-						signals \
-						exec_cmdas \
-						exec_cmda_child \
-						exec_cmdas_get_fds \
-						pipes_utils \
+						command/command_execute \
+						command/command_parse \
+						command/command_add \
+						command/command_new \
+						command/command_free \
+						command/command_redirections \
+						command/command_bin \
+						ctx/ctx_exit \
+						error/ctx_error \
+						error/ctx_error_exit \
+						exec/exec_cmdas \
+						exec/exec_cmda_child \
+						exec/exec_cmdas_get_fds \
+						path/bin_find \
+						path/bin_find_path \
+						builtins/builtins_try \
+						env/env_find \
+						env/env_find_bin \
+						signals/signals \
+						debug/debug_utils \
 						main
