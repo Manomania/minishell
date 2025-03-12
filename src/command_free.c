@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:49:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/11 18:10:31 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/12 17:17:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,11 @@ void	command_free(t_command *cmd)
 
 	if (!cmd)
 		return ;
-	if (cmd->cmd)
-		free(cmd->cmd);
+	if (cmd->args[0])
+	{
+		free(cmd->args[0]);
+		cmd->args[0] = NULL;
+	}
 	if (cmd->args)
 	{
 		i = 0;
@@ -56,6 +59,6 @@ void	command_free(t_command *cmd)
 		}
 		free(cmd->args);
 	}
-	free_redirections(cmd->redirections);
+	free_redirections(cmd->redirection);
 	free(cmd);
 }

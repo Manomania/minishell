@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 19:27:50 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/11 13:12:22 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/12 17:56:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,8 @@ void	exec_cmda_child(t_ctx *ctx, t_command *current_cmd, int *pipe_prev,
 	handle_input(ctx, pipe_prev);
 	handle_output(ctx, current_cmd, pipe_curr);
 	args = current_cmd->args;
-	execve(current_cmd->cmd, args, ctx->envp);
+	args++;
+	execve(current_cmd->args[0], args, ctx->envp);
 	ctx_clear(ctx);
 	exit(EXIT_FAILURE);
 }

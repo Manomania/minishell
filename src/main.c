@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/11 18:13:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/12 17:13:54 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,8 @@ static t_bool	main_loop(t_ctx *ctx)
 		ctx->tokens = NULL;
 		return (true);
 	}
-	if (ctx->cmd->cmd && ft_strncmp(ctx->cmd->cmd, "exit", __INT_MAX__) == 0)
+	if (ctx->cmd->args[0] && ft_strncmp(ctx->cmd->args[0], "exit",
+			__INT_MAX__) == 0)
 		should_exit = true;
 	if (!should_exit)
 		status = command_execute(ctx);

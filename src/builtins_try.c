@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:19:14 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 13:57:06 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/12 17:18:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
  */
 t_bool	builtins_try(t_ctx *ctx, t_command *cmd)
 {
-	if (ft_strncmp(cmd->cmd, "exit", __INT_MAX__) == 0)
+	if (ft_strncmp(cmd->args[0], "exit", __INT_MAX__) == 0)
 		ctx_exit(ctx);
 	return (false);
 }

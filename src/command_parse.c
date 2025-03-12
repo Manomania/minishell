@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/11 18:09:52 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/12 17:13:37 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,12 @@ static int	handle_redirection(t_command *cmd, t_token *token,
  */
 static t_bool	init_command_args(t_command *cmd)
 {
-	if (!cmd->args && cmd->cmd)
+	if (!cmd->args && cmd->args[0])
 	{
 		cmd->args = malloc(sizeof(char *) * 2);
 		if (!cmd->args)
 			return (false);
-		cmd->args[0] = ft_strdup(cmd->cmd);
+		cmd->args[0] = ft_strdup(cmd->args[0]);
 		if (!cmd->args[0])
 		{
 			free(cmd->args);
@@ -83,8 +83,8 @@ t_command	*command_parse(t_token *tokens)
 	{
 		if (current->type == TOK_WORD)
 		{
-			if (!cmd->cmd)
-				cmd->cmd = ft_strdup(current->value);
+			if (!cmd->args[0])
+				cmd->args[0] = ft_strdup(current->value);
 			else
 			{
 				if (!cmd->args && !init_command_args(cmd))
@@ -101,7 +101,7 @@ t_command	*command_parse(t_token *tokens)
 		if (current)
 			current = current->next;
 	}
-	if (cmd->cmd && !init_command_args(cmd))
+	if (cmd->args[0] && !init_command_args(cmd))
 		return (command_free(cmd), NULL);
 	return (cmd);
 }

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:52:18 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/11 12:12:00 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/12 17:18:16 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,15 @@ t_bool	command_bin(t_ctx *ctx)
 	char	*bin_og;
 	char	*bin;
 
-	bin_og = ctx->cmd->cmd;
+	bin_og = ctx->cmd->args[0];
 	bin = bin_find(ctx, bin_og);
 	if (!bin)
 	{
 		free(bin_og);
-		ctx->cmd->cmd = NULL;
+		ctx->cmd->args[0] = NULL;
 		return (false);
 	}
 	free(bin_og);
-	ctx->cmd->cmd = bin;
+	ctx->cmd->args[0] = bin;
 	return (true);
 }

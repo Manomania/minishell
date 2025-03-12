@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/11 13:23:06 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/12 17:13:14 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,28 +57,13 @@ void	execute_command_in_pipeline(t_ctx *ctx, t_command *cmd, int pipes[2][2],
  */
 static int	ensure_arguments(t_command *cmd)
 {
-	if (!cmd->cmd)
-		return (-1);
 	if (!cmd->args)
 	{
 		cmd->args = malloc(sizeof(char *) * 2);
 		if (!cmd->args)
 			return (-1);
-		cmd->args[0] = ft_strdup(cmd->cmd);
-		if (!cmd->args[0])
-		{
-			free(cmd->args);
-			cmd->args = NULL;
-			return (-1);
-		}
 		cmd->args[1] = NULL;
 		cmd->arg_count = 1;
-	}
-	else if (cmd->args[0] == NULL)
-	{
-		cmd->args[0] = ft_strdup(cmd->cmd);
-		if (!cmd->args[0])
-			return (-1);
 	}
 	return (0);
 }
@@ -95,7 +80,7 @@ int	command_execute(t_ctx *ctx)
 
 	if (!ctx || !ctx->cmd)
 		return (ctx_error(ERR_ALLOC), -1);
-	if (!ctx->cmd->cmd)
+	if (!ctx->cmd->args[0])
 		return (-1);
 	if (builtins_try(ctx, ctx->cmd))
 		return (0);
@@ -103,12 +88,12 @@ int	command_execute(t_ctx *ctx)
 		return (ctx_error(ERR_CMD_NOT_FOUND));
 	if (ensure_arguments(ctx->cmd) != 0)
 	{
-		free(ctx->cmd->cmd);
+		free(ctx->cmd->args[0]);
 		return (ctx_error(ERR_ALLOC));
 	}
-	if (handle_redirections(ctx->cmd->redirections) != 0)
+	if (handle_redirections(ctx->cmd->redirection) != 0)
 	{
-		free(ctx->cmd->cmd);
+		free(ctx->cmd->args[0]);
 		return (-1);
 	}
 	out = exec_cmdas(ctx);

@@ -1,8 +1,14 @@
-SRC_F				=	init_parsing \
-						lexer_utils \
-						token_utils \
-						token_is \
-						parse_line \
+SRC_F				=	free/free \
+						free/free_env \
+						init/init_ctx \
+						init/init_parse \
+						lexer/lexer_read \
+						lexer/lexer_token \
+						lexer/lexer_utils \
+						lexer/lexer_token_is \
+						parser/parser_command \
+						parser/parser_pipeline \
+						parser/parser_utils \
 						ctx_init \
 						ctx_clear \
 						ctx_error \
