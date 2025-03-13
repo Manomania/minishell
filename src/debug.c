@@ -229,19 +229,19 @@ int	main(int argc, char **argv, char **envp)
 	{
 		input = readline(YELLOW"minishell$ "RESET);
 		if (!input)
-			break ;
+			break;
 		if (input[0] != '\0')
 			add_history(input);
 		if (ft_strncmp(input, "exit", ft_strlen(input)) == 0)
 		{
 			free(input);
-			break ;
+			break;
 		}
 		tokens = tokenize(input);
 		if (tokens)
 		{
 			print_tokens(tokens);
-			commands = parse_token(tokens);
+			commands = parse_token(tokens, ctx);
 			if (commands)
 			{
 				print_commands(commands);

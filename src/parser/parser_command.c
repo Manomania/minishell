@@ -57,10 +57,19 @@ void	add_redirection(t_command *cmd, t_redirection *redirection)
 	current->next = current;
 }
 
-int	parse_redirection(t_parse *parse, t_command *cmd)
+/**
+ * @brief Parses a redirection with environment variable expansion
+ *
+ * @param parse Parser context
+ * @param cmd Command structure
+ * @param ctx Shell context
+ * @return 1 if successful, 0 on error
+ */
+int	parse_redirection(t_parse *parse, t_command *cmd, t_ctx *ctx)
 {
 	t_token_type	type;
 	t_redirection	*redirection;
+	char			*expanded;
 
 	type = parse->current->type;
 	advance_parse(parse);
@@ -69,7 +78,14 @@ int	parse_redirection(t_parse *parse, t_command *cmd)
 		ft_printf(RED"Error: Expected filename after redirection\n"RESET);
 		return (0);
 	}
-	redirection = create_redirection(type, parse->current->value);
+	if (type == TOK_HERE_DOC_FROM)
+		redirection = create_redirection(type, parse->current->value);
+	else
+	{
+		expanded = handle_quotes_and_vars(ctx, parse->current->value);
+		redirection = create_redirection(type, expanded);
+		free(expanded);
+	}
 	if (!redirection)
 		return (0);
 	add_redirection(cmd, redirection);
@@ -77,9 +93,32 @@ int	parse_redirection(t_parse *parse, t_command *cmd)
 	return (1);
 }
 
-t_command	*parse_command(t_parse *parse)
+/**
+ * @brief Process token value with environment variable expansion
+ *
+ * @param ctx Shell context
+ * @param token_value Token value to process
+ * @return Processed value with environment variables expanded
+ */
+char	*process_token(t_ctx *ctx, char *token_value)
+{
+	char	*expanded;
+
+	expanded = handle_quotes_and_vars(ctx, token_value);
+	return (expanded);
+}
+
+/**
+ * @brief Parses a command with environment variable expansion
+ *
+ * @param parse Parser context
+ * @param ctx Shell context
+ * @return Command structure or NULL on error
+ */
+t_command	*parse_command(t_parse *parse, t_ctx *ctx)
 {
 	t_command	*cmd;
+	char		*expanded;
 
 	cmd = create_command();
 	if (!cmd)
@@ -90,11 +129,26 @@ t_command	*parse_command(t_parse *parse)
 	{
 		if (parse->current->type == TOK_WORD)
 		{
-			if (!add_argument(cmd, parse->current->value))
+			expanded = handle_quotes_and_vars(ctx, parse->current->value);
+			if (!add_argument(cmd, expanded))
 			{
-				free(cmd);
+				free(expanded);
+				free_command(cmd);
 				return (NULL);
 			}
+			free(expanded);
+			advance_parse(parse);
+		}
+		else if (parse->current->type == TOK_ENV)
+		{
+			expanded = expand_var(ctx, parse->current->value);
+			if (!add_argument(cmd, expanded))
+			{
+				free(expanded);
+				free_command(cmd);
+				return (NULL);
+			}
+			free(expanded);
 			advance_parse(parse);
 		}
 		else if (parse->current->type == TOK_REDIR_FROM
@@ -102,8 +156,11 @@ t_command	*parse_command(t_parse *parse)
 			|| parse->current->type == TOK_HERE_DOC_FROM
 			|| parse->current->type == TOK_HERE_DOC_TO)
 		{
-			if (!parse_redirection(parse, cmd))
+			if (!parse_redirection(parse, cmd, ctx))
+			{
+				free_command(cmd);
 				return (NULL);
+			}
 		}
 		else
 			advance_parse(parse);
@@ -111,7 +168,14 @@ t_command	*parse_command(t_parse *parse)
 	return (cmd);
 }
 
-t_command	*parse_token(t_token *token)
+/**
+ * @brief Parses a token list with environment variable expansion
+ *
+ * @param token Token list
+ * @param ctx Shell context
+ * @return Command structure or NULL on error
+ */
+t_command	*parse_token(t_token *token, t_ctx *ctx)
 {
 	t_parse		parse;
 	t_command	*cmd;
@@ -124,7 +188,7 @@ t_command	*parse_token(t_token *token)
 		ft_printf(RED"Error: Unexpected token at start of command\n"RESET);
 		return (NULL);
 	}
-	cmd = parse_command_sequence(&parse);
+	cmd = parse_command_sequence(&parse, ctx);
 	if (!cmd)
 		return (NULL);
 	if (parse.current->type != TOK_EOF)

@@ -13,6 +13,21 @@
 #include "minishell.h"
 
 /**
+ * Checks if the current lexer character is a lone '$' symbol.
+ *
+ * @param lexer Pointer to the lexer structure
+ * @return 1 if lone '$', 0 otherwise
+ */
+static int	is_lone_dollar(t_lexer *lexer)
+{
+	return (get_lexer(lexer) == ' ' || get_lexer(lexer) == '\t'
+		|| get_lexer(lexer) == '\0' || get_lexer(lexer) == '<'
+		|| get_lexer(lexer) == '>' || get_lexer(lexer) == '|'
+		|| get_lexer(lexer) == '"' || get_lexer(lexer) == '\''
+		|| get_lexer(lexer) == '&');
+}
+
+/**
  * @brief Extracts the next token from the lexer
  *
  * @param lexer Pointer to lexer structure
@@ -77,6 +92,8 @@ t_token	*next_token_lexer(t_lexer *lexer)
 	if (current == '$')
 	{
 		advance_lexer(lexer);
+		if (is_lone_dollar(lexer))
+			return (create_token(TOK_WORD, ft_strdup("$")));
 		word = read_word_lexer(lexer);
 		if (word)
 			return (create_token(TOK_ENV, word));

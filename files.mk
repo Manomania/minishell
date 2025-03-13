@@ -1,4 +1,5 @@
-SRC_F				=	free/free \
+SRC_F				=	env/env \
+						free/free \
 						free/free_env \
 						init/init_ctx \
 						init/init_parse \

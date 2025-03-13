@@ -103,6 +103,11 @@ typedef struct s_ctx
 *                             Function Prototypes                              *
 *******************************************************************************/
 
+// env.c
+char			*expand_var(t_ctx *ctx, char *var_name);
+char			*expand_env_vars(t_ctx *ctx, char *str);
+char			*handle_quotes_and_vars(t_ctx *ctx, char *str);
+
 // init.c
 t_ctx			*init_ctx(char **envp);
 t_env			*create_env_node(char *key, char *value);
@@ -141,13 +146,13 @@ int				check_token_type(t_parse *parse, t_token_type type);
 //parser_command.c
 int				add_argument(t_command *cmd, char *value);
 void			add_redirection(t_command *cmd, t_redirection *redirection);
-int				parse_redirection(t_parse *parse, t_command *cmd);
-t_command		*parse_command(t_parse *parse);
-t_command		*parse_token(t_token *token);
+int				parse_redirection(t_parse *parse, t_command *cmd, t_ctx *ctx);
+t_command		*parse_command(t_parse *parse, t_ctx *ctx);
+t_command		*parse_token(t_token *token, t_ctx *ctx);
 
 //parser_pipeline.c
-t_command		*parse_pipeline(t_parse *parse);
-t_command		*parse_command_sequence(t_parse *parse);
+t_command		*parse_pipeline(t_parse *parse, t_ctx *ctx);
+t_command		*parse_command_sequence(t_parse *parse, t_ctx *ctx);
 void			connect_commands(t_command *left_cmd, t_command *right_cmd, t_token_type op_type);
 
 // free.c
@@ -161,5 +166,8 @@ void			free_all_commands(t_command *cmd);
 void			free_env_list(t_env *env_list);
 int				parse_env_var(char *env_str, t_env **env_list);
 void			free_ctx(t_ctx *ctx);
+
+// debug.c
+char			*get_env_value(t_env *env_list, char *key);
 
 #endif
