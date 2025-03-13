@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 18:24:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 12:27:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,7 @@
  * @brief Checks if a string is a path and not just a command
  *
  * @param str The string to check
- * @return t_bool true if the string is a path, false if it's just a command
- *
- * @example
- * is_path("ls")        // Returns false (command)
- * is_path("./ls")      // Returns true (relative path)
- * is_path("../bin/ls") // Returns true (relative path with parent dir)
- * is_path("/bin/ls")   // Returns true (absolute path)
- * is_path("~/bin/ls")  // Returns true (home directory path)
- * is_path(NULL)        // Returns false (null pointer protection)
+ * @return t_bool true if the string is a path, false if just a command
  */
 static t_bool	is_path(const char *str)
 {
@@ -40,7 +32,7 @@ static t_bool	is_path(const char *str)
 	while (str[i])
 	{
 		if (str[i] == '/' || (str[i] == '.' && (str[i + 1] == '/' || str[i
-						+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
+					+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
 							|| str[i + 2] == '\0')))))
 			return (true);
 		i++;
@@ -56,9 +48,40 @@ static t_bool	is_path(const char *str)
  */
 static char	*try_direct_path(char *bin)
 {
-	if (access(bin, X_OK) == 0)
-		return (ft_strdup(bin));
+	if (access(bin, F_OK) == 0)
+	{
+		if (access(bin, X_OK) == 0)
+			return (ft_strdup(bin));
+		ft_printf("Permission denied: %s\n", bin);
+		return (NULL);
+	}
 	return (NULL);
+}
+
+/**
+ * @brief Resolves a relative path to an absolute path
+ *
+ * @param bin Path to resolve
+ * @return char* Absolute path or NULL on error
+ */
+static char	*resolve_relative_path(char *bin)
+{
+	char	*cwd;
+	char	*absolute_path;
+	char	*tmp;
+
+	if (bin[0] == '/')
+		return (ft_strdup(bin));
+	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		return (NULL);
+	tmp = ft_strjoin(cwd, "/");
+	free(cwd);
+	if (!tmp)
+		return (NULL);
+	absolute_path = ft_strjoin(tmp, bin);
+	free(tmp);
+	return (absolute_path);
 }
 
 /**
@@ -79,6 +102,13 @@ char	*bin_find(t_ctx *ctx, char *bin)
 		path = try_direct_path(bin);
 		if (path)
 			return (path);
+		if (bin[0] != '/')
+		{
+			path = resolve_relative_path(bin);
+			if (path && access(path, X_OK) == 0)
+				return (path);
+			free(path);
+		}
 		return (bin_find_path(ctx, ".", bin));
 	}
 	return (env_find_bin(ctx, bin));

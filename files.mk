@@ -1,8 +1,9 @@
-SRC_F				=	free/free \
+SRC_F				= \
 						free/free_env \
 						free/free_2d_array \
 						free/free_ctx \
 						free/pipes_utils \
+						free/free_all_commands \
 						init/init_ctx \
 						init/init_parse \
 						lexer/lexer_read \
@@ -16,7 +17,6 @@ SRC_F				=	free/free \
 						command/command_parse \
 						command/command_add \
 						command/command_new \
-						command/command_free \
 						command/command_redirections \
 						command/command_bin \
 						ctx/ctx_exit \

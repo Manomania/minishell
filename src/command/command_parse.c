@@ -6,14 +6,43 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 11:51:10 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 12:13:23 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Handles redirection tokens and adds them to the command
+ * @brief Processes a word token during command parsing
+ *
+ * @param cmd Command structure being built
+ * @param token Current token being processed
+ * @return t_bool true on success, false on failure
+ */
+static t_bool	process_word_token(t_command *cmd, t_token *token)
+{
+	if (!cmd->args)
+	{
+		cmd->args = malloc(sizeof(char *) * 2);
+		if (!cmd->args)
+			return (false);
+		cmd->args[0] = ft_strdup(token->value);
+		if (!cmd->args[0])
+		{
+			free(cmd->args);
+			cmd->args = NULL;
+			return (false);
+		}
+		cmd->args[1] = NULL;
+		cmd->arg_count = 0;
+	}
+	else if (command_add_argument(cmd, token->value) != 0)
+		return (false);
+	return (true);
+}
+
+/**
+ * @brief Processes a redirection token during command parsing
  *
  * @param cmd Command to add redirection to
  * @param token Current redirection token
@@ -38,48 +67,59 @@ static int	handle_redirection(t_command *cmd, t_token *token,
 }
 
 /**
- * @brief Initialize command with first arg as command name
- * Command name goes to args[0] as per standard convention
+ * @brief Processes tokens until end of command or pipeline marker
  *
- * @param cmd Command structure to initialize
- * @param cmd_name Name of the command to set
- * @return t_bool Whether the function succeeded or not
+ * @param current Current token pointer reference
+ * @param cmd Current command being built
+ * @return t_bool true on success, false on failure
  */
-static t_bool	init_command(t_command *cmd, char *cmd_name)
+static t_bool	process_command_tokens(t_token **current, t_command *cmd)
 {
-	if (!cmd || !cmd_name)
-		return (false);
-	cmd->args = malloc(sizeof(char *) * 2);
-	if (!cmd->args)
-		return (false);
-	cmd->args[0] = ft_strdup(cmd_name);
-	if (!cmd->args[0])
+	while (*current && (*current)->type != TOK_PIPE)
 	{
-		free(cmd->args);
-		cmd->args = NULL;
-		return (false);
+		if ((*current)->type == TOK_WORD)
+		{
+			if (!process_word_token(cmd, *current))
+				return (false);
+		}
+		else if (token_is_redirection((*current)->type))
+		{
+			if ((*current)->next && handle_redirection(cmd, *current,
+					(*current)->next) == -1)
+				return (false);
+			if ((*current)->next)
+				*current = (*current)->next;
+		}
+		if (*current)
+			*current = (*current)->next;
 	}
-	cmd->args[1] = NULL;
-	cmd->arg_count = 0;
 	return (true);
 }
 
 /**
- * @brief Process a word token during command parsing
+ * @brief Creates commands for a pipeline of commands
  *
- * @param cmd Command structure being built
- * @param token Current token being processed
+ * @param cmd Current command pointer reference
+ * @param current Current token pointer reference
  * @return t_bool true on success, false on failure
  */
-static t_bool	process_word_token(t_command *cmd, t_token *token)
+static t_bool	create_pipeline(t_command **cmd, t_token **current)
 {
-	if (!cmd->args)
+	t_command	*new_cmd;
+
+	if (*current && (*current)->type == TOK_PIPE)
 	{
-		if (!init_command(cmd, token->value))
+		new_cmd = command_new();
+		if (!new_cmd)
 			return (false);
+		(*cmd)->next = new_cmd;
+		*cmd = new_cmd;
+		*current = (*current)->next;
+		if (!process_command_tokens(current, *cmd))
+			return (false);
+		if (*current && (*current)->type == TOK_PIPE)
+			return (create_pipeline(cmd, current));
 	}
-	else if (command_add_argument(cmd, token->value) != 0)
-		return (false);
 	return (true);
 }
 
@@ -91,30 +131,24 @@ static t_bool	process_word_token(t_command *cmd, t_token *token)
  */
 t_command	*command_parse(t_token *tokens)
 {
-	t_command *cmd;
-	t_token *current;
+	t_command	*cmd;
+	t_command	*first_cmd;
+	t_token		*current;
 
 	cmd = command_new();
 	if (!cmd)
 		return (NULL);
+	first_cmd = cmd;
 	current = tokens;
-	while (current && current->type != TOK_PIPE)
+	if (!process_command_tokens(&current, cmd))
 	{
-		if (current->type == TOK_WORD)
-		{
-			if (!process_word_token(cmd, current))
-				return (command_free(cmd), NULL);
-		}
-		else if (token_is_redirection(current->type))
-		{
-			if (current->next && handle_redirection(cmd, current,
-					current->next) == -1)
-				return (command_free(cmd), NULL);
-			if (current->next)
-				current = current->next;
-		}
-		if (current)
-			current = current->next;
+		free_all_commands(first_cmd);
+		return (NULL);
 	}
-	return (cmd);
+	if (!create_pipeline(&cmd, &current))
+	{
+		free_all_commands(first_cmd);
+		return (NULL);
+	}
+	return (first_cmd);
 }

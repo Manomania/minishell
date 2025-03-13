@@ -6,98 +6,80 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/12 17:13:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 12:27:43 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Child cleanup - frees all resources in child process
+ * @brief Executes a single command without a pipeline
  *
- * @param ctx Context to clean up
- * @param error_code Exit code to use
+ * @param ctx Context with environment
+ * @return int Exit status of the command
  */
-static void	child_cleanup_exit(t_ctx *ctx, int error_code)
+static int	execute_single_command(t_ctx *ctx)
 {
-	ctx_clear(ctx);
-	exit(error_code);
-}
+	pid_t	pid;
+	int		status;
+	int		exit_code;
 
-/**
- * @brief Handles the execution of a command in a pipeline
- *
- * @param ctx Context
- * @param cmd Command to execute
- * @param pipes Array of pipe file descriptors
- * @param cmd_index Index of the command in the pipeline
- * @param cmd_count Total number of commands in the pipeline
- */
-void	execute_command_in_pipeline(t_ctx *ctx, t_command *cmd, int pipes[2][2],
-		int cmd_index, int cmd_count)
-{
-	reset_signals();
-	if (cmd_index > 0)
-		dup2(pipes[0][0], STDIN_FILENO);
-	if (cmd_index < cmd_count - 1)
-		dup2(pipes[1][1], STDOUT_FILENO);
-	close_all_pipes(pipes);
-	if (builtins_try(ctx, cmd))
-		child_cleanup_exit(ctx, EXIT_SUCCESS);
-	if (command_execute(ctx) != EXIT_SUCCESS)
-		child_cleanup_exit(ctx, EXIT_FAILURE);
-	child_cleanup_exit(ctx, EXIT_SUCCESS);
-}
-
-/**
- * @brief Ensure command has arguments array properly initialized
- *
- * @param cmd Command to initialize arguments for
- * @return int 0 on success, -1 on error
- */
-static int	ensure_arguments(t_command *cmd)
-{
-	if (!cmd->args)
+	if (builtins_try(ctx, ctx->cmd))
+		return (0);
+	if (!command_bin(ctx))
+		return (ctx_error(ERR_CMD_NOT_FOUND));
+	pid = fork();
+	if (pid == -1)
+		return (ctx_error(ERR_CHILD));
+	if (pid == 0)
 	{
-		cmd->args = malloc(sizeof(char *) * 2);
-		if (!cmd->args)
-			return (-1);
-		cmd->args[1] = NULL;
-		cmd->arg_count = 1;
+		handle_redirections(ctx->cmd->redirection);
+		if (!ctx->cmd->args[0] || access(ctx->cmd->args[0], X_OK) != 0)
+		{
+			ft_printf("Command not found or not executable: %s\n",
+				ctx->cmd->args[0] ? ctx->cmd->args[0] : "NULL");
+			exit(EXIT_FAILURE);
+		}
+		if (execve(ctx->cmd->args[0], ctx->cmd->args, ctx->envp) == -1)
+		{
+			perror("execve");
+			exit(EXIT_FAILURE);
+		}
 	}
-	return (0);
+	waitpid(pid, &status, 0);
+	if (WIFEXITED(status))
+		exit_code = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+		exit_code = 128 + WTERMSIG(status);
+	else
+		exit_code = 1;
+	return (exit_code);
 }
 
 /**
- * @brief Executes a command with execve
+ * @brief Checks if the command is part of a pipeline
+ *
+ * @param cmd Command to check
+ * @return t_bool true if command is part of a pipeline
+ */
+static t_bool	is_pipeline(t_command *cmd)
+{
+	return (cmd && cmd->next);
+}
+
+/**
+ * @brief Executes a command or pipeline
  *
  * @param ctx Context containing environment
  * @return int 0 on success, -1 on error
  */
 int	command_execute(t_ctx *ctx)
 {
-	int	out;
-
 	if (!ctx || !ctx->cmd)
-		return (ctx_error(ERR_ALLOC), -1);
-	if (!ctx->cmd->args[0])
-		return (-1);
-	if (builtins_try(ctx, ctx->cmd))
-		return (0);
-	if (!command_bin(ctx))
-		return (ctx_error(ERR_CMD_NOT_FOUND));
-	if (ensure_arguments(ctx->cmd) != 0)
-	{
-		free(ctx->cmd->args[0]);
 		return (ctx_error(ERR_ALLOC));
-	}
-	if (handle_redirections(ctx->cmd->redirection) != 0)
-	{
-		free(ctx->cmd->args[0]);
+	if (!ctx->cmd->args || !ctx->cmd->args[0])
 		return (-1);
-	}
-	out = exec_cmdas(ctx);
-	if (out == -1)
-		return (ctx_error(ERR_CMD_NOT_FOUND));
-	return (out);
+	if (is_pipeline(ctx->cmd))
+		return (exec_cmdas(ctx));
+	return (execute_single_command(ctx));
 }

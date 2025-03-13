@@ -6,35 +6,62 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:40:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 15:07:57 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 12:28:21 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/**
+ * @brief Gets PATH directories from environment
+ *
+ * @param ctx Context
+ * @return char** Array of path directories or NULL if error
+ */
 static char	**env_get_path_dirs(t_ctx *ctx)
 {
 	char	*path_var;
 	char	**path_dirs;
+	int		i;
+	int		len;
 
 	path_var = env_find(ctx, (char *)"PATH=");
 	if (!path_var)
-		return (NULL);
+	{
+		path_dirs = malloc(sizeof(char *) * 5);
+		if (!path_dirs)
+			return (NULL);
+		path_dirs[0] = ft_strdup("/bin");
+		path_dirs[1] = ft_strdup("/usr/bin");
+		path_dirs[2] = ft_strdup("/usr/local/bin");
+		path_dirs[3] = ft_strdup("/sbin");
+		path_dirs[4] = NULL;
+		return (path_dirs);
+	}
 	path_dirs = ft_split(path_var, ':');
 	free(path_var);
 	if (!path_dirs)
-		ctx_error_exit(ctx, ERR_ALLOC);
+	{
+		ctx_error(ERR_ALLOC);
+		return (NULL);
+	}
+	i = 0;
+	while (path_dirs[i])
+	{
+		len = ft_strlen(path_dirs[i]);
+		if (len > 0 && path_dirs[i][len - 1] == '/')
+			path_dirs[i][len - 1] = '\0';
+		i++;
+	}
 	return (path_dirs);
 }
 
 /**
- * @brief Tries to find a binary
+ * @brief Tries to find a binary in PATH
  *
  * @param ctx Context
  * @param bin The binary to search for
- * @return A full path to the binary if it is found and executable, or NULL.
- *
- * @exception	ENOMEM if malloc fails
+ * @return A full path to the binary if found and executable, or NULL
  */
 char	*env_find_bin(t_ctx *ctx, char *bin)
 {
@@ -45,12 +72,17 @@ char	*env_find_bin(t_ctx *ctx, char *bin)
 	if (!bin)
 		return (NULL);
 	path_dirs = env_get_path_dirs(ctx);
+	if (!path_dirs)
+		return (NULL);
 	og_path_dirs = path_dirs;
 	while (*path_dirs)
 	{
 		path = bin_find_path(ctx, *path_dirs, bin);
 		if (path)
-			return (free_2d_array((void **)og_path_dirs), path);
+		{
+			free_2d_array((void **)og_path_dirs);
+			return (path);
+		}
 		path_dirs++;
 	}
 	free_2d_array((void **)og_path_dirs);

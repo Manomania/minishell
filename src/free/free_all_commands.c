@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   command_free.c                                     :+:      :+:    :+:   */
+/*   free_all_commands.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:49:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 11:50:44 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 12:22:02 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,23 @@ void	command_free(t_command *cmd)
 		free_command_args(cmd->args, cmd->arg_count);
 	free_redirections(cmd->redirection);
 	free(cmd);
+}
+
+/**
+ * @brief Frees all commands in a pipeline
+ *
+ * @param cmd First command in the pipeline
+ */
+void	free_all_commands(t_command *cmd)
+{
+	t_command	*current;
+	t_command	*next;
+
+	current = cmd;
+	while (current)
+	{
+		next = current->next;
+		command_free(current);
+		current = next;
+	}
 }

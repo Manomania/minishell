@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/12 17:13:54 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 12:22:50 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,20 +63,21 @@ static t_bool	main_loop(t_ctx *ctx)
 	ctx->cmd = command_parse(ctx->tokens);
 	if (!ctx->cmd)
 	{
-		ctx_error(ERR_UNIMPLEMENTED);
 		free_all_token(ctx->tokens);
 		ctx->tokens = NULL;
-		return (true);
+		return (false);
 	}
-	if (ctx->cmd->args[0] && ft_strncmp(ctx->cmd->args[0], "exit",
-			__INT_MAX__) == 0)
+	if (ctx->cmd->args && ctx->cmd->args[0] && ft_strncmp(ctx->cmd->args[0],
+			"exit", __INT_MAX__) == 0)
 		should_exit = true;
 	if (!should_exit)
 		status = command_execute(ctx);
 	(void)status;
-	command_free(ctx->cmd);
+	if (ctx->cmd)
+		free_all_commands(ctx->cmd);
 	ctx->cmd = NULL;
-	free_all_token(ctx->tokens);
+	if (ctx->tokens)
+		free_all_token(ctx->tokens);
 	ctx->tokens = NULL;
 	return (should_exit);
 }
