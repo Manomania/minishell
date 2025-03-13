@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/13 12:22:50 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 13:38:26 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,42 +44,60 @@
  * @param ctx Context containing environment and state
  * @return t_bool true if the loop should exit, false otherwise
  */
-static t_bool	main_loop(t_ctx *ctx)
+static void	main_loop(t_ctx *ctx, int prev_status)
 {
 	t_bool	should_exit;
+	char	*rdl_str1;
+	char	*rdl_str2;
 	char	*input;
 	int		status;
 
 	should_exit = false;
-	input = readline("$ ");
+	if (prev_status > 0)
+	{
+		rdl_str1 = ft_itoa(prev_status);
+		rdl_str2 = ft_strjoin(rdl_str1, " $ ");
+		if (!rdl_str2)
+			prev_status = -1;
+		input = readline(rdl_str2);
+		free(rdl_str1);
+		free(rdl_str2);
+	}
+	if (prev_status <= 0)
+		input = readline("$ ");
 	if (!input)
-		return (true);
+		return ;
 	if (input[0] != '\0')
 		add_history(input);
 	ctx->tokens = tokenize(input);
 	free(input);
 	if (!ctx->tokens)
-		return (false);
+		return (main_loop(ctx, 0));
 	ctx->cmd = command_parse(ctx->tokens);
 	if (!ctx->cmd)
 	{
 		free_all_token(ctx->tokens);
 		ctx->tokens = NULL;
-		return (false);
+		return (main_loop(ctx, 0));
 	}
 	if (ctx->cmd->args && ctx->cmd->args[0] && ft_strncmp(ctx->cmd->args[0],
 			"exit", __INT_MAX__) == 0)
+	{
+		status = 0;
 		should_exit = true;
+	}
 	if (!should_exit)
 		status = command_execute(ctx);
-	(void)status;
 	if (ctx->cmd)
 		free_all_commands(ctx->cmd);
 	ctx->cmd = NULL;
 	if (ctx->tokens)
 		free_all_token(ctx->tokens);
 	ctx->tokens = NULL;
-	return (should_exit);
+	if (status == -1)
+		status = prev_status;
+	if (!should_exit)
+		main_loop(ctx, status);
 }
 
 /**
@@ -96,9 +114,7 @@ int	main(int argc, char **argv, char **envp)
 
 	ctx = ctx_init(argc, argv, envp);
 	setup_signals();
-	while (1)
-		if (main_loop(ctx))
-			break ;
+	main_loop(ctx, 0);
 	ctx_clear(ctx);
 	return (EXIT_SUCCESS);
 }
