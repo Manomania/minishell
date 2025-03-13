@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/12 17:13:37 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 11:51:10 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,29 +38,48 @@ static int	handle_redirection(t_command *cmd, t_token *token,
 }
 
 /**
- * @brief Initialize command arguments with first arg as command name
- * Following the standard convention where args[0] is the command name
+ * @brief Initialize command with first arg as command name
+ * Command name goes to args[0] as per standard convention
  *
  * @param cmd Command structure to initialize
+ * @param cmd_name Name of the command to set
  * @return t_bool Whether the function succeeded or not
  */
-static t_bool	init_command_args(t_command *cmd)
+static t_bool	init_command(t_command *cmd, char *cmd_name)
 {
-	if (!cmd->args && cmd->args[0])
+	if (!cmd || !cmd_name)
+		return (false);
+	cmd->args = malloc(sizeof(char *) * 2);
+	if (!cmd->args)
+		return (false);
+	cmd->args[0] = ft_strdup(cmd_name);
+	if (!cmd->args[0])
 	{
-		cmd->args = malloc(sizeof(char *) * 2);
-		if (!cmd->args)
-			return (false);
-		cmd->args[0] = ft_strdup(cmd->args[0]);
-		if (!cmd->args[0])
-		{
-			free(cmd->args);
-			cmd->args = NULL;
-			return (false);
-		}
-		cmd->args[1] = NULL;
-		cmd->arg_count = 0;
+		free(cmd->args);
+		cmd->args = NULL;
+		return (false);
 	}
+	cmd->args[1] = NULL;
+	cmd->arg_count = 0;
+	return (true);
+}
+
+/**
+ * @brief Process a word token during command parsing
+ *
+ * @param cmd Command structure being built
+ * @param token Current token being processed
+ * @return t_bool true on success, false on failure
+ */
+static t_bool	process_word_token(t_command *cmd, t_token *token)
+{
+	if (!cmd->args)
+	{
+		if (!init_command(cmd, token->value))
+			return (false);
+	}
+	else if (command_add_argument(cmd, token->value) != 0)
+		return (false);
 	return (true);
 }
 
@@ -72,8 +91,8 @@ static t_bool	init_command_args(t_command *cmd)
  */
 t_command	*command_parse(t_token *tokens)
 {
-	t_command	*cmd;
-	t_token		*current;
+	t_command *cmd;
+	t_token *current;
 
 	cmd = command_new();
 	if (!cmd)
@@ -83,25 +102,19 @@ t_command	*command_parse(t_token *tokens)
 	{
 		if (current->type == TOK_WORD)
 		{
-			if (!cmd->args[0])
-				cmd->args[0] = ft_strdup(current->value);
-			else
-			{
-				if (!cmd->args && !init_command_args(cmd))
-					return (command_free(cmd), NULL);
-				command_add_argument(cmd, current->value);
-			}
+			if (!process_word_token(cmd, current))
+				return (command_free(cmd), NULL);
 		}
 		else if (token_is_redirection(current->type))
 		{
-			if (handle_redirection(cmd, current, current->next) == -1)
+			if (current->next && handle_redirection(cmd, current,
+					current->next) == -1)
 				return (command_free(cmd), NULL);
-			current = current->next;
+			if (current->next)
+				current = current->next;
 		}
 		if (current)
 			current = current->next;
 	}
-	if (cmd->args[0] && !init_command_args(cmd))
-		return (command_free(cmd), NULL);
 	return (cmd);
 }

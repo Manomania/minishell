@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:48:09 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/12 17:16:47 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 11:47:37 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ t_command	*command_new(void)
 	cmd = (t_command *)malloc(sizeof(t_command));
 	if (!cmd)
 		return (NULL);
-	cmd->args = ft_calloc(2, sizeof(char *));
+	cmd->args = NULL;
 	cmd->arg_count = 0;
 	cmd->redirection = NULL;
 	cmd->next = NULL;

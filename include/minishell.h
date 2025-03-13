@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/12 17:55:36 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 11:26:11 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,7 +211,6 @@ void						free_all_commands(t_command *cmd);
 // free_env.c
 void						free_env_list(t_env *env_list);
 int							parse_env_var(char *env_str, t_env **env_list);
-void						free_ctx(t_ctx *ctx);
 
 // init_parsing.c
 t_lexer						*create_lexer(char *input);

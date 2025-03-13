@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/12 18:19:29 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 11:25:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ t_ctx	*ctx_init(int argc, char **argv, char **envp)
 	{
 		if (!parse_env_var(envp[i], &ctx->env_list))
 		{
-			free_ctx(ctx);
+			ctx_clear(ctx);
 			return (NULL);
 		}
 		i++;
