@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 12:27:43 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 12:35:16 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,12 @@ static int	execute_single_command(t_ctx *ctx)
 		if (!ctx->cmd->args[0] || access(ctx->cmd->args[0], X_OK) != 0)
 		{
 			ft_printf("Command not found or not executable: %s\n",
-				ctx->cmd->args[0] ? ctx->cmd->args[0] : "NULL");
+				ctx->cmd->args[0]);
 			exit(EXIT_FAILURE);
 		}
-		if (execve(ctx->cmd->args[0], ctx->cmd->args, ctx->envp) == -1)
-		{
-			perror("execve");
-			exit(EXIT_FAILURE);
-		}
+		execve(ctx->cmd->args[0], ctx->cmd->args, ctx->envp);
+		perror("execve");
+		exit(EXIT_FAILURE);
 	}
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))

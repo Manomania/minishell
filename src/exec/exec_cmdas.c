@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 12:29:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 12:34:11 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,44 +34,47 @@ int	count_commands(t_command *cmd)
 }
 
 /**
- * @brief Resolves binary paths for a command
+ * @brief Sets up the child process for command execution
  *
  * @param ctx Context with environment
- * @param cmd Command to resolve path for
- * @return int 0 on success, -1 on failure
+ * @param cmd Command to execute
+ * @param input_fd Input file descriptor
+ * @param output_fd Output file descriptor
  */
-static int	resolve_command_binary(t_ctx *ctx, t_command *cmd)
+static void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
+		int output_fd)
 {
-	char	*bin_og;
-	char	*bin;
+	char	*bin_path;
 
+	if (input_fd != STDIN_FILENO)
+	{
+		dup2(input_fd, STDIN_FILENO);
+		close(input_fd);
+	}
+	if (output_fd != STDOUT_FILENO)
+	{
+		dup2(output_fd, STDOUT_FILENO);
+		close(output_fd);
+	}
+	if (handle_redirections(cmd->redirection) != 0)
+		exit(EXIT_FAILURE);
+	if (builtins_try(ctx, cmd))
+		exit(EXIT_SUCCESS);
 	if (!cmd->args || !cmd->args[0])
-		return (-1);
-	if (ft_strncmp(cmd->args[0], "cat", __INT_MAX__) == 0
-		|| ft_strncmp(cmd->args[0], "ls", __INT_MAX__) == 0
-		|| ft_strncmp(cmd->args[0], "grep", __INT_MAX__) == 0
-		|| ft_strncmp(cmd->args[0], "echo", __INT_MAX__) == 0
-		|| ft_strncmp(cmd->args[0], "wc", __INT_MAX__) == 0)
+		exit(EXIT_FAILURE);
+	bin_path = bin_find(ctx, cmd->args[0]);
+	if (!bin_path)
 	{
-		bin_og = cmd->args[0];
-		bin = ft_strjoin("/bin/", bin_og);
-		if (!bin)
-			return (-1);
-		free(bin_og);
-		cmd->args[0] = bin;
-		return (0);
+		ft_printf("Command not found: %s\n", cmd->args[0]);
+		exit(EXIT_FAILURE);
 	}
-	bin_og = cmd->args[0];
-	bin = bin_find(ctx, bin_og);
-	if (!bin)
+	free(cmd->args[0]);
+	cmd->args[0] = bin_path;
+	if (execve(cmd->args[0], cmd->args, ctx->envp) == -1)
 	{
-		free(bin_og);
-		cmd->args[0] = NULL;
-		return (-1);
+		perror("execve");
+		exit(EXIT_FAILURE);
 	}
-	free(bin_og);
-	cmd->args[0] = bin;
-	return (0);
 }
 
 /**
@@ -95,34 +98,7 @@ static pid_t	exec_piped_command(t_ctx *ctx, t_command *cmd, int input_fd,
 		return (-1);
 	}
 	if (pid == 0)
-	{
-		if (input_fd != STDIN_FILENO)
-		{
-			dup2(input_fd, STDIN_FILENO);
-			close(input_fd);
-		}
-		if (output_fd != STDOUT_FILENO)
-		{
-			dup2(output_fd, STDOUT_FILENO);
-			close(output_fd);
-		}
-		if (handle_redirections(cmd->redirection) != 0)
-			exit(EXIT_FAILURE);
-		if (builtins_try(ctx, cmd))
-			exit(EXIT_SUCCESS);
-		if (!cmd->args || !cmd->args[0])
-			exit(EXIT_FAILURE);
-		if (resolve_command_binary(ctx, cmd) != 0)
-		{
-			ft_printf("Command not found: %s\n", cmd->args[0]);
-			exit(EXIT_FAILURE);
-		}
-		if (execve(cmd->args[0], cmd->args, ctx->envp) == -1)
-		{
-			perror("execve");
-			exit(EXIT_FAILURE);
-		}
-	}
+		setup_child_process(ctx, cmd, input_fd, output_fd);
 	return (pid);
 }
 
@@ -174,6 +150,38 @@ static int	wait_for_pids(pid_t *pids, int count)
 }
 
 /**
+ * @brief Execute one command in the pipeline process
+ *
+ * @param ctx Context information
+ * @param current Current command being processed
+ * @param pipe_fds Pipe file descriptors
+ * @param i Index of current command
+ * @param cmd_count Total number of commands
+ * @param pids Array of process IDs
+ * @param prev_pipe Previous pipe's read end
+ * @return int Updated previous pipe file descriptor
+ */
+static int	process_pipeline_cmd(t_ctx *ctx, t_command *current,
+		int pipe_fds[2], int i, int cmd_count, pid_t *pids, int prev_pipe)
+{
+	if (i < cmd_count - 1)
+	{
+		if (setup_pipe(pipe_fds) == -1)
+			return (-1);
+	}
+	else
+		pipe_fds[1] = STDOUT_FILENO;
+	pids[i] = exec_piped_command(ctx, current, prev_pipe, pipe_fds[1]);
+	if (prev_pipe != STDIN_FILENO)
+		close(prev_pipe);
+	if (pipe_fds[1] != STDOUT_FILENO)
+		close(pipe_fds[1]);
+	if (i < cmd_count - 1)
+		return (pipe_fds[0]);
+	return (prev_pipe);
+}
+
+/**
  * @brief Execute the commands in a pipeline
  *
  * @param ctx Context
@@ -198,23 +206,13 @@ t_bool	exec_cmdas(t_ctx *ctx)
 	i = 0;
 	while (i < cmd_count)
 	{
-		if (i < cmd_count - 1)
+		prev_pipe = process_pipeline_cmd(ctx, current, pipe_fds, i, cmd_count,
+				pids, prev_pipe);
+		if (prev_pipe == -1)
 		{
-			if (setup_pipe(pipe_fds) == -1)
-			{
-				free(pids);
-				return (ctx_error(ERR_PIPE));
-			}
+			free(pids);
+			return (ctx_error(ERR_PIPE));
 		}
-		else
-			pipe_fds[1] = STDOUT_FILENO;
-		pids[i] = exec_piped_command(ctx, current, prev_pipe, pipe_fds[1]);
-		if (prev_pipe != STDIN_FILENO)
-			close(prev_pipe);
-		if (pipe_fds[1] != STDOUT_FILENO)
-			close(pipe_fds[1]);
-		if (i < cmd_count - 1)
-			prev_pipe = pipe_fds[0];
 		current = current->next;
 		i++;
 	}
