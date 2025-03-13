@@ -97,7 +97,7 @@ char	*read_word_lexer(t_lexer *lexer)
 }
 
 /**
- * @brief Reads a complex word that might contain quotes
+ * @brief Reads a complex word that might contain environment variables
  *
  * @param lexer Pointer to lexer structure
  * @return Newly allocated string containing the word or NULL on error
@@ -108,6 +108,7 @@ char	*read_complex_word(t_lexer *lexer)
 	char	*result;
 	char	*part;
 	char	quote_char;
+	int		dollar_pos;
 
 	result = NULL;
 	while (get_lexer(lexer) != '\0' && get_lexer(lexer) != ' '
@@ -127,6 +128,13 @@ char	*read_complex_word(t_lexer *lexer)
 			result = join_and_free(result, part);
 			free(part);
 		}
+		else if (get_lexer(lexer) == '$')
+		{
+			dollar_pos = lexer->position;
+			if (!result)
+				result = ft_strdup("");
+			break;
+		}
 		else
 		{
 			part = read_word_lexer(lexer);
@@ -134,6 +142,10 @@ char	*read_complex_word(t_lexer *lexer)
 			free(part);
 		}
 	}
+
+	if (!result)
+		return (ft_strdup(""));
+
 	return (result);
 }
 

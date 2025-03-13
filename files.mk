@@ -5,6 +5,7 @@ SRC_F				=	env/env \
 						init/init_parse \
 						lexer/lexer_read \
 						lexer/lexer_token \
+						lexer/lexer_token_utils \
 						lexer/lexer_utils \
 						parser/parser_command \
 						parser/parser_pipeline \

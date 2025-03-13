@@ -13,21 +13,6 @@
 #include "minishell.h"
 
 /**
- * Checks if the current lexer character is a lone '$' symbol.
- *
- * @param lexer Pointer to the lexer structure
- * @return 1 if lone '$', 0 otherwise
- */
-static int	is_lone_dollar(t_lexer *lexer)
-{
-	return (get_lexer(lexer) == ' ' || get_lexer(lexer) == '\t'
-		|| get_lexer(lexer) == '\0' || get_lexer(lexer) == '<'
-		|| get_lexer(lexer) == '>' || get_lexer(lexer) == '|'
-		|| get_lexer(lexer) == '"' || get_lexer(lexer) == '\''
-		|| get_lexer(lexer) == '&');
-}
-
-/**
  * @brief Extracts the next token from the lexer
  *
  * @param lexer Pointer to lexer structure
@@ -36,75 +21,35 @@ static int	is_lone_dollar(t_lexer *lexer)
  */
 t_token	*next_token_lexer(t_lexer *lexer)
 {
+	t_token	*token;
 	char	*word;
-	char	current;
 
 	skip_whitespace_lexer(lexer);
-	current = get_lexer(lexer);
-	if (current == '\0')
-		return (create_token(TOK_EOF, NULL));
-	if (current == '\n')
+	token = handle_basics_token(lexer);
+	if (token)
+		return (token);
+	token = handle_pipe_and_token(lexer);
+	if (token)
+		return (token);
+	token = handle_redir_from_and_to_token(lexer);
+	if (token)
+		return (token);
+	if (get_lexer(lexer) == '$')
 	{
-		advance_lexer(lexer);
-		return (create_token(TOK_NEW_LINE, ft_strdup("\n")));
-	}
-	if (current == '|')
-	{
-		advance_lexer(lexer);
-		if (get_lexer(lexer) == '|')
-		{
-			advance_lexer(lexer);
-			return (create_token(TOK_OR, ft_strdup("||")));
-		}
-		return (create_token(TOK_PIPE, ft_strdup("|")));
-	}
-	if (current == '&')
-	{
-		advance_lexer(lexer);
-		if (get_lexer(lexer) == '&')
-		{
-			advance_lexer(lexer);
-			return (create_token(TOK_AND, ft_strdup("&&")));
-		}
-		ft_printf(RED"Error:\nUnexpected '&'\n"RESET);
-		return (create_token(TOK_EOF, NULL));
-	}
-	if (current == '<')
-	{
-		advance_lexer(lexer);
-		if (get_lexer(lexer) == '<')
-		{
-			advance_lexer(lexer);
-			return (create_token(TOK_HERE_DOC_FROM, ft_strdup("<<")));
-		}
-		return (create_token(TOK_REDIR_FROM, ft_strdup("<")));
-	}
-	if (current == '>')
-	{
-		advance_lexer(lexer);
-		if (get_lexer(lexer) == '>')
-		{
-			advance_lexer(lexer);
-			return (create_token(TOK_HERE_DOC_TO, ft_strdup(">>")));
-		}
-		return (create_token(TOK_REDIR_TO, ft_strdup(">")));
-	}
-	if (current == '$')
-	{
-		advance_lexer(lexer);
-		if (is_lone_dollar(lexer))
-			return (create_token(TOK_WORD, ft_strdup("$")));
-		word = read_word_lexer(lexer);
-		if (word)
-			return (create_token(TOK_ENV, word));
-		return (create_token(TOK_ENV, ft_strdup("")));
+		token = handle_env_token(lexer);
+		if (token)
+			return (token);
 	}
 	word = read_complex_word(lexer);
 	if (!word)
 		return (NULL);
+	if (word[0] == '\0' && get_lexer(lexer) == '$')
+	{
+		free(word);
+		return (handle_env_token(lexer));
+	}
 	return (create_token(TOK_WORD, word));
 }
-
 
 void	free_token(t_token *token)
 {

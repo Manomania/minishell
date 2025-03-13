@@ -124,7 +124,7 @@ static char	*process_vars(t_ctx *ctx, char *str, int *i, int in_quotes)
 
 	result = ft_strdup("");
 	(*i)++;
-	if (str[*i] == '\'' && in_quotes)
+	if (in_quotes && str[*i - 2] == '\'')
 	{
 		result = join_and_free(result, ft_strdup("$"));
 		return (result);
@@ -159,10 +159,19 @@ static char	*process_quotes(t_ctx *ctx, char *str, int *i, char quote)
 	result = ft_strdup("");
 	(*i)++;
 	start = *i;
+	if (quote == '\'')
+	{
+		while (str[*i] && str[*i] != quote)
+			(*i)++;
+
+		result = append_part(result, str, start, *i);
+		if (str[*i])
+			(*i)++;
+		return (result);
+	}
 	while (str[*i] && str[*i] != quote)
 	{
-		if ((str[*i] == '$' && quote == '"')
-			|| (str[*i - 1] == '\'' && str[*i] == '$'))
+		if (str[*i] == '$')
 		{
 			result = append_part(result, str, start, *i);
 			part = process_vars(ctx, str, i, 1);
@@ -197,7 +206,19 @@ char	*handle_quotes_and_vars(t_ctx *ctx, char *str)
 	start = 0;
 	while (str[i])
 	{
-		if (str[i] == '\'' || str[i] == '"')
+		if (str[i] == '\'')
+		{
+			result = append_part(result, str, start, i);
+			i++;
+			start = i;
+			while (str[i] && str[i] != '\'')
+				i++;
+			result = append_part(result, str, start, i);
+			if (str[i])
+				i++;
+			start = i;
+		}
+		else if (str[i] == '"')
 		{
 			result = append_part(result, str, start, i);
 			part = process_quotes(ctx, str, &i, str[i]);

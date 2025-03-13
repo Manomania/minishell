@@ -37,6 +37,8 @@
 typedef enum e_token_type
 {
 	TOK_WORD,			// Commands, args, filename
+	TOK_OPEN_PAR,		// (
+	TOK_CLOSE_PAR,		// )
 	TOK_REDIR_FROM,		// <
 	TOK_REDIR_TO,		// >
 	TOK_HERE_DOC_FROM,	// <<
@@ -135,6 +137,12 @@ char			*read_quoted_string_lexer(t_lexer *lexer, char quote_char);
 t_token			*next_token_lexer(t_lexer *lexer);
 void			free_token(t_token *token);
 void			free_all_token(t_token *token);
+
+//lexer_token_utils.c
+t_token			*handle_basics_token(t_lexer *lexer);
+t_token			*handle_pipe_and_token(t_lexer *lexer);
+t_token			*handle_redir_from_and_to_token(t_lexer *lexer);
+t_token			*handle_env_token(t_lexer *lexer);
 
 //parser_utils.c
 void			advance_parse(t_parse *parse);
