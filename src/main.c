@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/13 13:38:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/13 13:47:54 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,30 @@
 // 	}
 // }
 
+static char	*prompted_input(int prev_status)
+{
+	char	*rdl_str1;
+	char	*rdl_str2;
+	char	*rdl_str3;
+	char	*input;
+
+	if (prev_status > 0)
+	{
+		rdl_str1 = ft_itoa(prev_status);
+		rdl_str2 = ft_strjoin("\001\033[33m\002", rdl_str1);
+		rdl_str3 = ft_strjoin(rdl_str2, " $ \001\033[0m\002");
+		if (!rdl_str3)
+			prev_status = -1;
+		input = readline(rdl_str3);
+		free(rdl_str1);
+		free(rdl_str2);
+		free(rdl_str3);
+	}
+	if (prev_status <= 0)
+		input = readline("\001\033[32m\002$ \001\033[0m\002");
+	return (input);
+}
+
 /**
  * @brief Processes input and executes commands
  *
@@ -47,26 +71,16 @@
 static void	main_loop(t_ctx *ctx, int prev_status)
 {
 	t_bool	should_exit;
-	char	*rdl_str1;
-	char	*rdl_str2;
 	char	*input;
 	int		status;
 
 	should_exit = false;
-	if (prev_status > 0)
-	{
-		rdl_str1 = ft_itoa(prev_status);
-		rdl_str2 = ft_strjoin(rdl_str1, " $ ");
-		if (!rdl_str2)
-			prev_status = -1;
-		input = readline(rdl_str2);
-		free(rdl_str1);
-		free(rdl_str2);
-	}
-	if (prev_status <= 0)
-		input = readline("$ ");
+	input = prompted_input(prev_status);
 	if (!input)
-		return ;
+	{
+		ft_printf("\nexit\n");
+		ctx_exit(ctx);
+	}
 	if (input[0] != '\0')
 		add_history(input);
 	ctx->tokens = tokenize(input);
@@ -83,6 +97,7 @@ static void	main_loop(t_ctx *ctx, int prev_status)
 	if (ctx->cmd->args && ctx->cmd->args[0] && ft_strncmp(ctx->cmd->args[0],
 			"exit", __INT_MAX__) == 0)
 	{
+		ft_printf("exit\n");
 		status = 0;
 		should_exit = true;
 	}
