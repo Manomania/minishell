@@ -6,23 +6,49 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/14 14:28:54 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:56:39 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
+ * @brief Executes the child process portion of a single command
+ */
+static void	execute_child(t_ctx *ctx)
+{
+	reset_signals();
+	handle_redirections(ctx->cmd->redirection);
+	if (!ctx->cmd->args[0] || access(ctx->cmd->args[0], X_OK) != 0)
+	{
+		ft_printf("Command not found or not executable: %s\n",
+			ctx->cmd->args[0]);
+		exit(EXIT_FAILURE);
+	}
+	execve(ctx->cmd->args[0], ctx->cmd->args, ctx->envp);
+	perror("execve");
+	exit(EXIT_FAILURE);
+}
+
+/**
+ * @brief Gets the exit status from process termination information
+ */
+static int	get_exit_status(int status)
+{
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	if (WIFSIGNALED(status))
+		return (128 + WTERMSIG(status));
+	return (1);
+}
+
+/**
  * @brief Executes a single command without a pipeline
- *
- * @param ctx Context with environment
- * @return int Exit status of the command
  */
 static int	execute_single_command(t_ctx *ctx)
 {
 	pid_t	pid;
 	int		status;
-	int		exit_code;
 
 	if (builtins_try(ctx, ctx->cmd))
 		return (0);
@@ -33,29 +59,12 @@ static int	execute_single_command(t_ctx *ctx)
 	if (pid == -1)
 		return (ctx_error(ERR_CHILD));
 	if (pid == 0)
-	{
-		reset_signals();
-		handle_redirections(ctx->cmd->redirection);
-		if (!ctx->cmd->args[0] || access(ctx->cmd->args[0], X_OK) != 0)
-		{
-			ft_printf("Command not found or not executable: %s\n",
-				ctx->cmd->args[0]);
-			exit(EXIT_FAILURE);
-		}
-		execve(ctx->cmd->args[0], ctx->cmd->args, ctx->envp);
-		perror("execve");
-		exit(EXIT_FAILURE);
-	}
+		execute_child(ctx);
 	waitpid(pid, &status, 0);
 	setup_signals();
-	if (WIFEXITED(status))
-		exit_code = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-		exit_code = 128 + WTERMSIG(status);
-	else
-		exit_code = 1;
-	return (exit_code);
+	return (get_exit_status(status));
 }
+
 
 /**
  * @brief Checks if the command is part of a pipeline
