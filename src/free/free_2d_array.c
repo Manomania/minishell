@@ -1,25 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   token_is.c                                         :+:      :+:    :+:   */
+/*   free_2d_array.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 13:58:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 14:03:25 by elagouch         ###   ########.fr       */
+/*   Created: 2025/02/13 16:38:09 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 15:07:04 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Checks if a token is a redirection token
+ * @brief Frees a NULL-terminated pointer of pointers
  *
- * @param tok Token type to check
- * @return t_bool true if token is a redirection, false otherwise
+ * @param ptrs The pointer of pointers to free
  */
-t_bool	token_is_redirection(t_token_type type)
+void	free_2d_array(void **ptrs)
 {
-	return (type == TOK_REDIR_FROM || type == TOK_REDIR_TO
-		|| type == TOK_HERE_DOC_FROM || type == TOK_HERE_DOC_TO);
+	int	i;
+
+	if (!ptrs)
+		return ;
+	i = 0;
+	while (ptrs[i])
+	{
+		free(ptrs[i]);
+		i++;
+	}
+	free(ptrs);
 }

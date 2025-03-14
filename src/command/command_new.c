@@ -1,32 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipeline_new.c                                     :+:      :+:    :+:   */
+/*   command_new.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 13:51:47 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 13:52:19 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 13:48:09 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/13 11:47:37 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Creates a new pipeline structure
+ * @brief Creates a new command structure
  *
- * @return t_pipeline* New initialized pipeline or NULL if allocation fails
+ * @return t_command* New initialized command or NULL if allocation fails
  */
-t_pipeline	*create_pipeline(void)
+t_command	*command_new(void)
 {
-	t_pipeline	*pipeline;
+	t_command	*cmd;
 
-	pipeline = (t_pipeline *)malloc(sizeof(t_pipeline));
-	if (!pipeline)
+	cmd = (t_command *)malloc(sizeof(t_command));
+	if (!cmd)
 		return (NULL);
-	pipeline->commands = NULL;
-	pipeline->next = NULL;
-	pipeline->prev = NULL;
-	pipeline->operator = TOK_EOF;
-	return (pipeline);
+	cmd->args = NULL;
+	cmd->arg_count = 0;
+	cmd->redirection = NULL;
+	cmd->next = NULL;
+	return (cmd);
 }

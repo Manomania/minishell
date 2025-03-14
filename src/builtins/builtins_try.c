@@ -1,36 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   token_utils.c                                      :+:      :+:    :+:   */
+/*   builtins_try.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/05 19:19:16 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/06 14:52:47 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 12:19:14 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/12 17:18:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	free_token(t_token *token)
+/**
+ * @brief Tries the token against all builtins commands
+ *
+ * @param ctx Context
+ * @param tok Token
+ * @return t_bool Whether a command was successfully executed or not
+ */
+t_bool	builtins_try(t_ctx *ctx, t_command *cmd)
 {
-	if (token)
-	{
-		free(token->value);
-		free(token);
-	}
-}
-
-void	free_all_token(t_token *token)
-{
-	t_token	*current;
-	t_token	*next;
-
-	current = token;
-	while (current)
-	{
-		next = current->next;
-		free_token(current);
-		current = next;
-	}
+	if (ft_strncmp(cmd->args[0], "exit", __INT_MAX__) == 0)
+		ctx_exit(ctx);
+	return (false);
 }

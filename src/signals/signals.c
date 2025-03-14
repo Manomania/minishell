@@ -1,28 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctx_error_exit.c                                   :+:      :+:    :+:   */
+/*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/06 17:07:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/06 17:11:28 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 17:58:55 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/08 17:59:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Frees context, displays an error and quits with the corresponding
- * exit code
- *
- * @param ctx context
- * @param err error code
+ * @brief Sets up signal handlers for interactive mode
  */
-void	ctx_error_exit(t_ctx *ctx, t_error_type err)
+void	setup_signals(void)
 {
-	if (ctx)
-		ctx_clear(ctx);
-	errno = ctx_error(err);
-	exit(errno);
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+}
+
+/**
+ * @brief Resets signal handlers for child processes
+ */
+void	reset_signals(void)
+{
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 }

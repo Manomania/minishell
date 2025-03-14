@@ -1,27 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins_try.c                                     :+:      :+:    :+:   */
+/*   ctx_error_exit.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 12:19:14 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 13:57:06 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/06 17:07:35 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/12 17:55:45 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Tries the token against all builtins commands
+ * @brief Frees context, displays an error and quits with the corresponding
+ * exit code
  *
- * @param ctx Context
- * @param tok Token
- * @return t_bool Whether a command was successfully executed or not
+ * @param ctx context
+ * @param err error code
  */
-t_bool	builtins_try(t_ctx *ctx, t_command *cmd)
+void	ctx_error_exit(t_ctx *ctx, t_error_type err)
 {
-	if (ft_strncmp(cmd->cmd, "exit", __INT_MAX__) == 0)
-		ctx_exit(ctx);
-	return (false);
+	if (ctx)
+		ctx_clear(ctx);
+	errno = ctx_error(err);
+	exit(errno);
 }

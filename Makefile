@@ -8,30 +8,30 @@ HEADER				=	$(INC_DIR)minishell.h
 CC 					?= 	cc
 # Standard compilation checks
 CFLAGS 				:= 	-Wall -Wextra -Werror -g3
-## Compability checks
-#CFLAGS				+= -Wpedantic
-## Dependency management
-#CFLAGS				+= -MD -MP
-## Warns when a variable declaration shadows another variable
-#CFLAGS				+= -Wshadow
-## More thorough than -Wunused-result
-#CFLAGS				+= -Wunused-result
-## Implicit conversions that may change value
-#CFLAGS				+= -Wconversion
-## Implicit conversions between signed and unsigned
-#CFLAGS				+= -Wsign-conversion
-## Disables pointer arithmetics
-## (no `*ptr++`)
-#CFLAGS				+= -Wpointer-arith
-## Catches more printf/scanf format mismatches
-#CFLAGS				+= -Wformat=2
-## Warns about == for floats which is sus
-#CFLAGS				+= -Wfloat-equal
-## Makes strings const char*
-#CFLAGS				+= -Wwrite-strings
-## Keeps the frame pointer in registers
-## Minor performance cost
-#CFLAGS				+= -fno-omit-frame-pointer
+### Compability checks
+##CFLAGS				+= -Wpedantic
+### Dependency management
+##CFLAGS				+= -MD -MP
+### Warns when a variable declaration shadows another variable
+##CFLAGS				+= -Wshadow
+### More thorough than -Wunused-result
+##CFLAGS				+= -Wunused-result
+### Implicit conversions that may change value
+##CFLAGS				+= -Wconversion
+### Implicit conversions between signed and unsigned
+##CFLAGS				+= -Wsign-conversion
+### Disables pointer arithmetics
+### (no `*ptr++`)
+##CFLAGS				+= -Wpointer-arith
+### Catches more printf/scanf format mismatches
+##CFLAGS				+= -Wformat=2
+### Warns about == for floats which is sus
+##CFLAGS				+= -Wfloat-equal
+### Makes strings const char*
+##CFLAGS				+= -Wwrite-strings
+### Keeps the frame pointer in registers
+### Minor performance cost
+##CFLAGS				+= -fno-omit-frame-pointer
 AR					:=	ar rcs
 RM					:=	rm -f
 
@@ -57,6 +57,13 @@ LIBFT_DIR			:=	libft/
 LIBFT				:=	$(LIBFT_DIR)libft.a
 
 ########################################################################################################################
+#                                                         LIB                                                          #
+########################################################################################################################
+
+LIBFT_DIR			:=	libft/
+LIBFT				:=	$(LIBFT_DIR)libft.a
+
+########################################################################################################################
 #                                                       TARGETS                                                        #
 ########################################################################################################################
 
@@ -70,8 +77,16 @@ all:					.print_header $(LIBFT) $(NAME)
 
 make_libft:
 							@$(MAKE) --silent -C $(LIBFT_DIR)
+all:					.print_header $(LIBFT) $(NAME)
+
+make_libft:
+							@$(MAKE) --silent -C $(LIBFT_DIR)
 
 clean:					.print_header
+							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
+							@$(MAKE) --silent -C $(LIBFT_DIR) clean
+							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
+							@printf "\n"
 							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
 							@$(MAKE) --silent -C $(LIBFT_DIR) clean
 							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
@@ -86,6 +101,10 @@ fclean: 				clean
 							@$(MAKE) --silent -C $(LIBFT_DIR) fclean
 							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
 							@printf "\n"
+							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
+							@$(MAKE) --silent -C $(LIBFT_DIR) fclean
+							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
+							@printf "\n"
 							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(NAME)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
 							@$(RM) $(NAME)
 							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
@@ -93,6 +112,7 @@ fclean: 				clean
 
 re: 					.print_header fclean all
 
+.PHONY: 				all make_libft clean fclean re
 .PHONY: 				all make_libft clean fclean re
 
 ########################################################################################################################
@@ -103,10 +123,14 @@ $(NAME):				$(LIBFT) $(OBJ)
 							@$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $@ -lreadline
 
 $(LIBFT):				make_libft
+$(NAME):				$(LIBFT) $(OBJ)
+							@$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $@ -lreadline
+
+$(LIBFT):				make_libft
 
 $(OBJ_DIR)%.o: 			$(SRC_DIR)%.c $(HEADER)
-							@mkdir -p $(OBJ_DIR)
-							@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -c $< -o $@
+							@mkdir -p $(dir $@)
+							@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -c $< -o $@
 							$(call PROGRESS_BAR_PERCENTAGE)
 							$(if $(filter $(COMPILED_SRCS),$(SRCS_TO_COMPILE)),$(call SEPARATOR))
 

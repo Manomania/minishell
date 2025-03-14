@@ -1,34 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   command_new.c                                      :+:      :+:    :+:   */
+/*   lexer_token_is.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 13:48:09 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 13:48:20 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/08 13:58:39 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/12 18:00:00 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Creates a new command structure
+ * @brief Checks if a token is a redirection token
  *
- * @return t_command* New initialized command or NULL if allocation fails
+ * @param tok Token type to check
+ * @return t_bool true if token is a redirection, false otherwise
  */
-t_command	*command_new(void)
+t_bool	token_is_redirection(t_token_type type)
 {
-	t_command	*cmd;
-
-	cmd = (t_command *)malloc(sizeof(t_command));
-	if (!cmd)
-		return (NULL);
-	cmd->cmd = NULL;
-	cmd->args = NULL;
-	cmd->arg_count = 0;
-	cmd->redirections = NULL;
-	cmd->next = NULL;
-	cmd->prev = NULL;
-	return (cmd);
+	return (type == TOK_REDIR_FROM || type == TOK_REDIR_TO
+		|| type == TOK_HERE_DOC_FROM || type == TOK_HERE_DOC_TO);
 }

@@ -6,39 +6,113 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/08 16:04:01 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:11:28 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/**
- * @brief Main loop of the app
- *
- * @param ctx Context
- * @return t_bool Whether to break the loop or not
- */
-static t_bool	main_loop(t_ctx *ctx)
+// static void	display_args(t_ctx *ctx)
+// {
+// 	char	**args;
+// 	int		i;
+
+// 	if (!ctx->cmd || !ctx->cmd->args)
+// 	{
+// 		ft_printf("No command found!\n");
+// 		return ;
+// 	}
+// 	ft_printf("Command: %s\n", ctx->cmd->cmd);
+// 	if (ctx->cmd->arg_count == 0)
+// 	{
+// 		ft_printf("No arguments provided\n");
+// 		return ;
+// 	}
+// 	ft_printf("Arguments (%d):\n", ctx->cmd->arg_count);
+// 	args = ctx->cmd->args;
+// 	i = 1;
+// 	while (args[i])
+// 	{
+// 		ft_printf("  Arg[%d]: '%s'\n", i - 1, args[i]);
+// 		i++;
+// 	}
+// }
+
+static char	*prompted_input(int prev_status)
 {
+	char	*rdl_str1;
+	char	*rdl_str2;
+	char	*rdl_str3;
 	char	*input;
 
-	input = readline("$> ");
+	if (prev_status > 0)
+	{
+		rdl_str1 = ft_itoa(prev_status);
+		rdl_str2 = ft_strjoin("\001\033[33m\002", rdl_str1);
+		rdl_str3 = ft_strjoin(rdl_str2, " $ \001\033[0m\002");
+		if (!rdl_str3)
+			prev_status = -1;
+		input = readline(rdl_str3);
+		free(rdl_str1);
+		free(rdl_str2);
+		free(rdl_str3);
+	}
+	if (prev_status <= 0)
+		input = readline("\001\033[32m\002$ \001\033[0m\002");
+	return (input);
+}
+
+/**
+ * @brief Processes input and executes commands
+ *
+ * @param ctx Context containing environment and state
+ * @return t_bool true if the loop should exit, false otherwise
+ */
+static void	main_loop(t_ctx *ctx, int prev_status)
+{
+	t_bool	should_exit;
+	char	*input;
+	int		status;
+
+	should_exit = false;
+	input = prompted_input(prev_status);
 	if (!input)
-		return (true);
+	{
+		ft_printf("\nexit\n");
+		ctx_exit(ctx);
+	}
 	if (input[0] != '\0')
 		add_history(input);
 	ctx->tokens = tokenize(input);
-	ctx->cmd = command_parse(ctx);
-	if (!ctx->cmd)
-		ctx_error(ERR_UNIMPLEMENTED);
-	else
-		command_execute(ctx, ctx->cmd);
 	free(input);
-	command_free(ctx->cmd);
+	if (!ctx->tokens)
+		return (main_loop(ctx, 0));
+	ctx->cmd = command_parse(ctx->tokens);
+	if (!ctx->cmd)
+	{
+		free_all_token(ctx->tokens);
+		ctx->tokens = NULL;
+		return (main_loop(ctx, 0));
+	}
+	if (ctx->cmd->args && ctx->cmd->args[0] && ft_strncmp(ctx->cmd->args[0],
+			"exit", __INT_MAX__) == 0)
+	{
+		ft_printf("exit\n");
+		status = 0;
+		should_exit = true;
+	}
+	if (!should_exit)
+		status = command_execute(ctx);
+	if (ctx->cmd)
+		free_all_commands(ctx->cmd);
 	ctx->cmd = NULL;
-	free_all_token(ctx->tokens);
+	if (ctx->tokens)
+		free_all_token(ctx->tokens);
 	ctx->tokens = NULL;
-	return (false);
+	if (status == -1)
+		status = prev_status;
+	if (!should_exit)
+		main_loop(ctx, status);
 }
 
 /**
@@ -54,9 +128,8 @@ int	main(int argc, char **argv, char **envp)
 	t_ctx	*ctx;
 
 	ctx = ctx_init(argc, argv, envp);
-	while (1)
-		if (main_loop(ctx))
-			break ;
+	setup_signals();
+	main_loop(ctx, 0);
 	ctx_clear(ctx);
 	return (EXIT_SUCCESS);
 }
