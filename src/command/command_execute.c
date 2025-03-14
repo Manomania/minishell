@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 12:35:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:28:54 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,13 @@ static int	execute_single_command(t_ctx *ctx)
 		return (0);
 	if (!command_bin(ctx))
 		return (ctx_error(ERR_CMD_NOT_FOUND));
+	setup_parent_signals();
 	pid = fork();
 	if (pid == -1)
 		return (ctx_error(ERR_CHILD));
 	if (pid == 0)
 	{
+		reset_signals();
 		handle_redirections(ctx->cmd->redirection);
 		if (!ctx->cmd->args[0] || access(ctx->cmd->args[0], X_OK) != 0)
 		{
@@ -45,6 +47,7 @@ static int	execute_single_command(t_ctx *ctx)
 		exit(EXIT_FAILURE);
 	}
 	waitpid(pid, &status, 0);
+	setup_signals();
 	if (WIFEXITED(status))
 		exit_code = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
