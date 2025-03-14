@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/14 14:10:17 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:43:06 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,36 +44,19 @@ typedef enum e_bool
 	true,
 }							t_bool;
 
-typedef enum e_error_type
-{
-	ERR_NONE = 0,
-	ERR_CMD_NOT_FOUND,
-	ERR_NO_PERMISSION,
-	ERR_IO_ERROR,
-	ERR_UNIMPLEMENTED,
-	ERR_ALLOC,
-}							t_error_type;
-
-typedef struct s_error_info
-{
-	int						code;
-	const char				*message;
-	t_bool					use_perror;
-}							t_error_info;
-
 typedef enum e_token_type
 {
-	TOK_WORD,          // Commands, args, filename
-	TOK_REDIR_FROM,    // <
-	TOK_REDIR_TO,      // >
-	TOK_HERE_DOC_FROM, // <<
-	TOK_HERE_DOC_TO,   // >>
-	TOK_PIPE,          // |
-	TOK_ENV,           // $
-	TOK_AND,           // &&
-	TOK_OR,            // ||
-	TOK_NEW_LINE,      // \n
-	TOK_EOF,           // '\0'
+	TOK_WORD,
+	TOK_REDIR_FROM,
+	TOK_REDIR_TO,
+	TOK_HERE_DOC_FROM,
+	TOK_HERE_DOC_TO,
+	TOK_PIPE,
+	TOK_ENV,
+	TOK_AND,
+	TOK_OR,
+	TOK_NEW_LINE,
+	TOK_EOF,
 }							t_token_type;
 
 typedef struct s_token
@@ -125,12 +108,6 @@ typedef struct s_env
 	char					*key;
 	char					*value;
 }							t_env;
-
-typedef enum e_bool
-{
-	false,
-	true,
-}							t_bool;
 
 typedef enum e_error_type
 {
@@ -319,8 +296,10 @@ void						exec_cmda_parent(t_command **current_cmd,
 t_bool						command_bin(t_ctx *ctx);
 t_bool						exec_cmdas(t_ctx *ctx);
 
-// Signals
+// signals
 void						setup_signals(void);
 void						reset_signals(void);
+void						setup_parent_signals(void);
+void						set_child_mode(int in_child);
 
 #endif

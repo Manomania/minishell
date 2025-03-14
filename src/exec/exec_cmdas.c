@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 12:34:11 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:33:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ static void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
 {
 	char	*bin_path;
 
+	/* Reset signals to default for child process */
+	reset_signals();
 	if (input_fd != STDIN_FILENO)
 	{
 		dup2(input_fd, STDIN_FILENO);
@@ -171,6 +173,7 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_command *current,
 	}
 	else
 		pipe_fds[1] = STDOUT_FILENO;
+	setup_parent_signals();
 	pids[i] = exec_piped_command(ctx, current, prev_pipe, pipe_fds[1]);
 	if (prev_pipe != STDIN_FILENO)
 		close(prev_pipe);
@@ -202,6 +205,7 @@ t_bool	exec_cmdas(t_ctx *ctx)
 	pids = malloc(sizeof(pid_t) * cmd_count);
 	if (!pids)
 		return (ctx_error(ERR_ALLOC));
+	setup_parent_signals();
 	prev_pipe = STDIN_FILENO;
 	i = 0;
 	while (i < cmd_count)
@@ -217,6 +221,7 @@ t_bool	exec_cmdas(t_ctx *ctx)
 		i++;
 	}
 	exit_status = wait_for_pids(pids, cmd_count);
+	setup_signals();
 	free(pids);
 	return (exit_status);
 }

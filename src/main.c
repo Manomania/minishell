@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/14 14:11:28 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 14:40:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,23 +62,16 @@ static char	*prompted_input(int prev_status)
 	return (input);
 }
 
-/**
- * @brief Processes input and executes commands
- *
- * @param ctx Context containing environment and state
- * @return t_bool true if the loop should exit, false otherwise
- */
+static void	main_loop_end(t_ctx *ctx, int prev_status);
+
 static void	main_loop(t_ctx *ctx, int prev_status)
 {
-	t_bool	should_exit;
 	char	*input;
-	int		status;
 
-	should_exit = false;
 	input = prompted_input(prev_status);
 	if (!input)
 	{
-		ft_printf("\nexit\n");
+		ft_putstr("exit");
 		ctx_exit(ctx);
 	}
 	if (input[0] != '\0')
@@ -94,10 +87,25 @@ static void	main_loop(t_ctx *ctx, int prev_status)
 		ctx->tokens = NULL;
 		return (main_loop(ctx, 0));
 	}
+	main_loop_end(ctx, prev_status);
+}
+
+/**
+ * @brief Processes input and executes commands
+ *
+ * @param ctx Context containing environment and state
+ * @return t_bool true if the loop should exit, false otherwise
+ */
+static void	main_loop_end(t_ctx *ctx, int prev_status)
+{
+	t_bool	should_exit;
+	int		status;
+
+	should_exit = false;
 	if (ctx->cmd->args && ctx->cmd->args[0] && ft_strncmp(ctx->cmd->args[0],
 			"exit", __INT_MAX__) == 0)
 	{
-		ft_printf("exit\n");
+		ft_putstr("exit");
 		status = 0;
 		should_exit = true;
 	}
