@@ -27,7 +27,8 @@ char	*get_env_value(t_env *env_list, char *key)
 	current = env_list;
 	while (current)
 	{
-		if (ft_strncmp(current->key, key, ft_strlen(key)) == 0)
+		if (ft_strncmp(current->key, key, ft_strlen(key)) == 0
+			&& ft_strlen(current->key) == ft_strlen(key))
 			return (current->value);
 		current = current->next;
 	}

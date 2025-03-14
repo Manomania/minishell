@@ -105,9 +105,10 @@ typedef struct s_ctx
 *                             Function Prototypes                              *
 *******************************************************************************/
 
+char			*join_and_free(char *s1, char *s2);
+
 // env.c
 char			*expand_var(t_ctx *ctx, char *var_name);
-char			*expand_env_vars(t_ctx *ctx, char *str);
 char			*handle_quotes_and_vars(t_ctx *ctx, char *str);
 
 // init.c
@@ -138,20 +139,20 @@ t_token			*next_token_lexer(t_lexer *lexer);
 void			free_token(t_token *token);
 void			free_all_token(t_token *token);
 
-//lexer_token_utils.c
+// lexer_token_utils.c
 t_token			*handle_basics_token(t_lexer *lexer);
 t_token			*handle_pipe_and_token(t_lexer *lexer);
 t_token			*handle_redir_from_and_to_token(t_lexer *lexer);
 t_token			*handle_env_token(t_lexer *lexer);
 
-//parser_utils.c
+// parser_utils.c
 void			advance_parse(t_parse *parse);
 char			*get_token_value(t_parse *parse);
 int				check_parse(t_parse *parse, t_token_type type);
 int				consume_parse(t_parse *parse, t_token_type type);
 int				check_token_type(t_parse *parse, t_token_type type);
 
-//parser_command.c
+// parser_command.c
 int				add_argument(t_command *cmd, char *value);
 void			add_redirection(t_command *cmd, t_redirection *redirection);
 int				parse_redirection(t_parse *parse, t_command *cmd, t_ctx *ctx);

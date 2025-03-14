@@ -6,7 +6,7 @@
 /*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 12:30:04 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/13 12:31:45 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/14 11:11:24 by maximart         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,27 +66,6 @@ char	*expand_var(t_ctx *ctx, char *var_name)
 }
 
 /**
- * @brief Appends a string to the result and frees both strings
- *
- * @param s1 First string (will be freed)
- * @param s2 Second string (will be freed)
- * @return New allocated concatenated string
- */
-static char	*join_and_free(char *s1, char *s2)
-{
-	char	*result;
-
-	if (!s1)
-		return (s2);
-	if (!s2)
-		return (s1);
-	result = ft_strjoin(s1, s2);
-	free(s1);
-	free(s2);
-	return (result);
-}
-
-/**
  * @brief Process a part of a string and append it to the result
  *
  * @param result Current result string
@@ -107,167 +86,143 @@ static char	*append_part(char *result, char *str, int start, int end)
 	return (join_and_free(result, part));
 }
 
-/**
- * @brief Process variables in a string
- *
- * @param ctx Shell context
- * @param str Input string
- * @param i Current position (will be updated)
- * @param in_quotes Whether we're inside quotes
- * @return Processed string with variables expanded
- */
-static char	*process_vars(t_ctx *ctx, char *str, int *i, int in_quotes)
-{
-	char	*result;
-	char	*var_name;
-	char	*var_value;
-
-	result = ft_strdup("");
-	(*i)++;
-	if (in_quotes && str[*i - 2] == '\'')
-	{
-		result = join_and_free(result, ft_strdup("$"));
-		return (result);
-	}
-	var_name = get_var_name(str, i);
-	if (!var_name)
-	{
-		result = join_and_free(result, ft_strdup("$"));
-		return (result);
-	}
-	var_value = expand_var(ctx, var_name);
-	result = join_and_free(result, var_value);
-	free(var_name);
-	return (result);
-}
 
 /**
- * @brief Process a quoted string
+ * @brief Finds the first occurrence of a single quote in a string
  *
- * @param ctx Shell context
- * @param str Input string
- * @param i Current position (will be updated)
- * @param quote The quote character (' or ")
- * @return Processed string with quotes expanded
+ * @param str String to search in
+ * @return char* Pointer to the first single quote, or NULL if not found
  */
-static char	*process_quotes(t_ctx *ctx, char *str, int *i, char quote)
+int	find_first_quote(char *str)
 {
-	char	*result;
-	int		start;
-	char	*part;
-
-	result = ft_strdup("");
-	(*i)++;
-	start = *i;
-	if (quote == '\'')
-	{
-		while (str[*i] && str[*i] != quote)
-			(*i)++;
-
-		result = append_part(result, str, start, *i);
-		if (str[*i])
-			(*i)++;
-		return (result);
-	}
-	while (str[*i] && str[*i] != quote)
-	{
-		if (str[*i] == '$')
-		{
-			result = append_part(result, str, start, *i);
-			part = process_vars(ctx, str, i, 1);
-			result = join_and_free(result, part);
-			start = *i;
-		}
-		else
-			(*i)++;
-	}
-	result = append_part(result, str, start, *i);
-	if (str[*i])
-		(*i)++;
-	return (result);
-}
-
-/**
- * @brief Handles quotes and environment variables in a string
- *
- * @param ctx Shell context
- * @param str String to process
- * @return New string with variables expanded according to quoting rules
- */
-char	*handle_quotes_and_vars(t_ctx *ctx, char *str)
-{
-	int		i;
-	char	*result;
-	char	*part;
-	int		start;
+	int	i;
 
 	i = 0;
-	result = ft_strdup("");
-	start = 0;
+	if (!str)
+		return (0);
 	while (str[i])
 	{
 		if (str[i] == '\'')
-		{
-			result = append_part(result, str, start, i);
-			i++;
-			start = i;
-			while (str[i] && str[i] != '\'')
-				i++;
-			result = append_part(result, str, start, i);
-			if (str[i])
-				i++;
-			start = i;
-		}
-		else if (str[i] == '"')
-		{
-			result = append_part(result, str, start, i);
-			part = process_quotes(ctx, str, &i, str[i]);
-			result = join_and_free(result, part);
-			start = i;
-		}
-		else if (str[i] == '$')
-		{
-			result = append_part(result, str, start, i);
-			part = process_vars(ctx, str, &i, 0);
-			result = join_and_free(result, part);
-			start = i;
-		}
-		else
-			i++;
+			return (1);
+		i++;
 	}
-	result = append_part(result, str, start, i);
-	return (result);
+	return (0);
 }
 
 /**
- * @brief Expands environment variables in a string
+ * @brief Handles the dollar sign expansion in a string
  *
- * @param ctx Shell context
- * @param str String containing variables to expand
- * @return New string with variables expanded
+ * @param ctx Context containing variable information
+ * @param str String being processed
+ * @param i Pointer to current position in string
+ * @param squote Flag indicating if inside single quotes
+ * @return char* Expanded variable or dollar sign
  */
-char	*expand_env_vars(t_ctx *ctx, char *str)
+char	*handle_dollar(t_ctx *ctx, char *str, int *i, int squote)
+{
+	char	*var_value;
+
+	(*i)++;
+	if (!squote)
+	{
+		var_value = expand_var(ctx, get_var_name(str, i));
+		return (var_value);
+	}
+	else
+		return (ft_strdup("$"));
+}
+
+/**
+ * @brief Processes a string, handling quotes and variable expansion
+ *
+ * @param ctx Context containing variable information
+ * @param str String to process
+ * @param result Current result string
+ * @return char* Updated result string
+ */
+char	*process_string(t_ctx *ctx, char *str, char *result)
 {
 	int		i;
-	char	*result;
-	char	*part;
 	int		start;
+	int		squote;
+	char	*var_value;
+	int		first_quote;
 
 	i = 0;
-	result = ft_strdup("");
 	start = 0;
+	first_quote = find_first_quote(str);
+	squote = 0;
 	while (str[i])
 	{
-		if (str[i] == '$')
+		if (str[i] == '\'' && first_quote)
 		{
-			result = append_part(result, str, start, i);
-			part = process_vars(ctx, str, &i, 0);
-			result = join_and_free(result, part);
-			start = i;
+			printf(RED"DEBUG: HERE THE QUOTE\n"RESET);
+			squote = 1;
 		}
-		else
-			i++;
+		else if (str[i] == '$' && first_quote)
+		{
+			printf(RED"DEBUG: HERE D WITH S\n"RESET);
+			result = append_part(result, str, start, i);
+			var_value = handle_dollar(ctx, str, &i, !squote);
+			result = join_and_free(result, var_value);
+			start = i;
+			continue;
+		}
+		else if (str[i] == '$' && !first_quote && squote)
+		{
+			printf(RED"DEBUG: HERE S\n"RESET);
+			result = append_part(result, str, start, i);
+			var_value = handle_dollar(ctx, str, &i, !squote);
+			result = join_and_free(result, var_value);
+			start = i;
+			continue;
+		}
+		else if (str[i] == '$' && first_quote && squote == 1)
+		{
+			printf(RED"DEBUG: HERE D WITH S2\n"RESET);
+			result = append_part(result, str, start, i);
+			var_value = handle_dollar(ctx, str, &i, squote);
+			result = join_and_free(result, var_value);
+			start = i;
+			continue;
+		}
+		else if (str[i] == '$' && !first_quote && !squote)
+		{
+			printf(RED"DEBUG: HERE D\n"RESET);
+			result = append_part(result, str, start, i);
+			var_value = handle_dollar(ctx, str, &i, !squote);
+			result = join_and_free(result, var_value);
+			start = i;
+			continue;
+		}
+		else if (str[i] == '$' && !first_quote && squote == 1)
+		{
+			printf(RED"DEBUG: HERE S\n"RESET);
+			result = append_part(result, str, start, i);
+			var_value = handle_dollar(ctx, str, &i, !squote);
+			result = join_and_free(result, var_value);
+			start = i;
+			continue;
+		}
+		i++;
 	}
-	result = append_part(result, str, start, i);
+	return (append_part(result, str, start, i));
+}
+
+/**
+ * @brief Handles quotes and variables in a string
+ *
+ * @param ctx Context containing variable information
+ * @param str Input string to process
+ * @return char* Newly allocated string with processed content
+ */
+char	*handle_quotes_and_vars(t_ctx *ctx, char *str)
+{
+	char	*result;
+
+	if (!str)
+		return (ft_strdup(""));
+	result = ft_strdup("");
+	result = process_string(ctx, str, result);
 	return (result);
 }
