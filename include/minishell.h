@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/14 14:43:06 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:44:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,6 +145,19 @@ typedef struct s_ctx
 	int						fd_file_out;
 }							t_ctx;
 
+/**
+ * @brief Structure to hold pipeline process data
+ */
+typedef struct s_pipe_data
+{
+	t_command				*current;
+	int						cmd_count;
+	int						i;
+	int						prev_pipe;
+	pid_t					*pids;
+	int						pipe_fds[2];
+}							t_pipe_data;
+
 // *************************************************************************** #
 //                            Function Prototypes                              #
 // *************************************************************************** #
@@ -266,7 +279,8 @@ char						*env_find(t_ctx *ctx, char *bin);
 char						*env_find_bin(t_ctx *ctx, char *bin);
 
 // Paths manipulation
-char						*bin_find_path(t_ctx *ctx, char *dir, char *bin);
+char						*bin_find_path(t_ctx *ctx, const char *dir,
+								char *bin);
 char						*bin_find(t_ctx *ctx, char *bin);
 
 // Memory
@@ -295,6 +309,15 @@ void						exec_cmda_parent(t_command **current_cmd,
 								int *pipe_prev, int *pipe_curr);
 t_bool						command_bin(t_ctx *ctx);
 t_bool						exec_cmdas(t_ctx *ctx);
+
+// Execution: utils
+void						execute_command(t_ctx *ctx, t_command *cmd);
+void						setup_child_process(t_ctx *ctx, t_command *cmd,
+								int input_fd, int output_fd);
+pid_t						exec_piped_command(t_ctx *ctx, t_command *cmd,
+								int input_fd, int output_fd);
+int							setup_pipe(int pipe_fds[2]);
+int							wait_for_pids(pid_t *pids, int count);
 
 // signals
 void						setup_signals(void);

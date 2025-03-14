@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:59:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 12:29:48 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:44:19 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
  * @param bin The binary to search for
  * @return char* Full path to binary if found and executable, NULL otherwise
  */
-char	*bin_find_path(t_ctx *ctx, char *dir, char *bin)
+char	*bin_find_path(t_ctx *ctx, const char *dir, char *bin)
 {
 	char	*tmp;
 	char	*full_path;

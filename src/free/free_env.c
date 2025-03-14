@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:42:24 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/12 18:24:54 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:14:15 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,11 @@ int	parse_env_var(char *env_str, t_env **env_list)
 	equals_pos = ft_strchr(env_str, '=');
 	if (!equals_pos)
 		return (add_env_var(env_list, env_str, NULL));
-	key_len = equals_pos - env_str;
-	key = (char *)malloc(key_len + 1);
+	key_len = (int)(equals_pos - env_str);
+	key = (char *)malloc((size_t)(key_len + 1));
 	if (!key)
 		return (0);
-	ft_strlcpy(key, env_str, key_len + 1);
+	ft_strlcpy(key, env_str, (size_t)(key_len + 1));
 	value = equals_pos + 1;
 	result = add_env_var(env_list, key, value);
 	free(key);

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:48:41 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/14 14:11:36 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:41:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static char	**allocate_args_array(t_command *cmd, int new_size)
 	char	**new_args;
 	int		i;
 
-	new_args = (char **)malloc(sizeof(char *) * new_size);
+	new_args = (char **)malloc(sizeof(char *) * (size_t)new_size);
 	if (!new_args)
 		return (NULL);
 	i = 0;

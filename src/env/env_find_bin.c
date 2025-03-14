@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:40:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 12:35:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:45:09 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ static void	normalize_path_dirs(char **path_dirs)
 	i = 0;
 	while (path_dirs[i])
 	{
-		len = ft_strlen(path_dirs[i]);
+		len = (int)ft_strlen(path_dirs[i]);
 		if (len > 0 && path_dirs[i][len - 1] == '/')
 			path_dirs[i][len - 1] = '\0';
 		i++;

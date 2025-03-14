@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_token.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:31:33 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/10 14:31:43 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:30:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ t_token	*next_token_lexer(t_lexer *lexer)
 			advance_lexer(lexer);
 			return (create_token(TOK_AND, ft_strdup("&&")));
 		}
-		ft_printf(RED"Error:\nUnexpected '&'\n"RESET);
+		ft_printf(RED "error:\nUnexpected '&'\n" RESET);
 		return (create_token(TOK_EOF, NULL));
 	}
 	if (current == '<')
@@ -88,7 +88,6 @@ t_token	*next_token_lexer(t_lexer *lexer)
 	return (create_token(TOK_WORD, word));
 }
 
-
 void	free_token(t_token *token)
 {
 	if (token)
@@ -100,8 +99,8 @@ void	free_token(t_token *token)
 
 void	free_all_token(t_token *token)
 {
-	t_token *current;
-	t_token *next;
+	t_token	*current;
+	t_token	*next;
 
 	current = token;
 	while (current)

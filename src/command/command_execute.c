@@ -65,7 +65,6 @@ static int	execute_single_command(t_ctx *ctx)
 	return (get_exit_status(status));
 }
 
-
 /**
  * @brief Checks if the command is part of a pipeline
  *

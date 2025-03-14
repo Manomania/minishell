@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:13:34 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/14 14:11:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:25:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int	ctx_error(t_error_type err)
 	if (info->use_perror)
 		perror(info->message);
 	else
-		ft_printf("Error: %s\n", info->message);
+		ft_printf("error: %s\n", info->message);
 	code = info->code;
 	free(error_table);
 	return (code);
