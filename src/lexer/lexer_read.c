@@ -30,22 +30,22 @@ char	*join_and_free(char *s1, char *s2)
 	return (result);
 }
 
-
 /**
- * @brief Reads a quoted string from the lexer input stream
+ * @brief Reads a quoted string from the lexer input
  *
  * @param lexer Pointer to lexer structure
  * @param quote_char The quote delimiter character
- * @return Newly allocated string without quotes or NULL on error
- * @note Caller must free the returned string
+ * @param preserve_quotes Whether to include quotes for internal processing
+ * @return Newly allocated string or NULL on error
  */
 char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 {
 	int		start;
 	int		end;
 	char	*content;
+	size_t	len;
 
-	start = lexer->position + 1;
+	start = lexer->position;
 	advance_lexer(lexer);
 	while (get_lexer(lexer) != '\0' && get_lexer(lexer) != quote_char)
 		advance_lexer(lexer);
@@ -54,13 +54,14 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 		ft_printf(RED"Error:\nUnclosed quote\n"RESET);
 		return (NULL);
 	}
-	end = lexer->position;
+	end = lexer->position + 1;
 	advance_lexer(lexer);
-	content = malloc((unsigned long)(end - start + 1));
+	len = end - start;
+	content = malloc(len + 1);
 	if (!content)
 		return (NULL);
-	ft_strlcpy(content, lexer->input + start, (size_t)(end - start + 1));
-	content[end - start] = '\0';
+	ft_strlcpy(content, lexer->input + start, len + 1);
+	content[len] = '\0';
 	return (content);
 }
 
@@ -97,18 +98,69 @@ char	*read_word_lexer(t_lexer *lexer)
 }
 
 /**
- * @brief Reads a complex word that might contain environment variables
+ * @brief Handle word part during complex word reading
+ *
+ * @param lexer Pointer to lexer structure
+ * @param result Current result buffer
+ * @return Updated result buffer or NULL on error
+ */
+static char	*handle_word_part(t_lexer *lexer, char *result)
+{
+	char	*part;
+
+	part = read_word_lexer(lexer);
+	result = join_and_free(result, part);
+	free(part);
+	return (result);
+}
+
+/**
+ * @brief Handle quoted part during complex word reading
+ *
+ * @param lexer Pointer to lexer structure
+ * @param result Current result buffer
+ * @param quote_char Quote character (single or double)
+ * @return Updated result buffer or NULL on error
+ */
+static char	*handle_quoted_part(t_lexer *lexer, char *result, char quote_char)
+{
+	char	*part;
+
+	part = read_quoted_string_lexer(lexer, quote_char);
+	if (!part)
+	{
+		free(result);
+		return (NULL);
+	}
+	result = join_and_free(result, part);
+	free(part);
+	return (result);
+}
+
+/**
+ * @brief Handle dollar sign during complex word reading
+ *
+ * @param lexer Pointer to lexer structure
+ * @param result Current result buffer
+ * @return Updated result buffer with position at dollar sign
+ */
+static char	*handle_dollar_sign(char *result)
+{
+	if (!result)
+		result = ft_strdup("");
+	return (result);
+}
+
+/**
+ * @brief Reads a complex word that might contain various elements
  *
  * @param lexer Pointer to lexer structure
  * @return Newly allocated string containing the word or NULL on error
- * @note Caller must free the returned string
  */
 char	*read_complex_word(t_lexer *lexer)
 {
 	char	*result;
-	char	*part;
 	char	quote_char;
-	int		dollar_pos;
 
 	result = NULL;
 	while (get_lexer(lexer) != '\0' && get_lexer(lexer) != ' '
@@ -119,33 +171,22 @@ char	*read_complex_word(t_lexer *lexer)
 		if (get_lexer(lexer) == '"' || get_lexer(lexer) == '\'')
 		{
 			quote_char = get_lexer(lexer);
-			part = read_quoted_string_lexer(lexer, quote_char);
-			if (!part)
-			{
-				free(result);
+			result = handle_quoted_part(lexer, result, quote_char);
+			if (!result)
 				return (NULL);
-			}
-			result = join_and_free(result, part);
-			free(part);
 		}
 		else if (get_lexer(lexer) == '$')
 		{
-			dollar_pos = lexer->position;
-			if (!result)
-				result = ft_strdup("");
+			result = handle_dollar_sign(result);
 			break;
 		}
 		else
 		{
-			part = read_word_lexer(lexer);
-			result = join_and_free(result, part);
-			free(part);
+			result = handle_word_part(lexer, result);
 		}
 	}
-
 	if (!result)
 		return (ft_strdup(""));
-
 	return (result);
 }
 

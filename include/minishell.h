@@ -101,11 +101,16 @@ typedef struct s_ctx
 	int		interactive;
 }			t_ctx;
 
+typedef struct s_quote_state
+{
+	int	in_single_quote;
+	int	in_double_quote;
+}		t_quote_state;
+
 /*******************************************************************************
 *                             Function Prototypes                              *
 *******************************************************************************/
 
-char			*join_and_free(char *s1, char *s2);
 
 // env.c
 char			*expand_var(t_ctx *ctx, char *var_name);
@@ -131,6 +136,7 @@ void			skip_whitespace_lexer(t_lexer *lexer);
 // lexer_read.c
 t_token			*tokenize(char *input);
 char			*read_word_lexer(t_lexer *lexer);
+char			*join_and_free(char *s1, char *s2);
 char			*read_complex_word(t_lexer *lexer);
 char			*read_quoted_string_lexer(t_lexer *lexer, char quote_char);
 

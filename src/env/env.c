@@ -88,48 +88,63 @@ static char	*append_part(char *result, char *str, int start, int end)
 
 
 /**
- * @brief Finds the first occurrence of a single quote in a string
+ * @brief Checks if a character is a single quote
  *
- * @param str String to search in
- * @return char* Pointer to the first single quote, or NULL if not found
+ * @param c Character to check
+ * @return 1 if single quote, 0 otherwise
  */
-int	find_first_quote(char *str)
+static int	is_single_quote(char c)
 {
-	int	i;
-
-	i = 0;
-	if (!str)
-		return (0);
-	while (str[i])
-	{
-		if (str[i] == '\'')
-			return (1);
-		i++;
-	}
-	return (0);
+	return (c == '\'');
 }
 
 /**
- * @brief Handles the dollar sign expansion in a string
+ * @brief Checks if a character is a double quote
  *
- * @param ctx Context containing variable information
- * @param str String being processed
- * @param i Pointer to current position in string
- * @param squote Flag indicating if inside single quotes
- * @return char* Expanded variable or dollar sign
+ * @param c Character to check
+ * @return 1 if double quote, 0 otherwise
  */
-char	*handle_dollar(t_ctx *ctx, char *str, int *i, int squote)
+static int	is_double_quote(char c)
 {
+	return (c == '"');
+}
+
+/**
+ * @brief Updates quote state based on current character
+ *
+ * @param c Current character
+ * @param in_squote Pointer to single quote state
+ * @param in_dquote Pointer to double quote state
+ */
+static void	update_quote_state(char c, int *in_squote, int *in_dquote)
+{
+	if (is_single_quote(c) && !(*in_dquote))
+		*in_squote = !(*in_squote);
+	else if (is_double_quote(c) && !(*in_squote))
+		*in_dquote = !(*in_dquote);
+}
+
+/**
+ * @brief Handles variable expansion based on quote context
+ *
+ * @param ctx Shell context
+ * @param str Input string
+ * @param i Current position (will be updated)
+ * @param in_squote Whether in single quotes
+ * @return Expanded variable or dollar sign
+ */
+static char	*expand_variable(t_ctx *ctx, char *str, int *i, int in_squote)
+{
+	char	*var_name;
 	char	*var_value;
 
 	(*i)++;
-	if (!squote)
-	{
-		var_value = expand_var(ctx, get_var_name(str, i));
-		return (var_value);
-	}
-	else
+	if (in_squote)
 		return (ft_strdup("$"));
+	var_name = get_var_name(str, i);
+	var_value = expand_var(ctx, var_name);
+	free(var_name);
+	return (var_value);
 }
 
 /**
@@ -138,69 +153,29 @@ char	*handle_dollar(t_ctx *ctx, char *str, int *i, int squote)
  * @param ctx Context containing variable information
  * @param str String to process
  * @param result Current result string
- * @return char* Updated result string
+ * @return Updated result string
  */
 char	*process_string(t_ctx *ctx, char *str, char *result)
 {
 	int		i;
 	int		start;
-	int		squote;
+	int		in_squote;
+	int		in_dquote;
 	char	*var_value;
-	int		first_quote;
 
 	i = 0;
 	start = 0;
-	first_quote = find_first_quote(str);
-	squote = 0;
+	in_squote = 0;
+	in_dquote = 0;
 	while (str[i])
 	{
-		if (str[i] == '\'' && first_quote)
+		update_quote_state(str[i], &in_squote, &in_dquote);
+		if (str[i] == '$' && !in_squote)
 		{
-			printf(RED"DEBUG: HERE THE QUOTE\n"RESET);
-			squote = 1;
-		}
-		else if (str[i] == '$' && first_quote)
-		{
-			printf(RED"DEBUG: HERE D WITH S\n"RESET);
 			result = append_part(result, str, start, i);
-			var_value = handle_dollar(ctx, str, &i, !squote);
+			var_value = expand_variable(ctx, str, &i, in_squote);
 			result = join_and_free(result, var_value);
-			start = i;
-			continue;
-		}
-		else if (str[i] == '$' && !first_quote && squote)
-		{
-			printf(RED"DEBUG: HERE S\n"RESET);
-			result = append_part(result, str, start, i);
-			var_value = handle_dollar(ctx, str, &i, !squote);
-			result = join_and_free(result, var_value);
-			start = i;
-			continue;
-		}
-		else if (str[i] == '$' && first_quote && squote == 1)
-		{
-			printf(RED"DEBUG: HERE D WITH S2\n"RESET);
-			result = append_part(result, str, start, i);
-			var_value = handle_dollar(ctx, str, &i, squote);
-			result = join_and_free(result, var_value);
-			start = i;
-			continue;
-		}
-		else if (str[i] == '$' && !first_quote && !squote)
-		{
-			printf(RED"DEBUG: HERE D\n"RESET);
-			result = append_part(result, str, start, i);
-			var_value = handle_dollar(ctx, str, &i, !squote);
-			result = join_and_free(result, var_value);
-			start = i;
-			continue;
-		}
-		else if (str[i] == '$' && !first_quote && squote == 1)
-		{
-			printf(RED"DEBUG: HERE S\n"RESET);
-			result = append_part(result, str, start, i);
-			var_value = handle_dollar(ctx, str, &i, !squote);
-			result = join_and_free(result, var_value);
+			free(var_value);
 			start = i;
 			continue;
 		}
@@ -214,7 +189,7 @@ char	*process_string(t_ctx *ctx, char *str, char *result)
  *
  * @param ctx Context containing variable information
  * @param str Input string to process
- * @return char* Newly allocated string with processed content
+ * @return Newly allocated string with processed content
  */
 char	*handle_quotes_and_vars(t_ctx *ctx, char *str)
 {
