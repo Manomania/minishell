@@ -38,7 +38,9 @@ RM					:=	rm -f
 include files.mk
 
 SRC					=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRC_F)))
+TSRC 				= 	$(addprefix $(SRC_DIR), $(addsuffix .o, $(TSRC_F)))
 OBJ 				= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC_F)))
+TOBJ 				= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(TSRC_F)))
 DEP 				= 	$(addprefix $(OBJ_DIR), $(addsuffix .d, $(SRC_F)))
 
 ########################################################################################################################
@@ -121,6 +123,8 @@ re: 					.print_header fclean all
 
 $(NAME):				$(LIBFT) $(OBJ)
 							@$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $@ -lreadline
+minishell_test:			$(LIBFT) $(TOBJ)
+							@$(CC) $(CFLAGS) $(TOBJ) $(LIBFT) -o $@ -lreadline
 
 $(LIBFT):				make_libft
 $(NAME):				$(LIBFT) $(OBJ)
