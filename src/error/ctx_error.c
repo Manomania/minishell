@@ -6,10 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:13:34 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 15:47:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 17:45:36 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "error.h"
 #include "minishell.h"
 
 /**
@@ -30,7 +31,8 @@ t_error_info	*get_error_table(void)
 	error_table[ERR_IO_ERROR] = (t_error_info){EIO, "Input/output error", true};
 	error_table[ERR_UNIMPLEMENTED] = (t_error_info){ENOSYS,
 		"Not implemented yet", true};
-	error_table[ERR_ALLOC] = (t_error_info){ENOMEM, "Allocation failed", true};
+	error_table[ERR_ALLOC] = (t_error_info){ENOMEM,
+		"Allocation failed. Your RAM might be full", true};
 	error_table[ERR_PIPE] = (t_error_info){EPIPE, "Pipe error", false};
 	error_table[ERR_CHILD] = (t_error_info){ECHILD, "Fork error", false};
 	return (error_table);
@@ -44,16 +46,29 @@ t_error_info	*get_error_table(void)
  */
 int	ctx_error(t_error_type err)
 {
-	t_error_info	*info;
+	return (ctx_error_level(err, ERROR));
+}
+
+/**
+ * @brief Displays an error and gets an exit code
+ *
+ * @param err Error type
+ * @param level Error level
+ * @return int Exit code
+ */
+int	ctx_error_level(t_error_type err, t_error_level level)
+{
 	t_error_info	*error_table;
+	t_error_info	*info;
+	char			*msg;
 	int				code;
 
 	error_table = get_error_table();
 	info = &error_table[err];
+	msg = (char *)info->message;
 	if (info->use_perror)
-		perror(info->message);
-	else
-		ft_printf("error: %s\n", info->message);
+		msg = strerror(info->code);
+	error_print(level, "minishell", msg);
 	code = info->code;
 	free(error_table);
 	return (code);

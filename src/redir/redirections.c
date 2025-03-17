@@ -6,10 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:45:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 14:34:57 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 17:23:08 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "debug.h"
+#include "error.h"
 #include "minishell.h"
 
 /**
@@ -74,7 +76,6 @@ static int	process_redirection(t_redirection *redir)
 	int	fd;
 	int	redirect_result;
 
-	/* Skip here_doc redirection, handled separately */
 	if (redir->type == TOK_HERE_DOC_FROM)
 		return (0);
 	fd = open_redirect_file(redir->type, redir->filename);
@@ -87,6 +88,7 @@ static int	process_redirection(t_redirection *redir)
 /**
  * @brief Sets up all redirections for a command
  *
+ * @param ctx Context for error handling
  * @param redirections List of redirections
  * @return 0 on success, -1 on error
  */
@@ -94,14 +96,28 @@ int	setup_redirections(t_redirection *redirections)
 {
 	t_redirection	*redir;
 	int				result;
+	char			error_msg[256];
 
 	redir = redirections;
+	if (!redir)
+	{
+		debug_log(DEBUG_INFO, "redir", "No redirections to process");
+		return (0);
+	}
+	debug_log(DEBUG_INFO, "redir", "Setting up redirections");
 	while (redir)
 	{
+		debug_log(DEBUG_VERBOSE, "redir", "Processing redirection");
 		result = process_redirection(redir);
 		if (result != 0)
+		{
+			ft_strlcpy(error_msg, "Failed to set up redirection for: ", 256);
+			ft_strlcat(error_msg, redir->filename, 256);
+			error_print(ERROR, "redir", error_msg);
 			return (result);
+		}
 		redir = redir->next;
 	}
+	debug_log(DEBUG_INFO, "redir", "All redirections processed successfully");
 	return (0);
 }

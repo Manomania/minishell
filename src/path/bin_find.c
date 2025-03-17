@@ -6,10 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/14 15:54:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 18:09:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "error.h"
 #include "minishell.h"
 
 /**
@@ -32,7 +33,7 @@ static t_bool	is_path(const char *str)
 	while (str[i])
 	{
 		if (str[i] == '/' || (str[i] == '.' && (str[i + 1] == '/' || str[i
-						+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
+					+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
 							|| str[i + 2] == '\0')))))
 			return (true);
 		i++;
@@ -46,16 +47,19 @@ static t_bool	is_path(const char *str)
  * @param bin Binary path to check
  * @return char* strdup of bin if executable, NULL otherwise
  */
-static char	*try_direct_path(char *bin)
+static char	*try_direct_path(char *bin, t_path_error *error_state)
 {
-	if (access(bin, F_OK) == 0)
+	if (access(bin, F_OK) != 0)
 	{
-		if (access(bin, X_OK) == 0)
-			return (ft_strdup(bin));
-		ft_printf("Permission denied: %s\n", bin);
+		*error_state = PATH_ERR_NOT_FOUND;
 		return (NULL);
 	}
-	return (NULL);
+	if (access(bin, X_OK) != 0)
+	{
+		*error_state = PATH_ERR_NO_PERMISSION;
+		return (NULL);
+	}
+	return (ft_strdup(bin));
 }
 
 /**
@@ -93,23 +97,42 @@ static char	*resolve_relative_path(char *bin)
  */
 char	*bin_find(t_ctx *ctx, char *bin)
 {
-	char	*path;
+	char			*path;
+	t_path_error	error_state;
 
+	error_state = PATH_ERR_NONE;
 	if (!bin)
 		return (NULL);
 	if (is_path(bin))
 	{
-		path = try_direct_path(bin);
+		path = try_direct_path(bin, &error_state);
 		if (path)
 			return (path);
-		if (bin[0] != '/')
+		if (bin[0] != '/' && error_state == PATH_ERR_NONE)
 		{
 			path = resolve_relative_path(bin);
 			if (path && access(path, X_OK) == 0)
 				return (path);
+			if (path && access(path, F_OK) == 0)
+				error_state = PATH_ERR_NO_PERMISSION;
+			else
+				error_state = PATH_ERR_NOT_FOUND;
 			free(path);
 		}
-		return (bin_find_path(".", bin));
+		path = bin_find_path(".", bin);
+		if (path)
+			return (path);
 	}
-	return (env_find_bin(ctx, bin));
+	else
+	{
+		path = env_find_bin(ctx, bin);
+	}
+	if (!path)
+	{
+		if (error_state == PATH_ERR_NO_PERMISSION)
+			error_print(ERROR, bin, "Permission denied");
+		else
+			error_print(ERROR, bin, "Command not found");
+	}
+	return (path);
 }

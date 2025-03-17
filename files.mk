@@ -16,6 +16,7 @@ SRC_F				= \
 						parser/parser_pipeline \
 						parser/parser_utils \
 						command/command_execute \
+						command/command_execute_utils \
 						command/command_parse \
 						command/command_add \
 						command/command_new \
@@ -41,5 +42,6 @@ SRC_F				= \
 						redir/redirections \
 						memory/memory \
 						validation/validation \
+						main_utils \
 						main
 TSRC_F			=	$(subst main,test/main,$(SRC_F))
