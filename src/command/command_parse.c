@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 12:13:23 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 13:52:41 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static t_bool	process_word_token(t_command *cmd, t_token *token)
  * @param next_token The next token (containing filename)
  * @return int 0 on success, -1 on failure
  */
-static int	handle_redirection(t_command *cmd, t_token *token,
+static int	handle_redirection_token(t_command *cmd, t_token *token,
 		t_token *next_token)
 {
 	int	fd;
@@ -84,7 +84,7 @@ static t_bool	process_command_tokens(t_token **current, t_command *cmd)
 		}
 		else if (token_is_redirection((*current)->type))
 		{
-			if ((*current)->next && handle_redirection(cmd, *current,
+			if ((*current)->next && handle_redirection_token(cmd, *current,
 					(*current)->next) == -1)
 				return (false);
 			if ((*current)->next)
