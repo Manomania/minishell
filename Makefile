@@ -7,7 +7,7 @@ NAME				:=	minishell
 HEADER				=	$(INC_DIR)minishell.h
 CC 					?= 	cc
 # Standard compilation checks
-CFLAGS 				:= 	-Wall -Wextra -Werror
+CFLAGS 				:= 	-Wall -Wextra -Werror -g3
 # Compability checks
 CFLAGS				+= -Wpedantic
 # Dependency management
@@ -38,7 +38,9 @@ RM					:=	rm -f
 include files.mk
 
 SRC					=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRC_F)))
+TSRC 				= 	$(addprefix $(SRC_DIR), $(addsuffix .o, $(TSRC_F)))
 OBJ 				= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC_F)))
+TOBJ 				= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(TSRC_F)))
 DEP 				= 	$(addprefix $(OBJ_DIR), $(addsuffix .d, $(SRC_F)))
 
 ########################################################################################################################
@@ -50,6 +52,20 @@ OBJ_DIR				:=	obj/
 INC_DIR				:=	include/
 
 ########################################################################################################################
+#                                                         LIB                                                          #
+########################################################################################################################
+
+LIBFT_DIR			:=	libft/
+LIBFT				:=	$(LIBFT_DIR)libft.a
+
+########################################################################################################################
+#                                                         LIB                                                          #
+########################################################################################################################
+
+LIBFT_DIR			:=	libft/
+LIBFT				:=	$(LIBFT_DIR)libft.a
+
+########################################################################################################################
 #                                                       TARGETS                                                        #
 ########################################################################################################################
 
@@ -59,15 +75,38 @@ INC_DIR				:=	include/
 							$(call BUILD)
 							$(call SEPARATOR)
 
-all:					.print_header $(NAME)
+all:					.print_header $(LIBFT) $(NAME)
+
+make_libft:
+							@$(MAKE) --silent -C $(LIBFT_DIR)
+all:					.print_header $(LIBFT) $(NAME)
+
+make_libft:
+							@$(MAKE) --silent -C $(LIBFT_DIR)
 
 clean:					.print_header
+							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
+							@$(MAKE) --silent -C $(LIBFT_DIR) clean
+							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
+							@printf "\n"
+							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
+							@$(MAKE) --silent -C $(LIBFT_DIR) clean
+							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
+							@printf "\n"
 							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(OBJ_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
 							@rm -rf $(OBJ_DIR)
 							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
 							$(call SEPARATOR)
 
 fclean: 				clean
+							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
+							@$(MAKE) --silent -C $(LIBFT_DIR) fclean
+							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
+							@printf "\n"
+							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
+							@$(MAKE) --silent -C $(LIBFT_DIR) fclean
+							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
+							@printf "\n"
 							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(NAME)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
 							@$(RM) $(NAME)
 							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
@@ -75,18 +114,27 @@ fclean: 				clean
 
 re: 					.print_header fclean all
 
-.PHONY: 				all clean fclean re
+.PHONY: 				all make_libft clean fclean re
+.PHONY: 				all make_libft clean fclean re
 
 ########################################################################################################################
 #                                                       COMMANDS                                                       #
 ########################################################################################################################
 
-$(NAME):				$(OBJ)
-							@$(CC) $(CFLAGS) $(OBJ) -o $@
+$(NAME):				$(LIBFT) $(OBJ)
+							@$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $@ -lreadline
+minishell_test:			$(LIBFT) $(TOBJ)
+							@$(CC) $(CFLAGS) $(TOBJ) $(LIBFT) -o $@ -lreadline
+
+$(LIBFT):				make_libft
+$(NAME):				$(LIBFT) $(OBJ)
+							@$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $@ -lreadline
+
+$(LIBFT):				make_libft
 
 $(OBJ_DIR)%.o: 			$(SRC_DIR)%.c $(HEADER)
-							@mkdir -p $(OBJ_DIR)
-							@$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
+							@mkdir -p $(dir $@)
+							@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -c $< -o $@
 							$(call PROGRESS_BAR_PERCENTAGE)
 							$(if $(filter $(COMPILED_SRCS),$(SRCS_TO_COMPILE)),$(call SEPARATOR))
 

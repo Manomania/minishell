@@ -1,0 +1,110 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   command_add.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/08 13:48:41 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/14 15:41:46 by elagouch         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
+/**
+ * @brief Allocates and copies arguments to a new array
+ *
+ * @param cmd Command containing the arguments
+ * @param new_size Size of the new array to allocate
+ * @return char** New array of arguments or NULL on failure
+ */
+static char	**allocate_args_array(t_command *cmd, int new_size)
+{
+	char	**new_args;
+	int		i;
+
+	new_args = (char **)malloc(sizeof(char *) * (size_t)new_size);
+	if (!new_args)
+		return (NULL);
+	i = 0;
+	while (i < cmd->arg_count + 1)
+	{
+		new_args[i] = cmd->args[i];
+		i++;
+	}
+	new_args[i] = NULL;
+	new_args[new_size - 1] = NULL;
+	return (new_args);
+}
+
+/**
+ * @brief Adds an argument to a command
+ * Arguments are stored in args array starting at index 1
+ * args[0] is always the command name
+ *
+ * @param cmd Command to add argument to
+ * @param arg Argument string to add
+ * @return int 0 on success, -1 on failure
+ */
+int	command_add_argument(t_command *cmd, char *arg)
+{
+	char	**new_args;
+	char	*arg_copy;
+
+	if (!cmd || !arg)
+		return (-1);
+	new_args = allocate_args_array(cmd, cmd->arg_count + 3);
+	if (!new_args)
+		return (-1);
+	arg_copy = ft_strdup(arg);
+	if (!arg_copy)
+	{
+		free(new_args);
+		return (-1);
+	}
+	new_args[cmd->arg_count + 1] = arg_copy;
+	if (cmd->args)
+		free(cmd->args);
+	cmd->args = new_args;
+	cmd->arg_count++;
+	return (0);
+}
+
+/**
+ * @brief Adds a redirection to a command
+ *
+ * @param cmd Command to add redirection to
+ * @param type Redirection type (< > << >>)
+ * @param fd File descriptor (0 for input, 1 for output)
+ * @param filename Target filename
+ * @return int 0 on success, -1 on failure
+ */
+int	command_add_redirection(t_command *cmd, t_token_type type, int fd,
+		char *filename)
+{
+	t_redirection	*redir;
+	t_redirection	*current;
+
+	if (!cmd || !filename)
+		return (-1);
+	redir = malloc(sizeof(t_redirection));
+	if (!redir)
+		return (-1);
+	redir->type = type;
+	redir->fd = fd;
+	redir->filename = ft_strdup(filename);
+	if (!redir->filename)
+		return (free(redir), -1);
+	redir->next = NULL;
+	if (!cmd->redirection)
+		cmd->redirection = redir;
+	else
+	{
+		current = cmd->redirection;
+		while (current->next)
+			current = current->next;
+		current->next = redir;
+	}
+	return (0);
+}

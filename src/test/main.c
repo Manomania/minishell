@@ -6,38 +6,18 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/14 15:46:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 11:15:44 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// static void	display_args(t_ctx *ctx)
-// {
-// 	char	**args;
-// 	int		i;
-
-// 	if (!ctx->cmd || !ctx->cmd->args)
-// 	{
-// 		ft_printf("No command found!\n");
-// 		return ;
-// 	}
-// 	ft_printf("Command: %s\n", ctx->cmd->cmd);
-// 	if (ctx->cmd->arg_count == 0)
-// 	{
-// 		ft_printf("No arguments provided\n");
-// 		return ;
-// 	}
-// 	ft_printf("Arguments (%d):\n", ctx->cmd->arg_count);
-// 	args = ctx->cmd->args;
-// 	i = 1;
-// 	while (args[i])
-// 	{
-// 		ft_printf("  Arg[%d]: '%s'\n", i - 1, args[i]);
-// 		i++;
-// 	}
-// }
-
+/**
+ * @brief Gets a user input with appropriate prompt based on previous status
+ *
+ * @param prev_status The exit status of the previous command
+ * @return char* The input string obtained from readline
+ */
 static char	*prompted_input(int prev_status)
 {
 	char	*rdl_str1;
@@ -57,23 +37,33 @@ static char	*prompted_input(int prev_status)
 		free(rdl_str2);
 		free(rdl_str3);
 	}
-	if (prev_status <= 0)
+	else
 		input = readline("\001\033[32m\002$ \001\033[0m\002");
 	return (input);
 }
 
-static void	main_loop_end(t_ctx *ctx, int prev_status);
+/**
+ * @brief Completes the main loop process by executing commands
+ *
+ * @param ctx Context containing environment and state
+ * @param prev_status The previous command's exit status
+ */
+static void		main_loop_end(t_ctx *ctx, int prev_status);
 
+/**
+ * @brief Main loop that handles input and command processing
+ *
+ * @param ctx Context containing environment and state
+ * @param prev_status The previous command's exit status
+ * @return void* Always returns NULL
+ */
 static void	*main_loop(t_ctx *ctx, int prev_status)
 {
 	char	*input;
 
 	input = prompted_input(prev_status);
 	if (!input)
-	{
-		ft_putstr("exit");
 		ctx_exit(ctx);
-	}
 	if (input[0] != '\0')
 		add_history(input);
 	ctx->tokens = tokenize(input);
@@ -95,7 +85,7 @@ static void	*main_loop(t_ctx *ctx, int prev_status)
  * @brief Processes input and executes commands
  *
  * @param ctx Context containing environment and state
- * @return t_bool true if the loop should exit, false otherwise
+ * @param prev_status The previous command's exit status
  */
 static void	main_loop_end(t_ctx *ctx, int prev_status)
 {
@@ -106,7 +96,7 @@ static void	main_loop_end(t_ctx *ctx, int prev_status)
 	if (ctx->cmd->args && ctx->cmd->args[0] && ft_strncmp(ctx->cmd->args[0],
 			"exit", __INT_MAX__) == 0)
 	{
-		ft_putstr("exit");
+		ft_putstr("exit\n");
 		status = 0;
 		should_exit = true;
 	}
@@ -122,6 +112,18 @@ static void	main_loop_end(t_ctx *ctx, int prev_status)
 		status = prev_status;
 	if (!should_exit)
 		(void)main_loop(ctx, status);
+	else
+		ctx_clear(ctx);
+}
+
+/**
+ * @brief Check if we're running in test mode (non-interactive)
+ *
+ * @return t_bool true if stdin is not a terminal (piped input)
+ */
+static t_bool	is_test_mode(void)
+{
+	return (!isatty(STDIN_FILENO));
 }
 
 /**
@@ -138,7 +140,13 @@ int	main(int argc, char **argv, char **envp)
 
 	ctx = ctx_init(argc, argv, envp);
 	setup_signals();
+	if (is_test_mode())
+		rl_outstream = fopen("/dev/null", "w");
 	main_loop(ctx, 0);
+	if (is_test_mode() && rl_outstream != NULL && rl_outstream != stdout)
+	{
+		fclose(rl_outstream);
+	}
 	ctx_clear(ctx);
 	return (EXIT_SUCCESS);
 }

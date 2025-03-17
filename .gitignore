@@ -1,0 +1,10 @@
+*.o
+*.d
+.idea/
+minishell
+minishell_test
+testb
+repomix-output.txt
+file_bee
+output.txt\\nHeredoc
+actual_output.txt
