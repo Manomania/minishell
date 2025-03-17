@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 14:36:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 15:12:11 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,35 +104,60 @@ static char	*expand_variables(t_ctx *ctx, char *line)
 }
 
 /**
+ * @brief Processes a line read for heredoc
+ *
+ * @param line Line read from input
+ * @param ctx Context containing environment information
+ * @param pipe_fd File descriptor to write to
+ * @return 0 on success, -1 on error
+ */
+static int	process_heredoc_line(char *line, t_ctx *ctx, int pipe_fd)
+{
+	char	*expanded_line;
+
+	if (!line)
+		return (-1);
+	expanded_line = expand_variables(ctx, line);
+	free(line);
+	if (!expanded_line)
+		return (-1);
+	write(pipe_fd, expanded_line, ft_strlen(expanded_line));
+	write(pipe_fd, "\n", 1);
+	free(expanded_line);
+	return (0);
+}
+
+/**
  * @brief Reads content for heredoc until delimiter is found
  *
  * @param pipe_fd File descriptor to write heredoc content to
  * @param delimiter String marking end of heredoc
  * @param ctx Context containing environment information
- * @return 0 on success, -1 on error
+ * @return 0 on success, -1 on error, 1 on EOF
  */
 static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
 {
 	char	*line;
-	char	*expanded_line;
+	int		delimiter_len;
 
+	delimiter_len = ft_strlen(delimiter);
 	while (1)
 	{
 		line = readline("> ");
 		if (!line)
-			return (-1);
-		if (ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
+		{
+			ft_putstr_fd((char *)
+				"minishell: warning: here-document delimited by end-of-file\n",
+				2);
+			return (1);
+		}
+		if (ft_strncmp(line, delimiter, delimiter_len + 1) == 0)
 		{
 			free(line);
 			break ;
 		}
-		expanded_line = expand_variables(ctx, line);
-		free(line);
-		if (!expanded_line)
+		if (process_heredoc_line(line, ctx, pipe_fd) == -1)
 			return (-1);
-		write(pipe_fd, expanded_line, ft_strlen(expanded_line));
-		write(pipe_fd, "\n", 1);
-		free(expanded_line);
 	}
 	return (0);
 }
@@ -173,9 +198,9 @@ int	create_heredoc(t_ctx *ctx, char *delimiter)
  */
 int	setup_heredocs(t_ctx *ctx, t_command *cmd)
 {
-	t_redirection *redir;
-	int heredoc_fd;
-	int dup_result;
+	t_redirection	*redir;
+	int				heredoc_fd;
+	int				dup_result;
 
 	redir = cmd->redirection;
 	while (redir)

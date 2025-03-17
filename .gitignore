@@ -5,6 +5,7 @@ minishell
 minishell_test
 testb
 repomix-output.txt
-file_bee
+file_*.txt
 output.txt\\nHeredoc
 actual_output.txt
+.vscode
