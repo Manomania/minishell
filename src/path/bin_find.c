@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 18:09:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 18:15:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static t_bool	is_path(const char *str)
 	while (str[i])
 	{
 		if (str[i] == '/' || (str[i] == '.' && (str[i + 1] == '/' || str[i
-					+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
+						+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
 							|| str[i + 2] == '\0')))))
 			return (true);
 		i++;
@@ -122,16 +122,16 @@ char	*bin_find(t_ctx *ctx, char *bin)
 		path = bin_find_path(".", bin);
 		if (path)
 			return (path);
+		if (error_state == PATH_ERR_NOT_FOUND)
+			error_print(ERROR, bin, "No such file or directory");
+		else if (error_state == PATH_ERR_NO_PERMISSION)
+			error_print(ERROR, bin, "Permission denied");
+		return (NULL);
 	}
 	else
 	{
 		path = env_find_bin(ctx, bin);
-	}
-	if (!path)
-	{
-		if (error_state == PATH_ERR_NO_PERMISSION)
-			error_print(ERROR, bin, "Permission denied");
-		else
+		if (!path)
 			error_print(ERROR, bin, "Command not found");
 	}
 	return (path);

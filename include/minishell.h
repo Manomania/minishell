@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/17 18:06:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 18:17:26 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,7 @@ typedef enum e_error_type
 	ERR_ALLOC,
 	ERR_PIPE,
 	ERR_CHILD,
+	ERR_NO_SUCH_FILE,
 }							t_error_type;
 
 typedef struct s_error_info

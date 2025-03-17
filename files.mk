@@ -24,7 +24,6 @@ SRC_F				= \
 						command/command_bin \
 						ctx/ctx_exit \
 						error/error \
-						error/ctx_error \
 						error/ctx_error_exit \
 						debug/debug \
 						exec/exec_cmdas \
