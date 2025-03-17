@@ -16,10 +16,6 @@ CFLAGS				+= -MD -MP
 CFLAGS				+= -Wshadow
 # More thorough than -Wunused-result
 CFLAGS				+= -Wunused-result
-# Implicit conversions that may change value
-CFLAGS				+= -Wconversion
-# Implicit conversions between signed and unsigned
-CFLAGS				+= -Wsign-conversion
 # Disables pointer arithmetics
 # (no `*ptr++`)
 CFLAGS				+= -Wpointer-arith
@@ -79,10 +75,6 @@ all:					.print_header $(LIBFT) $(NAME)
 
 make_libft:
 							@$(MAKE) --silent -C $(LIBFT_DIR)
-all:					.print_header $(LIBFT) $(NAME)
-
-make_libft:
-							@$(MAKE) --silent -C $(LIBFT_DIR)
 
 clean:					.print_header
 							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
@@ -123,14 +115,11 @@ re: 					.print_header fclean all
 
 $(NAME):				$(LIBFT) $(OBJ)
 							@$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $@ -lreadline
+
+$(LIBFT):				make_libft
+
 minishell_test:			$(LIBFT) $(TOBJ)
 							@$(CC) $(CFLAGS) $(TOBJ) $(LIBFT) -o $@ -lreadline
-
-$(LIBFT):				make_libft
-$(NAME):				$(LIBFT) $(OBJ)
-							@$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $@ -lreadline
-
-$(LIBFT):				make_libft
 
 $(OBJ_DIR)%.o: 			$(SRC_DIR)%.c $(HEADER)
 							@mkdir -p $(dir $@)

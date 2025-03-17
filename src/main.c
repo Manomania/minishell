@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/14 15:46:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 15:25:11 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ static char	*prompted_input(int prev_status)
 	if (prev_status > 0)
 	{
 		rdl_str1 = ft_itoa(prev_status);
-		rdl_str2 = ft_strjoin("\001\033[33m\002", rdl_str1);
-		rdl_str3 = ft_strjoin(rdl_str2, " $ \001\033[0m\002");
+		rdl_str2 = ft_strjoin("\001" RED "\002", rdl_str1);
+		rdl_str3 = ft_strjoin(rdl_str2, " $ \001" RESET "\002");
 		if (!rdl_str3)
 			prev_status = -1;
 		input = readline(rdl_str3);
@@ -58,7 +58,7 @@ static char	*prompted_input(int prev_status)
 		free(rdl_str3);
 	}
 	if (prev_status <= 0)
-		input = readline("\001\033[32m\002$ \001\033[0m\002");
+		input = readline("\001" GREEN "\002$ \001" RESET "\002");
 	return (input);
 }
 

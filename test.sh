@@ -21,6 +21,8 @@ MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+make minishell_test
+
 # Path to minishell
 MINISHELL="./minishell_test"
 

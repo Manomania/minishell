@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/17 10:59:09 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 14:37:00 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,6 +180,9 @@ void						init_parse_context(t_parse *parse, t_token *token);
 char						get_lexer(t_lexer *lexer);
 void						advance_lexer(t_lexer *lexer);
 void						skip_whitespace_lexer(t_lexer *lexer);
+t_token						*handle_operators(t_lexer *lexer, char current);
+t_token						*handle_redirection(t_lexer *lexer, char current);
+t_token						*handle_special_chars(t_lexer *lexer, char current);
 
 // lexer_read.c
 t_token						*tokenize(char *input);
@@ -320,5 +323,12 @@ void						setup_signals(void);
 void						reset_signals(void);
 void						setup_parent_signals(void);
 void						set_child_mode(int in_child);
+
+// redirections.c
+int							setup_redirections(t_redirection *redirections);
+
+// heredoc.c
+int							setup_heredocs(t_ctx *ctx, t_command *cmd);
+int							create_heredoc(t_ctx *ctx, char *delimiter);
 
 #endif

@@ -3,12 +3,13 @@ SRC_F				= \
 						free/free_2d_array \
 						free/free_ctx \
 						free/pipes_utils \
-						free/free_all_commands \
+						free/free_command \
 						init/init_ctx \
 						init/init_parse \
 						lexer/lexer_read \
 						lexer/lexer_token \
 						lexer/lexer_tokenize \
+						lexer/lexer_token_utils \
 						lexer/lexer_utils \
 						lexer/lexer_token_is \
 						parser/parser_command \
@@ -34,5 +35,7 @@ SRC_F				= \
 						env/env_find_bin \
 						signals/signals \
 						debug/debug_utils \
+						redir/heredoc \
+						redir/redirections \
 						main
 TSRC_F			=	$(subst main,test/main,$(SRC_F))

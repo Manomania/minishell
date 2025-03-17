@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 18:24:28 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/12 18:24:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 14:03:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	ctx_clear(t_ctx *ctx)
 		free_all_token(ctx->tokens);
 	ctx->tokens = NULL;
 	if (ctx->cmd)
-		command_free(ctx->cmd);
+		free_command(ctx->cmd);
 	ctx->cmd = NULL;
 	clear_history();
 	rl_free_line_state();
