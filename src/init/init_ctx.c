@@ -6,11 +6,33 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 11:25:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 10:58:15 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+/**
+ * @brief Initializes the environment in the context
+ *
+ * @param ctx Context
+ * @param envp Environment
+ */
+void	ctx_init_envp(t_ctx *ctx, char **envp)
+{
+	int	i;
+
+	i = 0;
+	while (envp[i])
+	{
+		if (!parse_env_var(envp[i], &ctx->env_list))
+		{
+			ctx_clear(ctx);
+			return ;
+		}
+		i++;
+	}
+}
 
 /**
  * @brief Initializes the context
@@ -23,24 +45,14 @@
 t_ctx	*ctx_init(int argc, char **argv, char **envp)
 {
 	t_ctx	*ctx;
-	int		i;
 
 	ctx = malloc(sizeof(t_ctx));
 	if (!ctx)
 		return (NULL);
+	ctx_init_envp(ctx, envp);
 	ctx->env_list = NULL;
 	ctx->exit_status = 0;
 	ctx->interactive = 1;
-	i = 0;
-	while (envp[i])
-	{
-		if (!parse_env_var(envp[i], &ctx->env_list))
-		{
-			ctx_clear(ctx);
-			return (NULL);
-		}
-		i++;
-	}
 	ctx->tokens = NULL;
 	ctx->cmd = NULL;
 	ctx->argc = argc;

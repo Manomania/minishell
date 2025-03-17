@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_read.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:27:07 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/10 14:27:21 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:27:58 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ char	*join_and_free(char *s1, char *s2)
 	return (result);
 }
 
-
 /**
  * @brief Reads a quoted string from the lexer input stream
  *
@@ -51,7 +50,7 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 		advance_lexer(lexer);
 	if (get_lexer(lexer) == '\0')
 	{
-		ft_printf(RED"Error:\nUnclosed quote\n"RESET);
+		ft_printf(RED "error:\nUnclosed quote\n" RESET);
 		return (NULL);
 	}
 	end = lexer->position;
@@ -135,42 +134,4 @@ char	*read_complex_word(t_lexer *lexer)
 		}
 	}
 	return (result);
-}
-
-t_token	*tokenize(char *input)
-{
-	t_lexer	*lexer;
-	t_token	*token;
-	t_token	*head;
-	t_token	*current;
-
-	lexer = create_lexer(input);
-	if (!lexer)
-		return (NULL);
-	head = NULL;
-	current = NULL;
-	while (1)
-	{
-		token = next_token_lexer(lexer);
-		if (!token)
-		{
-			free_all_token(head);
-			free(lexer);
-			return (NULL);
-		}
-		if (!head)
-		{
-			head = token;
-			current = token;
-		}
-		else
-		{
-			current->next = token;
-			current = token;
-		}
-		if (token->type == TOK_EOF)
-			break ;
-	}
-	free(lexer);
-	return (head);
 }

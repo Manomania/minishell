@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_command.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:37:01 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/10 14:37:13 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:41:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	add_argument(t_command *cmd, char *value)
 
 	if (!cmd || !value)
 		return (0);
-	new_args = malloc(sizeof(char *) * (cmd->arg_count + 2));
+	new_args = malloc(sizeof(char *) * (size_t)(cmd->arg_count + 2));
 	if (!new_args)
 		return (0);
 	i = 0;
@@ -66,7 +66,7 @@ int	parse_redirection(t_parse *parse, t_command *cmd)
 	advance_parse(parse);
 	if (!parse->current || parse->current->type != TOK_WORD)
 	{
-		ft_printf(RED"Error: Expected filename after redirection\n"RESET);
+		ft_printf(RED "error: Expected filename after redirection\n" RESET);
 		return (0);
 	}
 	redirection = create_redirection(type, parse->current->value);
@@ -111,17 +111,22 @@ t_command	*parse_command(t_parse *parse)
 	return (cmd);
 }
 
+/**
+ * @brief Parses a token linked list into a command
+ *
+ * @param token Token linked list to parse
+ * @return t_command* Resulting command
+ */
 t_command	*parse_token(t_token *token)
 {
 	t_parse		parse;
 	t_command	*cmd;
 
 	init_parse_context(&parse, token);
-	if (parse.current->type == TOK_AND ||
-	parse.current->type == TOK_OR ||
-	parse.current->type == TOK_PIPE)
+	if (parse.current->type == TOK_AND || parse.current->type == TOK_OR
+		|| parse.current->type == TOK_PIPE)
 	{
-		ft_printf(RED"Error: Unexpected token at start of command\n"RESET);
+		ft_printf(RED "error: Unexpected token at start of command\n" RESET);
 		return (NULL);
 	}
 	cmd = parse_command_sequence(&parse);
@@ -129,7 +134,7 @@ t_command	*parse_token(t_token *token)
 		return (NULL);
 	if (parse.current->type != TOK_EOF)
 	{
-		ft_printf(RED"Error:\nUnexpected token\n"RESET);
+		ft_printf(RED "error:\nUnexpected token\n" RESET);
 		free_all_commands(cmd);
 		return (NULL);
 	}

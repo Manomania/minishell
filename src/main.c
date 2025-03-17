@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/14 14:40:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:46:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ static char	*prompted_input(int prev_status)
 
 static void	main_loop_end(t_ctx *ctx, int prev_status);
 
-static void	main_loop(t_ctx *ctx, int prev_status)
+static void	*main_loop(t_ctx *ctx, int prev_status)
 {
 	char	*input;
 
@@ -88,6 +88,7 @@ static void	main_loop(t_ctx *ctx, int prev_status)
 		return (main_loop(ctx, 0));
 	}
 	main_loop_end(ctx, prev_status);
+	return (NULL);
 }
 
 /**
@@ -120,7 +121,7 @@ static void	main_loop_end(t_ctx *ctx, int prev_status)
 	if (status == -1)
 		status = prev_status;
 	if (!should_exit)
-		main_loop(ctx, status);
+		(void)main_loop(ctx, status);
 }
 
 /**

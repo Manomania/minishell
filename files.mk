@@ -8,6 +8,7 @@ SRC_F				= \
 						init/init_parse \
 						lexer/lexer_read \
 						lexer/lexer_token \
+						lexer/lexer_tokenize \
 						lexer/lexer_utils \
 						lexer/lexer_token_is \
 						parser/parser_command \
@@ -23,7 +24,8 @@ SRC_F				= \
 						error/ctx_error \
 						error/ctx_error_exit \
 						exec/exec_cmdas \
-						exec/exec_cmda_child \
+						exec/exec_cmdas_utils \
+						exec/exec_cmdas_utils2 \
 						exec/exec_cmdas_get_fds \
 						path/bin_find \
 						path/bin_find_path \

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 12:35:34 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:54:51 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ char	*bin_find(t_ctx *ctx, char *bin)
 				return (path);
 			free(path);
 		}
-		return (bin_find_path(ctx, ".", bin));
+		return (bin_find_path(".", bin));
 	}
 	return (env_find_bin(ctx, bin));
 }
