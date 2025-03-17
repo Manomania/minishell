@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/14 15:56:04 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 10:59:09 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,8 +279,7 @@ char						*env_find(t_ctx *ctx, char *bin);
 char						*env_find_bin(t_ctx *ctx, char *bin);
 
 // Paths manipulation
-char						*bin_find_path(t_ctx *ctx, const char *dir,
-								char *bin);
+char						*bin_find_path(const char *dir, char *bin);
 char						*bin_find(t_ctx *ctx, char *bin);
 
 // Memory

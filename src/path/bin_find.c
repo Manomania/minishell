@@ -109,7 +109,7 @@ char	*bin_find(t_ctx *ctx, char *bin)
 				return (path);
 			free(path);
 		}
-		return (bin_find_path(ctx, ".", bin));
+		return (bin_find_path(".", bin));
 	}
 	return (env_find_bin(ctx, bin));
 }

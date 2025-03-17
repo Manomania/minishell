@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/14 15:51:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 10:58:15 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	ctx_init_envp(t_ctx *ctx, char **envp)
 		if (!parse_env_var(envp[i], &ctx->env_list))
 		{
 			ctx_clear(ctx);
-			return (NULL);
+			return ;
 		}
 		i++;
 	}

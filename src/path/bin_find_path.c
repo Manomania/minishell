@@ -6,21 +6,36 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:59:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/14 15:49:41 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 10:59:10 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
+ * @brief Checks if a file exists and is executable
+ *
+ * @param path Path to the file to check
+ * @return int 1 if file exists and is executable, 0 otherwise
+ */
+static int	is_executable(const char *path)
+{
+	if (access(path, F_OK) == 0)
+	{
+		if (access(path, X_OK) == 0)
+			return (1);
+	}
+	return (0);
+}
+
+/**
  * @brief Checks if a binary is found in a directory and is executable
  *
- * @param ctx Context for error handling
  * @param dir The path to search in
  * @param bin The binary to search for
  * @return char* Full path to binary if found and executable, NULL otherwise
  */
-char	*bin_find_path(t_ctx *ctx, const char *dir, char *bin)
+char	*bin_find_path(const char *dir, char *bin)
 {
 	char	*tmp;
 	char	*full_path;
@@ -44,20 +59,4 @@ char	*bin_find_path(t_ctx *ctx, const char *dir, char *bin)
 		return (full_path);
 	free(full_path);
 	return (NULL);
-}
-
-/**
- * @brief Checks if a file exists and is executable
- *
- * @param path Path to the file to check
- * @return int 1 if file exists and is executable, 0 otherwise
- */
-static int	is_executable(const char *path)
-{
-	if (access(path, F_OK) == 0)
-	{
-		if (access(path, X_OK) == 0)
-			return (1);
-	}
-	return (0);
 }

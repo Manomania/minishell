@@ -98,7 +98,7 @@ char	*env_find_bin(t_ctx *ctx, char *bin)
 	og_path_dirs = path_dirs;
 	while (*path_dirs)
 	{
-		path = bin_find_path(ctx, *path_dirs, bin);
+		path = bin_find_path(*path_dirs, bin);
 		if (path)
 		{
 			free_2d_array((void **)og_path_dirs);
