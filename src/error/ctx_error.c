@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:13:34 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/14 15:25:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 15:47:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
  *
  * @return t_error_info* The error table map
  */
-static t_error_info	*get_error_table(void)
+t_error_info	*get_error_table(void)
 {
 	t_error_info	*error_table;
 

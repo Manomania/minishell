@@ -22,8 +22,10 @@ SRC_F				= \
 						command/command_redirections \
 						command/command_bin \
 						ctx/ctx_exit \
+						error/error \
 						error/ctx_error \
 						error/ctx_error_exit \
+						debug/debug \
 						exec/exec_cmdas \
 						exec/exec_cmdas_utils \
 						exec/exec_cmdas_utils2 \
@@ -37,5 +39,7 @@ SRC_F				= \
 						debug/debug_utils \
 						redir/heredoc \
 						redir/redirections \
+						memory/memory \
+						validation/validation \
 						main
 TSRC_F			=	$(subst main,test/main,$(SRC_F))

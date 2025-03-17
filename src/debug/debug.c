@@ -6,251 +6,201 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 19:20:06 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/12 17:02:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 15:49:16 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "debug.h"
+
+int					g_debug_level = DEBUG_NONE;
 
 /**
- * @brief Gets the value of an environment variable
+ * @brief Initialize debug system with specified verbosity level
  *
- * @param env_list Environment variable list
- * @param key Key to look for
- * @return Value of the variable or NULL if not found
+ * @param level Debug verbosity level
  */
-char	*get_env_value(t_env *env_list, char *key)
+void	debug_init(int level)
 {
-	t_env	*current;
-
-	current = env_list;
-	while (current)
-	{
-		if (ft_strncmp(current->key, key, ft_strlen(key)) == 0)
-			return (current->value);
-		current = current->next;
-	}
-	return (NULL);
+	g_debug_level = level;
 }
 
-void	print_redirection_type(t_token_type type)
+/**
+ * @brief Log a debug message if current level is high enough
+ *
+ * @param level Required debug level to show this message
+ * @param module Module name for the log
+ * @param msg Log message to display
+ */
+void	debug_log(int level, const char *module, const char *msg)
 {
-	if (type == TOK_REDIR_FROM)
-		ft_printf("< (REDIR_FROM)");
-	else if (type == TOK_REDIR_TO)
-		ft_printf("> (REDIR_TO)");
-	else if (type == TOK_HERE_DOC_FROM)
-		ft_printf("<< (HERE_DOC_FROM)");
-	else if (type == TOK_HERE_DOC_TO)
-		ft_printf(">> (HERE_DOC_TO)");
-	else
-		ft_printf("UNKNOWN");
-}
-
-void	print_redirections(t_redirection *redir)
-{
-	t_redirection	*current;
-	int				redir_count;
-
-	redir_count = 0;
-	current = redir;
-	if (!current)
+	if (g_debug_level >= level)
 	{
-		ft_printf(YELLOW "  No redirections\n" RESET);
-		return ;
-	}
-	ft_printf(YELLOW "  Redirections:\n" RESET);
-	while (current)
-	{
-		ft_printf(GREEN "    Redirection %d: " RESET, redir_count++);
-		ft_printf("Type: " YELLOW);
-		print_redirection_type(current->type);
-		ft_printf(RESET);
-		ft_printf(" | Filename: " GREEN "%s" RESET, current->filename);
-		ft_printf("\n");
-		current = current->next;
+		ft_putstr_fd((char *)CYAN, STDERR_FILENO);
+		ft_putstr_fd((char *)"[DEBUG] ", STDERR_FILENO);
+		if (module)
+		{
+			ft_putstr_fd((char *)module, STDERR_FILENO);
+			ft_putstr_fd((char *)": ", STDERR_FILENO);
+		}
+		ft_putstr_fd((char *)msg, STDERR_FILENO);
+		ft_putstr_fd((char *)RESET, STDERR_FILENO);
+		ft_putstr_fd((char *)"\n", STDERR_FILENO);
 	}
 }
 
-void	print_command_args(t_command *cmd)
-{
-	int	i;
-
-	i = 0;
-	if (!cmd->args || cmd->arg_count == 0)
-	{
-		ft_printf(YELLOW "  No arguments\n" RESET);
-		return ;
-	}
-	ft_printf(YELLOW "  Arguments:\n" RESET);
-	while (i < cmd->arg_count)
-	{
-		ft_printf(GREEN "    Arg %d: " RESET "%s\n", i, cmd->args[i]);
-		i++;
-	}
-}
-
-void	print_operator_type(t_token_type op_type)
-{
-	if (op_type == TOK_PIPE)
-		ft_printf(BLUE "  Piped to next command (|)\n" RESET);
-	else if (op_type == TOK_OR)
-		ft_printf(BLUE "  OR operator to next command (||)\n" RESET);
-	else if (op_type == TOK_AND)
-		ft_printf(BLUE "  AND operator to next command (&&)\n" RESET);
-}
-
-void	print_commands(t_command *cmd)
-{
-	t_command	*current;
-	int			cmd_count;
-
-	cmd_count = 0;
-	current = cmd;
-	ft_printf(YELLOW "\n===== COMMANDS =====\n" RESET);
-	if (!current)
-	{
-		ft_printf(RED "No commands to display\n" RESET);
-		ft_printf(YELLOW "===================\n\n" RESET);
-		return ;
-	}
-	while (current)
-	{
-		ft_printf(GREEN "Command %d:\n" RESET, cmd_count++);
-		print_command_args(current);
-		print_redirections(current->redirection);
-		if (current->next)
-			print_operator_type(current->operator);
-		current = current->next;
-	}
-	ft_printf(YELLOW "===================\n\n" RESET);
-}
-
-void	print_token_type(t_token_type type)
+/**
+ * @brief Get string representation of token type
+ *
+ * @param type Token type to convert
+ * @return String representing the token type
+ */
+static const char	*get_token_type_str(t_token_type type)
 {
 	if (type == TOK_WORD)
-		ft_printf("WORD");
-	else if (type == TOK_REDIR_FROM)
-		ft_printf("REDIR_FROM");
-	else if (type == TOK_REDIR_TO)
-		ft_printf("REDIR_TO");
-	else if (type == TOK_HERE_DOC_FROM)
-		ft_printf("HERE_DOC_FROM");
-	else if (type == TOK_HERE_DOC_TO)
-		ft_printf("HERE_DOC_TO");
-	else if (type == TOK_PIPE)
-		ft_printf("PIPE");
-	else if (type == TOK_ENV)
-		ft_printf("ENV");
-	else if (type == TOK_AND)
-		ft_printf("AND");
-	else if (type == TOK_OR)
-		ft_printf("OR");
-	else if (type == TOK_NEW_LINE)
-		ft_printf("NEW_LINE");
-	else if (type == TOK_EOF)
-		ft_printf("EOF");
-	else
-		ft_printf("UNKNOWN");
+		return ("WORD");
+	if (type == TOK_REDIR_FROM)
+		return ("REDIR_FROM");
+	if (type == TOK_REDIR_TO)
+		return ("REDIR_TO");
+	if (type == TOK_HERE_DOC_FROM)
+		return ("HERE_DOC_FROM");
+	if (type == TOK_HERE_DOC_TO)
+		return ("HERE_DOC_TO");
+	if (type == TOK_PIPE)
+		return ("PIPE");
+	if (type == TOK_ENV)
+		return ("ENV");
+	if (type == TOK_AND)
+		return ("AND");
+	if (type == TOK_OR)
+		return ("OR");
+	if (type == TOK_NEW_LINE)
+		return ("NEW_LINE");
+	if (type == TOK_EOF)
+		return ("EOF");
+	return ("UNKNOWN");
 }
 
-void	print_single_token(t_token *token, int count)
+/**
+ * @brief Print a single token for debugging
+ *
+ * @param level Required debug level to show this
+ * @param token Token to print
+ */
+void	debug_print_token(int level, t_token *token)
 {
-	ft_printf(GREEN "Token %d: " RESET, count);
-	ft_printf("Type: " YELLOW);
-	print_token_type(token->type);
-	ft_printf(RESET);
+	char	buffer[512];
+
+	if (g_debug_level < level || !token)
+		return ;
+	ft_strlcpy(buffer, "Token: Type=", sizeof(buffer));
+	ft_strlcat(buffer, get_token_type_str(token->type), sizeof(buffer));
+	ft_strlcat(buffer, ", Value=", sizeof(buffer));
 	if (token->value)
-		ft_printf(" | Value: " GREEN "%s" RESET, token->value);
+		ft_strlcat(buffer, token->value, sizeof(buffer));
 	else
-		ft_printf(" | Value: " GREEN "NULL" RESET);
-	ft_printf("\n");
+		ft_strlcat(buffer, "NULL", sizeof(buffer));
+	debug_log(level, "lexer", buffer);
 }
 
-void	print_tokens(t_token *tokens)
+/**
+ * @brief Print all tokens in a list for debugging
+ *
+ * @param level Required debug level to show this
+ * @param tokens Tokens list to print
+ */
+void	debug_print_tokens(int level, t_token *tokens)
 {
 	t_token	*current;
-	int		token_count;
+	int		count;
 
-	current = tokens;
-	token_count = 0;
-	ft_printf(YELLOW "\n===== TOKEN LIST =====\n" RESET);
-	if (!current)
-	{
-		ft_printf(RED "No tokens to display\n" RESET);
-		ft_printf(YELLOW "=====================\n\n" RESET);
+	if (g_debug_level < level)
 		return ;
-	}
+	debug_log(level, "lexer", "Token list:");
+	current = tokens;
+	count = 0;
 	while (current)
 	{
-		print_single_token(current, token_count);
-		token_count++;
+		debug_print_token(level, current);
 		current = current->next;
+		count++;
 	}
-	ft_printf(YELLOW "=====================\n\n" RESET);
 }
 
-void	cleanup(t_token *tokens)
+/**
+ * @brief Print a command structure for debugging
+ *
+ * @param level Required debug level to show this
+ * @param cmd Command to print
+ */
+void	debug_print_command(int level, t_command *cmd)
 {
-	if (tokens)
-		free_all_token(tokens);
-	clear_history();
-	rl_clear_history();
-	rl_free_line_state();
-	rl_cleanup_after_signal();
+	char			buffer[512];
+	t_redirection	*redir;
+	int				i;
+
+	if (g_debug_level < level || !cmd)
+		return ;
+	debug_log(level, "parser", "Command:");
+	if (cmd->args && cmd->args[0])
+	{
+		ft_strlcpy(buffer, "Command name: ", sizeof(buffer));
+		ft_strlcat(buffer, cmd->args[0], sizeof(buffer));
+		debug_log(level, "parser", buffer);
+	}
+	i = 1;
+	while (cmd->args && i <= cmd->arg_count)
+	{
+		ft_strlcpy(buffer, "Arg[", sizeof(buffer));
+		ft_strlcat(buffer, ft_itoa(i - 1), sizeof(buffer));
+		ft_strlcat(buffer, "]: ", sizeof(buffer));
+		ft_strlcat(buffer, cmd->args[i], sizeof(buffer));
+		debug_log(level, "parser", buffer);
+		i++;
+	}
+	redir = cmd->redirection;
+	while (redir)
+	{
+		ft_strlcpy(buffer, "Redirection: type=", sizeof(buffer));
+		ft_strlcat(buffer, get_token_type_str(redir->type), sizeof(buffer));
+		ft_strlcat(buffer, ", file=", sizeof(buffer));
+		ft_strlcat(buffer, redir->filename, sizeof(buffer));
+		debug_log(level, "parser", buffer);
+		redir = redir->next;
+	}
 }
 
-void	handle_signal(int sig)
+/**
+ * @brief Print all commands in a pipeline for debugging
+ *
+ * @param level Required debug level to show this
+ * @param cmd First command in the pipeline
+ */
+void	debug_print_commands(int level, t_command *cmd)
 {
-	(void)sig;
-	ft_printf("\nExiting...\n");
-	cleanup(NULL);
-	exit(0);
+	t_command	*current;
+	int			count;
+	char		buffer[64];
+
+	if (g_debug_level < level)
+		return ;
+	debug_log(level, "parser", "Command pipeline:");
+	current = cmd;
+	count = 0;
+	while (current)
+	{
+		ft_strlcpy(buffer, "Command #", sizeof(buffer));
+		ft_strlcat(buffer, ft_itoa(count), sizeof(buffer));
+		debug_log(level, "parser", buffer);
+		debug_print_command(level, current);
+		if (current->next)
+		{
+			ft_strlcpy(buffer, "Operator: ", sizeof(buffer));
+			ft_strlcat(buffer, get_token_type_str(current->operator),
+				sizeof(buffer));
+			debug_log(level, "parser", buffer);
+		}
+		current = current->next;
+		count++;
+	}
 }
-
-// #include <signal.h>
-
-// int	main(int argc, char **argv, char **envp)
-// {
-// 	char		*input;
-// 	t_token		*tokens;
-// 	t_command	*commands;
-// 	t_ctx		*ctx;
-// 	int			status;
-
-// 	(void)argc;
-// 	(void)argv;
-// 	ctx = init_ctx(envp);
-// 	if (!ctx)
-// 		return (1);
-// 	status = 0;
-// 	while (status == 0)
-// 	{
-// 		input = readline(YELLOW"minishell$ "RESET);
-// 		if (!input)
-// 			break ;
-// 		if (input[0] != '\0')
-// 			add_history(input);
-// 		if (ft_strncmp(input, "exit", ft_strlen(input)) == 0)
-// 		{
-// 			free(input);
-// 			break ;
-// 		}
-// 		tokens = tokenize(input);
-// 		if (tokens)
-// 		{
-// 			print_tokens(tokens);
-// 			commands = parse_token(tokens);
-// 			if (commands)
-// 			{
-// 				print_commands(commands);
-// 				free_all_commands(commands);
-// 			}
-// 			free_all_token(tokens);
-// 		}
-// 		free(input);
-// 	}
-// 	free_env_list(ctx->env_list);
-// 	free(ctx);
-// 	return (0);
-// }
