@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 10:58:15 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 11:30:23 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@ t_ctx	*ctx_init(int argc, char **argv, char **envp)
 	ctx = malloc(sizeof(t_ctx));
 	if (!ctx)
 		return (NULL);
-	ctx_init_envp(ctx, envp);
 	ctx->env_list = NULL;
+	ctx_init_envp(ctx, envp);
 	ctx->exit_status = 0;
 	ctx->interactive = 1;
 	ctx->tokens = NULL;
