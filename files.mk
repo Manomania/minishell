@@ -35,3 +35,4 @@ SRC_F				= \
 						signals/signals \
 						debug/debug_utils \
 						main
+TSRC_F			=	$(subst main,test/main,$(SRC_F))
