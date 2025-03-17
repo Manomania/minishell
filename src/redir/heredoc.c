@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 15:12:11 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 15:22:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,9 +146,9 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
 		line = readline("> ");
 		if (!line)
 		{
-			ft_putstr_fd((char *)
-				"minishell: warning: here-document delimited by end-of-file\n",
-				2);
+			ft_putstr_fd((char *) YELLOW
+				"minishell: warning: here-document delimited by end-of-file\n"
+				RESET, 2);
 			return (1);
 		}
 		if (ft_strncmp(line, delimiter, delimiter_len + 1) == 0)
