@@ -25,6 +25,7 @@ SRC_F				= \
 						error/ctx_error_exit \
 						exec/exec_cmdas \
 						exec/exec_cmdas_utils \
+						exec/exec_cmdas_utils2 \
 						exec/exec_cmdas_get_fds \
 						path/bin_find \
 						path/bin_find_path \

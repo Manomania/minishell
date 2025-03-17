@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/14 15:44:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:56:04 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -287,9 +287,6 @@ char						*bin_find(t_ctx *ctx, char *bin);
 void						free_2d_array(void **ptrs);
 
 // Pipelines
-void						execute_command_in_pipeline(t_ctx *ctx,
-								t_command *cmd, int pipes[2][2], int cmd_index,
-								int cmd_count);
 int							create_pipes(int pipes[2][2], int cmd_index,
 								int cmd_count);
 void						close_previous_pipe(int pipes[2][2], int cmd_index);

@@ -6,68 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:33:08 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/14 15:43:00 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:52:37 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-/**
- * @brief Handles command execution after redirection setup
- *
- * @param ctx Context with environment
- * @param cmd Command to execute
- * @return void
- */
-void	execute_command(t_ctx *ctx, t_command *cmd)
-{
-	char	*bin_path;
-
-	if (builtins_try(ctx, cmd))
-		exit(EXIT_SUCCESS);
-	if (!cmd->args || !cmd->args[0])
-		exit(EXIT_FAILURE);
-	bin_path = bin_find(ctx, cmd->args[0]);
-	if (!bin_path)
-	{
-		ft_printf("Command not found: %s\n", cmd->args[0]);
-		exit(EXIT_FAILURE);
-	}
-	free(cmd->args[0]);
-	cmd->args[0] = bin_path;
-	if (execve(cmd->args[0], cmd->args, ctx->envp) == -1)
-	{
-		perror("execve");
-		exit(EXIT_FAILURE);
-	}
-}
-
-/**
- * @brief Sets up the child process for command execution
- *
- * @param ctx Context with environment
- * @param cmd Command to execute
- * @param input_fd Input file descriptor
- * @param output_fd Output file descriptor
- */
-void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
-		int output_fd)
-{
-	reset_signals();
-	if (input_fd != STDIN_FILENO)
-	{
-		dup2(input_fd, STDIN_FILENO);
-		close(input_fd);
-	}
-	if (output_fd != STDOUT_FILENO)
-	{
-		dup2(output_fd, STDOUT_FILENO);
-		close(output_fd);
-	}
-	if (handle_redirections(cmd->redirection) != 0)
-		exit(EXIT_FAILURE);
-	execute_command(ctx, cmd);
-}
 
 /**
  * @brief Executes a single command in the pipeline

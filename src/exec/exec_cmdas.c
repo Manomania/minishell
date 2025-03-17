@@ -6,32 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/14 15:42:09 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/14 15:56:22 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-/**
- * @brief Counts the number of commands in a pipeline
- *
- * @param cmd The first command in the pipeline
- * @return int The number of commands
- */
-int	count_commands(t_command *cmd)
-{
-	int			count;
-	t_command	*current;
-
-	count = 0;
-	current = cmd;
-	while (current)
-	{
-		count++;
-		current = current->next;
-	}
-	return (count);
-}
 
 /**
  * @brief Handles pipe setup for commands
