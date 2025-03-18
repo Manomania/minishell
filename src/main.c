@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 17:50:06 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/18 13:07:37 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ static int	process_command(t_ctx *ctx, int prev_status)
 static t_bool	parse_user_input(t_ctx *ctx, char *input)
 {
 	ctx->tokens = tokenize(ctx, input);
+	if (g_debug_level > INFO)
+		print_tokens(ctx->tokens);
 	free(input);
 	if (!ctx->tokens)
 		return (false);
@@ -145,7 +147,7 @@ int	main(int argc, char **argv, char **envp)
 
 	check_debug_args(argc, argv);
 	debug_log(DEBUG_INFO, "main", "Initializing minishell");
-	ctx = ctx_init(argc, argv, envp);
+	ctx = init_ctx(argc, argv, envp);
 	if (!ctx)
 		error_exit(NULL, ERR_ALLOC, "context initialization");
 	setup_signals();

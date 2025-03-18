@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:37:01 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/17 13:55:59 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/18 11:47:01 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,31 +72,38 @@ void	add_redirection(t_command *cmd, t_redirection *redirection)
 	current = cmd->redirection;
 	while (current->next)
 		current = current->next;
-	current->next = redirection;
+	current->next = current;
 }
 
 /**
- * @brief Parses a redirection token
+ * @brief Parses a redirection with environment variable expansion
  *
- * This function parses a redirection token and adds it to the command.
- *
- * @param parse Parse context containing tokens
- * @param cmd Command to add the redirection to
- * @return 1 on success, 0 on failure
+ * @param parse Parser context
+ * @param cmd Command structure
+ * @param ctx Shell context
+ * @return 1 if successful, 0 on error
  */
-int	parse_redirection(t_parse *parse, t_command *cmd)
+int	parse_redirection(t_parse *parse, t_command *cmd, t_ctx *ctx)
 {
 	t_token_type	type;
 	t_redirection	*redirection;
+	char			*expanded;
 
 	type = parse->current->type;
 	advance_parse(parse);
 	if (!parse->current || parse->current->type != TOK_WORD)
 	{
-		ft_printf(RED "error: Expected filename after redirection\n" RESET);
+		ft_printf(RED "Error: Expected filename after redirection\n" RESET);
 		return (0);
 	}
-	redirection = create_redirection(type, parse->current->value);
+	if (type == TOK_HERE_DOC_FROM)
+		redirection = create_redirection(type, parse->current->value);
+	else
+	{
+		expanded = handle_quotes_and_vars(ctx, parse->current->value);
+		redirection = create_redirection(type, expanded);
+		free(expanded);
+	}
 	if (!redirection)
 		return (0);
 	add_redirection(cmd, redirection);
@@ -105,65 +112,31 @@ int	parse_redirection(t_parse *parse, t_command *cmd)
 }
 
 /**
- * @brief Initializes the arguments array for a command
+ * @brief Process token value with environment variable expansion
  *
- * This function initializes the arguments array with the first argument.
- *
- * @param cmd Command to initialize arguments for
- * @param first_arg Value of the first argument
- * @return 1 on success, 0 on failure
+ * @param ctx Shell context
+ * @param token_value Token value to process
+ * @return Processed value with environment variables expanded
  */
-static int	init_cmd_args(t_command *cmd, char *first_arg)
+char	*process_token(t_ctx *ctx, char *token_value)
 {
-	cmd->args = malloc(sizeof(char *) * 2);
-	if (!cmd->args)
-		return (0);
-	cmd->args[0] = ft_strdup(first_arg);
-	if (!cmd->args[0])
-	{
-		free(cmd->args);
-		cmd->args = NULL;
-		return (0);
-	}
-	cmd->args[1] = NULL;
-	cmd->arg_count = 0;
-	return (1);
+	char	*expanded;
+
+	expanded = handle_quotes_and_vars(ctx, token_value);
+	return (expanded);
 }
 
 /**
- * @brief Processes a word token during command parsing
+ * @brief Parses a command with environment variable expansion
  *
- * This function processes a word token and adds it to the command.
- *
- * @param cmd Command to add the word to
- * @param token Current token being processed
- * @return 1 on success, 0 on failure
+ * @param parse Parser context
+ * @param ctx Shell context
+ * @return Command structure or NULL on error
  */
-static int	process_word_token(t_command *cmd, t_token *token)
-{
-	if (!cmd->args)
-	{
-		init_cmd_args(cmd, token->value);
-		if (!cmd->args)
-			return (0);
-	}
-	else if (add_argument(cmd, token->value) == 0)
-		return (0);
-	return (1);
-}
-
-/**
- * @brief Parses a command from tokens
- *
- * This function constructs a command by processing tokens until a pipe
- * or operator is encountered.
- *
- * @param parse Parse context containing tokens
- * @return Parsed command or NULL on failure
- */
-t_command	*parse_command(t_parse *parse)
+t_command	*parse_command(t_parse *parse, t_ctx *ctx)
 {
 	t_command	*cmd;
+	char		*expanded;
 
 	cmd = create_command();
 	if (!cmd)
@@ -174,14 +147,38 @@ t_command	*parse_command(t_parse *parse)
 	{
 		if (parse->current->type == TOK_WORD)
 		{
-			if (!process_word_token(cmd, parse->current))
-				return (free_command(cmd), NULL);
+			expanded = handle_quotes_and_vars(ctx, parse->current->value);
+			if (!add_argument(cmd, expanded))
+			{
+				free(expanded);
+				free_command(cmd);
+				return (NULL);
+			}
+			free(expanded);
 			advance_parse(parse);
 		}
-		else if (token_is_redirection(parse->current->type))
+		else if (parse->current->type == TOK_ENV)
 		{
-			if (!parse_redirection(parse, cmd))
-				return (free_command(cmd), NULL);
+			expanded = expand_var(ctx, parse->current->value);
+			if (!add_argument(cmd, expanded))
+			{
+				free(expanded);
+				free_command(cmd);
+				return (NULL);
+			}
+			free(expanded);
+			advance_parse(parse);
+		}
+		else if (parse->current->type == TOK_REDIR_FROM
+			|| parse->current->type == TOK_REDIR_TO
+			|| parse->current->type == TOK_HERE_DOC_FROM
+			|| parse->current->type == TOK_HERE_DOC_TO)
+		{
+			if (!parse_redirection(parse, cmd, ctx))
+			{
+				free_command(cmd);
+				return (NULL);
+			}
 		}
 		else
 			advance_parse(parse);
@@ -190,14 +187,13 @@ t_command	*parse_command(t_parse *parse)
 }
 
 /**
- * @brief Parses a token linked list into a command
+ * @brief Parses a token list with environment variable expansion
  *
- * This function initializes a parsing context and parses tokens into commands.
- *
- * @param token Token linked list to parse
- * @return Resulting command structure
+ * @param token Token list
+ * @param ctx Shell context
+ * @return Command structure or NULL on error
  */
-t_command	*parse_token(t_token *token)
+t_command	*parse_token(t_token *token, t_ctx *ctx)
 {
 	t_parse		parse;
 	t_command	*cmd;
@@ -206,15 +202,15 @@ t_command	*parse_token(t_token *token)
 	if (parse.current->type == TOK_AND || parse.current->type == TOK_OR
 		|| parse.current->type == TOK_PIPE)
 	{
-		ft_printf(RED "error: Unexpected token at start of command\n" RESET);
+		ft_printf(RED "Error: Unexpected token at start of command\n" RESET);
 		return (NULL);
 	}
-	cmd = parse_command_sequence(&parse);
+	cmd = parse_command_sequence(ctx, &parse);
 	if (!cmd)
 		return (NULL);
 	if (parse.current->type != TOK_EOF)
 	{
-		ft_printf(RED "error:\nUnexpected token\n" RESET);
+		ft_printf(RED "Error:\nUnexpected token\n" RESET);
 		free_all_commands(cmd);
 		return (NULL);
 	}

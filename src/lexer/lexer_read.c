@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:27:07 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/14 15:27:58 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/18 11:51:57 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,16 +96,68 @@ char	*read_word_lexer(t_lexer *lexer)
 }
 
 /**
- * @brief Reads a complex word that might contain quotes
+ * @brief Handle word part during complex word reading
+ *
+ * @param lexer Pointer to lexer structure
+ * @param result Current result buffer
+ * @return Updated result buffer or NULL on error
+ */
+static char	*handle_word_part(t_lexer *lexer, char *result)
+{
+	char	*part;
+
+	part = read_word_lexer(lexer);
+	result = join_and_free(result, part);
+	free(part);
+	return (result);
+}
+
+/**
+ * @brief Handle quoted part during complex word reading
+ *
+ * @param lexer Pointer to lexer structure
+ * @param result Current result buffer
+ * @param quote_char Quote character (single or double)
+ * @return Updated result buffer or NULL on error
+ */
+static char	*handle_quoted_part(t_lexer *lexer, char *result, char quote_char)
+{
+	char	*part;
+
+	part = read_quoted_string_lexer(lexer, quote_char);
+	if (!part)
+	{
+		free(result);
+		return (NULL);
+	}
+	result = join_and_free(result, part);
+	free(part);
+	return (result);
+}
+
+/**
+ * @brief Handle dollar sign during complex word reading
+ *
+ * @param lexer Pointer to lexer structure
+ * @param result Current result buffer
+ * @return Updated result buffer with position at dollar sign
+ */
+static char	*handle_dollar_sign(char *result)
+{
+	if (!result)
+		result = ft_strdup("");
+	return (result);
+}
+
+/**
+ * @brief Reads a complex word that might contain various elements
  *
  * @param lexer Pointer to lexer structure
  * @return Newly allocated string containing the word or NULL on error
- * @note Caller must free the returned string
  */
 char	*read_complex_word(t_lexer *lexer)
 {
 	char	*result;
-	char	*part;
 	char	quote_char;
 
 	result = NULL;
@@ -117,21 +169,21 @@ char	*read_complex_word(t_lexer *lexer)
 		if (get_lexer(lexer) == '"' || get_lexer(lexer) == '\'')
 		{
 			quote_char = get_lexer(lexer);
-			part = read_quoted_string_lexer(lexer, quote_char);
-			if (!part)
-			{
-				free(result);
+			result = handle_quoted_part(lexer, result, quote_char);
+			if (!result)
 				return (NULL);
-			}
-			result = join_and_free(result, part);
-			free(part);
+		}
+		else if (get_lexer(lexer) == '$')
+		{
+			result = handle_dollar_sign(result);
+			break ;
 		}
 		else
 		{
-			part = read_word_lexer(lexer);
-			result = join_and_free(result, part);
-			free(part);
+			result = handle_word_part(lexer, result);
 		}
 	}
+	if (!result)
+		return (ft_strdup(""));
 	return (result);
 }

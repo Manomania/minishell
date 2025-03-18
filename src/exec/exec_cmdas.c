@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 17:20:38 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/18 12:37:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,7 @@ t_bool	exec_cmdas(t_ctx *ctx)
 	t_pipe_data	data;
 	int			exit_status;
 	int			i;
+	char		*a;
 	char		error_buf[64];
 
 	debug_log(DEBUG_INFO, "pipeline", "Starting pipeline execution");
@@ -131,7 +132,9 @@ t_bool	exec_cmdas(t_ctx *ctx)
 	debug_log(DEBUG_INFO, "pipeline", "Waiting for child processes");
 	exit_status = wait_for_pids(data.pids, data.cmd_count);
 	ft_strlcpy(error_buf, "Pipeline exit status: ", sizeof(error_buf));
-	ft_strlcat(error_buf, ft_itoa(exit_status), sizeof(error_buf));
+	a = ft_itoa(exit_status);
+	ft_strlcat(error_buf, a, sizeof(error_buf));
+	free(a);
 	debug_log(DEBUG_INFO, "pipeline", error_buf);
 	setup_signals();
 	free(data.pids);

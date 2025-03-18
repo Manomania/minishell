@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 11:30:23 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/18 12:46:40 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
  * @param ctx Context
  * @param envp Environment
  */
-void	ctx_init_envp(t_ctx *ctx, char **envp)
+void	init_ctx_envp(t_ctx *ctx, char **envp)
 {
 	int	i;
 
@@ -42,7 +42,7 @@ void	ctx_init_envp(t_ctx *ctx, char **envp)
  * @param envp Environment variables
  * @return t_ctx* Context
  */
-t_ctx	*ctx_init(int argc, char **argv, char **envp)
+t_ctx	*init_ctx(int argc, char **argv, char **envp)
 {
 	t_ctx	*ctx;
 
@@ -50,7 +50,7 @@ t_ctx	*ctx_init(int argc, char **argv, char **envp)
 	if (!ctx)
 		return (NULL);
 	ctx->env_list = NULL;
-	ctx_init_envp(ctx, envp);
+	init_ctx_envp(ctx, envp);
 	ctx->exit_status = 0;
 	ctx->interactive = 1;
 	ctx->tokens = NULL;

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 19:20:06 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/17 16:00:07 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/18 13:45:03 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ void	debug_print_command(int level, t_command *cmd)
 {
 	char			buffer[512];
 	t_redirection	*redir;
+	char			*count_str;
 	int				i;
 
 	if (g_debug_level < level || !cmd)
@@ -152,7 +153,9 @@ void	debug_print_command(int level, t_command *cmd)
 	while (cmd->args && i <= cmd->arg_count)
 	{
 		ft_strlcpy(buffer, "Arg[", sizeof(buffer));
-		ft_strlcat(buffer, ft_itoa(i - 1), sizeof(buffer));
+		count_str = ft_itoa(i - 1);
+		ft_strlcat(buffer, count_str, sizeof(buffer));
+		free(count_str);
 		ft_strlcat(buffer, "]: ", sizeof(buffer));
 		ft_strlcat(buffer, cmd->args[i], sizeof(buffer));
 		debug_log(level, "parser", buffer);

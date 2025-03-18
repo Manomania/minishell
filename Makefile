@@ -55,13 +55,6 @@ LIBFT_DIR			:=	libft/
 LIBFT				:=	$(LIBFT_DIR)libft.a
 
 ########################################################################################################################
-#                                                         LIB                                                          #
-########################################################################################################################
-
-LIBFT_DIR			:=	libft/
-LIBFT				:=	$(LIBFT_DIR)libft.a
-
-########################################################################################################################
 #                                                       TARGETS                                                        #
 ########################################################################################################################
 
@@ -81,20 +74,12 @@ clean:					.print_header
 							@$(MAKE) --silent -C $(LIBFT_DIR) clean
 							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
 							@printf "\n"
-							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
-							@$(MAKE) --silent -C $(LIBFT_DIR) clean
-							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
-							@printf "\n"
 							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(OBJ_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
 							@rm -rf $(OBJ_DIR)
 							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
 							$(call SEPARATOR)
 
 fclean: 				clean
-							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
-							@$(MAKE) --silent -C $(LIBFT_DIR) fclean
-							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
-							@printf "\n"
 							@printf "%$(SPACEMENT)b%b" "$(BLUE)[$(LIBFT_DIR)]:" "$(GREEN)[✓]$(DEF_COLOR)\n"
 							@$(MAKE) --silent -C $(LIBFT_DIR) fclean
 							@printf "$(RED)=> Deleted!$(DEF_COLOR)\n"
@@ -106,7 +91,6 @@ fclean: 				clean
 
 re: 					.print_header fclean all
 
-.PHONY: 				all make_libft clean fclean re
 .PHONY: 				all make_libft clean fclean re
 
 ########################################################################################################################

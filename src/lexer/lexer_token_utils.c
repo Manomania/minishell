@@ -5,25 +5,62 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/17 13:44:05 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 13:44:49 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/13 15:53:31 by maximart          #+#    #+#             */
+/*   Updated: 2025/03/18 11:39:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/**
- * @brief Handles redirection tokens during tokenization
- *
- * This function processes redirection operators (<, >, <<, >>)
- * and creates the appropriate token.
- *
- * @param lexer Lexer structure containing input and position
- * @param current Current character being processed
- * @return Token representing the redirection operator
- */
-t_token	*handle_redirection(t_lexer *lexer, char current)
+t_token	*handle_basics_token(t_lexer *lexer)
 {
+	char	current;
+
+	current = get_lexer(lexer);
+	if (current == '\0')
+		return (create_token(TOK_EOF, NULL));
+	if (current == '\n')
+	{
+		advance_lexer(lexer);
+		return (create_token(TOK_NEW_LINE, ft_strdup("\n")));
+	}
+	return (NULL);
+}
+
+t_token	*handle_pipe_and_token(t_lexer *lexer)
+{
+	char	current;
+
+	current = get_lexer(lexer);
+	if (current == '|')
+	{
+		advance_lexer(lexer);
+		if (get_lexer(lexer) == '|')
+		{
+			advance_lexer(lexer);
+			return (create_token(TOK_OR, ft_strdup("||")));
+		}
+		return (create_token(TOK_PIPE, ft_strdup("|")));
+	}
+	if (current == '&')
+	{
+		advance_lexer(lexer);
+		if (get_lexer(lexer) == '&')
+		{
+			advance_lexer(lexer);
+			return (create_token(TOK_AND, ft_strdup("&&")));
+		}
+		ft_printf(RED "Error:\nUnexpected '&'\n" RESET);
+		return (create_token(TOK_EOF, NULL));
+	}
+	return (NULL);
+}
+
+t_token	*handle_redir_from_and_to_token(t_lexer *lexer)
+{
+	char	current;
+
+	current = get_lexer(lexer);
 	if (current == '<')
 	{
 		advance_lexer(lexer);
@@ -48,71 +85,39 @@ t_token	*handle_redirection(t_lexer *lexer, char current)
 }
 
 /**
- * @brief Handles pipe and logical operators during tokenization
+ * Checks if the current lexer character is a lone '$' symbol.
  *
- * This function processes pipe (|) and logical operators (&&, ||)
- * and creates the appropriate token.
- *
- * @param lexer Lexer structure containing input and position
- * @param current Current character being processed
- * @return Token representing the operator
+ * @param lexer Pointer to the lexer structure
+ * @return 1 if lone '$', 0 otherwise
  */
-t_token	*handle_operators(t_lexer *lexer, char current)
+static int	is_lone_dollar(t_lexer *lexer)
 {
-	if (current == '|')
-	{
-		advance_lexer(lexer);
-		if (get_lexer(lexer) == '|')
-		{
-			advance_lexer(lexer);
-			return (create_token(TOK_OR, ft_strdup("||")));
-		}
-		return (create_token(TOK_PIPE, ft_strdup("|")));
-	}
-	else if (current == '&')
-	{
-		advance_lexer(lexer);
-		if (get_lexer(lexer) == '&')
-		{
-			advance_lexer(lexer);
-			return (create_token(TOK_AND, ft_strdup("&&")));
-		}
-		ft_printf(RED "error:\nUnexpected '&'\n" RESET);
-		return (create_token(TOK_EOF, NULL));
-	}
-	return (NULL);
+	return (get_lexer(lexer) == ' ' || get_lexer(lexer) == '\t'
+		|| get_lexer(lexer) == '\0' || get_lexer(lexer) == '<'
+		|| get_lexer(lexer) == '>' || get_lexer(lexer) == '|'
+		|| get_lexer(lexer) == '"' || get_lexer(lexer) == '\''
+		|| get_lexer(lexer) == '&' || get_lexer(lexer) == '\n');
 }
 
-/**
- * @brief Handles special characters during tokenization
- *
- * This function processes special characters like quotes and variables
- * and creates the appropriate token.
- *
- * @param lexer Lexer structure containing input and position
- * @param current Current character being processed
- * @return Token representing the processed text
- */
-t_token	*handle_special_chars(t_lexer *lexer, char current)
+t_token	*handle_env_token(t_lexer *lexer)
 {
 	char	*word;
+	char	current;
 
+	current = get_lexer(lexer);
 	if (current == '$')
 	{
 		advance_lexer(lexer);
+		if (is_lone_dollar(lexer))
+			return (create_token(TOK_WORD, ft_strdup("$")));
 		word = read_word_lexer(lexer);
-		if (word)
-			return (create_token(TOK_ENV, word));
-		return (create_token(TOK_ENV, ft_strdup("")));
-	}
-	else if (current == '\n')
-	{
-		advance_lexer(lexer);
-		return (create_token(TOK_NEW_LINE, ft_strdup("\n")));
-	}
-	else if (current == '\0')
-	{
-		return (create_token(TOK_EOF, NULL));
+		if (!word || word[0] == '\0')
+		{
+			if (word)
+				free(word);
+			return (create_token(TOK_WORD, ft_strdup(" $")));
+		}
+		return (create_token(TOK_ENV, word));
 	}
 	return (NULL);
 }

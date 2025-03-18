@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/17 18:17:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/18 12:47:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,17 +48,19 @@ typedef enum e_bool
 
 typedef enum e_token_type
 {
-	TOK_WORD,
-	TOK_REDIR_FROM,
-	TOK_REDIR_TO,
-	TOK_HERE_DOC_FROM,
-	TOK_HERE_DOC_TO,
-	TOK_PIPE,
-	TOK_ENV,
-	TOK_AND,
-	TOK_OR,
-	TOK_NEW_LINE,
-	TOK_EOF,
+	TOK_WORD,          // Commands, args, filename
+	TOK_OPEN_PAR,      // (
+	TOK_CLOSE_PAR,     // )
+	TOK_REDIR_FROM,    // <
+	TOK_REDIR_TO,      // >
+	TOK_HERE_DOC_FROM, // <<
+	TOK_HERE_DOC_TO,   // >>
+	TOK_PIPE,          // |
+	TOK_ENV,           // $
+	TOK_AND,           // &&
+	TOK_OR,            // ||
+	TOK_NEW_LINE,      // \n
+	TOK_EOF,           // '\0'
 }							t_token_type;
 
 typedef struct s_token
@@ -148,6 +150,12 @@ typedef struct s_ctx
 	int						fd_file_out;
 }							t_ctx;
 
+typedef struct s_quote_state
+{
+	int						in_single_quote;
+	int						in_double_quote;
+}							t_quote_state;
+
 /**
  * @brief Structure to hold pipeline process data
  */
@@ -176,8 +184,12 @@ typedef enum e_path_error
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
+// env.c
+char						*expand_var(t_ctx *ctx, char *var_name);
+char						*get_env_value(t_env *env_list, char *key);
+char						*handle_quotes_and_vars(t_ctx *ctx, char *str);
+
 // init.c
-t_ctx						*init_ctx(char **envp);
 t_env						*create_env_node(char *key, char *value);
 int							add_env_var(t_env **env_list, char *key,
 								char *value);
@@ -204,11 +216,18 @@ char						*read_word_lexer(t_lexer *lexer);
 char						*read_complex_word(t_lexer *lexer);
 char						*read_quoted_string_lexer(t_lexer *lexer,
 								char quote_char);
+char						*join_and_free(char *s1, char *s2);
 
 // lexer_token.c
 t_token						*next_token_lexer(t_lexer *lexer);
 void						free_token(t_token *token);
 void						free_all_token(t_token *token);
+
+// lexer_token_utils.c
+t_token						*handle_basics_token(t_lexer *lexer);
+t_token						*handle_pipe_and_token(t_lexer *lexer);
+t_token						*handle_redir_from_and_to_token(t_lexer *lexer);
+t_token						*handle_env_token(t_lexer *lexer);
 
 // parser_utils.c
 void						advance_parse(t_parse *parse);
@@ -221,13 +240,14 @@ int							check_token_type(t_parse *parse, t_token_type type);
 int							add_argument(t_command *cmd, char *value);
 void						add_redirection(t_command *cmd,
 								t_redirection *redirection);
-int							parse_redirection(t_parse *parse, t_command *cmd);
-t_command					*parse_command(t_parse *parse);
-t_command					*parse_token(t_token *token);
+int							parse_redirection(t_parse *parse, t_command *cmd,
+								t_ctx *ctx);
+t_command					*parse_command(t_parse *parse, t_ctx *ctx);
+t_command					*parse_token(t_token *token, t_ctx *ctx);
 
 // parser_pipeline.c
-t_command					*parse_pipeline(t_parse *parse);
-t_command					*parse_command_sequence(t_parse *parse);
+t_command					*parse_pipeline(t_ctx *ctx, t_parse *parse);
+t_command					*parse_command_sequence(t_ctx *ctx, t_parse *parse);
 void						connect_commands(t_command *left_cmd,
 								t_command *right_cmd, t_token_type op_type);
 
@@ -241,6 +261,7 @@ void						free_all_commands(t_command *cmd);
 // free_env.c
 void						free_env_list(t_env *env_list);
 int							parse_env_var(char *env_str, t_env **env_list);
+void						free_ctx(t_ctx *ctx);
 
 // init_parsing.c
 t_lexer						*create_lexer(char *input);
@@ -266,7 +287,7 @@ t_token						*next_token_lexer(t_lexer *lexer);
 void						print_tokens(t_token *tokens);
 
 // ctx_*.c
-t_ctx						*ctx_init(int argc, char **argv, char **envp);
+t_ctx						*init_ctx(int argc, char **argv, char **envp);
 void						ctx_clear(t_ctx *ctx);
 void						ctx_exit(t_ctx *ctx);
 

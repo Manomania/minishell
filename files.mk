@@ -1,7 +1,8 @@
-SRC_F				= \
+SRC_F				= env/env \
 						free/free_env \
 						free/free_2d_array \
 						free/free_ctx \
+						free/ctx_exit \
 						free/pipes_utils \
 						free/free_command \
 						init/init_ctx \
@@ -22,10 +23,10 @@ SRC_F				= \
 						command/command_new \
 						command/command_redirections \
 						command/command_bin \
-						ctx/ctx_exit \
 						error/error \
 						error/ctx_error_exit \
 						debug/debug \
+						debug/debug_utils \
 						exec/exec_cmdas \
 						exec/exec_cmdas_utils \
 						exec/exec_cmdas_utils2 \
@@ -36,7 +37,6 @@ SRC_F				= \
 						env/env_find \
 						env/env_find_bin \
 						signals/signals \
-						debug/debug_utils \
 						redir/heredoc \
 						redir/redirections \
 						memory/memory \
