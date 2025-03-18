@@ -16,14 +16,16 @@ SRC_F				= \
 						parser/parser_pipeline \
 						parser/parser_utils \
 						command/command_execute \
+						command/command_execute_utils \
 						command/command_parse \
 						command/command_add \
 						command/command_new \
 						command/command_redirections \
 						command/command_bin \
 						ctx/ctx_exit \
-						error/ctx_error \
+						error/error \
 						error/ctx_error_exit \
+						debug/debug \
 						exec/exec_cmdas \
 						exec/exec_cmdas_utils \
 						exec/exec_cmdas_utils2 \
@@ -37,5 +39,8 @@ SRC_F				= \
 						debug/debug_utils \
 						redir/heredoc \
 						redir/redirections \
+						memory/memory \
+						validation/validation \
+						main_utils \
 						main
 TSRC_F			=	$(subst main,test/main,$(SRC_F))

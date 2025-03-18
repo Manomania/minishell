@@ -6,10 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 15:22:38 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 15:56:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "error.h"
 #include "minishell.h"
 
 /**
@@ -146,9 +147,8 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
 		line = readline("> ");
 		if (!line)
 		{
-			ft_putstr_fd((char *) YELLOW
-				"minishell: warning: here-document delimited by end-of-file\n"
-				RESET, 2);
+			error_print(WARNING, "heredoc",
+				"here-document delimited by end-of-file");
 			return (1);
 		}
 		if (ft_strncmp(line, delimiter, delimiter_len + 1) == 0)

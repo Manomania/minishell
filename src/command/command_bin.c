@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:52:18 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 12:34:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 17:25:08 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ t_bool	command_bin(t_ctx *ctx)
 	bin = bin_find(ctx, bin_og);
 	if (!bin)
 	{
-		ft_printf("Command not found: %s\n", bin_og);
 		free(bin_og);
 		ctx->cmd->args[0] = NULL;
 		return (false);

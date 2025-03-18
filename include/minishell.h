@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/17 14:37:00 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/17 18:17:26 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@
 # define BLUE "\033[034m"
 # define GREEN "\033[092m"
 # define YELLOW "\033[093m"
+# define MAGENTA "\033[35m"
+# define CYAN "\033[36m"
 
 // *************************************************************************** #
 //                                 Structures                                  #
@@ -119,6 +121,7 @@ typedef enum e_error_type
 	ERR_ALLOC,
 	ERR_PIPE,
 	ERR_CHILD,
+	ERR_NO_SUCH_FILE,
 }							t_error_type;
 
 typedef struct s_error_info
@@ -158,6 +161,17 @@ typedef struct s_pipe_data
 	int						pipe_fds[2];
 }							t_pipe_data;
 
+/**
+ * @brief Simple enum proper error handling in bin_find.c
+ */
+typedef enum e_path_error
+{
+	PATH_ERR_NONE,
+	PATH_ERR_NOT_FOUND,
+	PATH_ERR_NO_PERMISSION,
+	PATH_ERR_OTHER
+}							t_path_error;
+
 // *************************************************************************** #
 //                            Function Prototypes                              #
 // *************************************************************************** #
@@ -185,7 +199,7 @@ t_token						*handle_redirection(t_lexer *lexer, char current);
 t_token						*handle_special_chars(t_lexer *lexer, char current);
 
 // lexer_read.c
-t_token						*tokenize(char *input);
+t_token						*tokenize(t_ctx *ctx, char *input);
 char						*read_word_lexer(t_lexer *lexer);
 char						*read_complex_word(t_lexer *lexer);
 char						*read_quoted_string_lexer(t_lexer *lexer,
@@ -247,7 +261,6 @@ char						*read_quoted_string_lexer(t_lexer *lexer,
 								char quote_char);
 char						*read_word_lexer(t_lexer *lexer);
 t_token						*next_token_lexer(t_lexer *lexer);
-t_token						*tokenize(char *input);
 
 // debug.c
 void						print_tokens(t_token *tokens);
@@ -267,12 +280,12 @@ int							command_execute(t_ctx *ctx);
 t_command					*command_parse(t_token *tokens);
 t_command					*command_new(void);
 
-// Debug
-void						print_tokens_list(t_token *tokens);
-
-// ctx_error*.c
-void						ctx_error_exit(t_ctx *ctx, t_error_type err);
-int							ctx_error(t_error_type err);
+// command_execute_utils.c
+int							setup_child_redirections(t_ctx *ctx,
+								t_command *cmd);
+int							check_command_executable(t_command *cmd);
+void						execute_child(t_ctx *ctx);
+int							get_exit_status(int status);
 
 // Builtins
 t_bool						builtins_try(t_ctx *ctx, t_command *cmd);
@@ -330,5 +343,9 @@ int							setup_redirections(t_redirection *redirections);
 // heredoc.c
 int							setup_heredocs(t_ctx *ctx, t_command *cmd);
 int							create_heredoc(t_ctx *ctx, char *delimiter);
+
+// main_utils.c
+char						*create_prompt(int prev_status);
+char						*get_user_input(t_ctx *ctx, int prev_status);
 
 #endif
