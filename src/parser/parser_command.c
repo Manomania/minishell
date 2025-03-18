@@ -142,7 +142,6 @@ t_command	*parse_command(t_parse *parse, t_ctx *ctx)
 		else if (parse->current->type == TOK_ENV)
 		{
 			expanded = expand_var(ctx, parse->current->value);
-			printf(RED"DEBUG: HERE ENV\n"RESET);
 			if (!add_argument(cmd, expanded))
 			{
 				free(expanded);
