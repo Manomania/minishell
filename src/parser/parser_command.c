@@ -3,15 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   parser_command.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:37:01 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/10 14:37:13 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/18 11:47:01 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/**
+ * @brief Adds an argument to a command
+ *
+ * This function adds a new argument to a command's argument list,
+ * allocating memory as needed.
+ *
+ * @param cmd Command to add the argument to
+ * @param value Value of the argument to add
+ * @return 1 on success, 0 on failure
+ */
 int	add_argument(t_command *cmd, char *value)
 {
 	char	**new_args;
@@ -19,7 +29,7 @@ int	add_argument(t_command *cmd, char *value)
 
 	if (!cmd || !value)
 		return (0);
-	new_args = malloc(sizeof(char *) * (cmd->arg_count + 2));
+	new_args = malloc(sizeof(char *) * (size_t)(cmd->arg_count + 2));
 	if (!new_args)
 		return (0);
 	i = 0;
@@ -42,6 +52,14 @@ int	add_argument(t_command *cmd, char *value)
 	return (1);
 }
 
+/**
+ * @brief Adds a redirection to a command
+ *
+ * This function adds a new redirection to a command's redirection list.
+ *
+ * @param cmd Command to add the redirection to
+ * @param redirection Redirection to add
+ */
 void	add_redirection(t_command *cmd, t_redirection *redirection)
 {
 	t_redirection	*current;
@@ -75,7 +93,7 @@ int	parse_redirection(t_parse *parse, t_command *cmd, t_ctx *ctx)
 	advance_parse(parse);
 	if (!parse->current || parse->current->type != TOK_WORD)
 	{
-		ft_printf(RED"Error: Expected filename after redirection\n"RESET);
+		ft_printf(RED "Error: Expected filename after redirection\n" RESET);
 		return (0);
 	}
 	if (type == TOK_HERE_DOC_FROM)
@@ -181,19 +199,18 @@ t_command	*parse_token(t_token *token, t_ctx *ctx)
 	t_command	*cmd;
 
 	init_parse_context(&parse, token);
-	if (parse.current->type == TOK_AND ||
-	parse.current->type == TOK_OR ||
-	parse.current->type == TOK_PIPE)
+	if (parse.current->type == TOK_AND || parse.current->type == TOK_OR
+		|| parse.current->type == TOK_PIPE)
 	{
-		ft_printf(RED"Error: Unexpected token at start of command\n"RESET);
+		ft_printf(RED "Error: Unexpected token at start of command\n" RESET);
 		return (NULL);
 	}
-	cmd = parse_command_sequence(&parse, ctx);
+	cmd = parse_command_sequence(ctx, &parse);
 	if (!cmd)
 		return (NULL);
 	if (parse.current->type != TOK_EOF)
 	{
-		ft_printf(RED"Error:\nUnexpected token\n"RESET);
+		ft_printf(RED "Error:\nUnexpected token\n" RESET);
 		free_all_commands(cmd);
 		return (NULL);
 	}

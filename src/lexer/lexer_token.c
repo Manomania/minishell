@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_token.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:31:33 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/10 14:31:43 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/18 11:40:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,10 +60,18 @@ void	free_token(t_token *token)
 	}
 }
 
+/**
+ * @brief Frees all tokens in a linked list
+ *
+ * This function releases the memory allocated for all tokens
+ * in a linked list, starting from the given token.
+ *
+ * @param token First token in the list
+ */
 void	free_all_token(t_token *token)
 {
-	t_token *current;
-	t_token *next;
+	t_token	*current;
+	t_token	*next;
 
 	current = token;
 	while (current)

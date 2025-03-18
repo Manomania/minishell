@@ -1,38 +1,65 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ctx_init.c                                         :+:      :+:    :+:   */
+/*   init_ctx.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/05 10:57:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/18 12:46:40 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_ctx	*init_ctx(char **envp)
+/**
+ * @brief Initializes the environment in the context
+ *
+ * @param ctx Context
+ * @param envp Environment
+ */
+void	init_ctx_envp(t_ctx *ctx, char **envp)
 {
-	t_ctx	*ctx;
-	int		i;
+	int	i;
 
-	ctx = (t_ctx *)malloc(sizeof(t_ctx));
-	if (!ctx)
-		return (NULL);
-	ctx->env_list = NULL;
-	ctx->exit_status = 0;
-	ctx->interactive = 1;
 	i = 0;
 	while (envp[i])
 	{
 		if (!parse_env_var(envp[i], &ctx->env_list))
 		{
-			free_ctx(ctx);
-			return (NULL);
+			ctx_clear(ctx);
+			return ;
 		}
 		i++;
 	}
+}
+
+/**
+ * @brief Initializes the context
+ *
+ * @param argc Arguments count
+ * @param argv Arguments
+ * @param envp Environment variables
+ * @return t_ctx* Context
+ */
+t_ctx	*init_ctx(int argc, char **argv, char **envp)
+{
+	t_ctx	*ctx;
+
+	ctx = malloc(sizeof(t_ctx));
+	if (!ctx)
+		return (NULL);
+	ctx->env_list = NULL;
+	init_ctx_envp(ctx, envp);
+	ctx->exit_status = 0;
+	ctx->interactive = 1;
+	ctx->tokens = NULL;
+	ctx->cmd = NULL;
+	ctx->argc = argc;
+	ctx->argv = argv;
+	ctx->envp = envp;
+	ctx->fd_file_in = -1;
+	ctx->fd_file_out = -1;
 	return (ctx);
 }
 

@@ -7,38 +7,36 @@ NAME				:=	minishell
 HEADER				=	$(INC_DIR)minishell.h
 CC 					?= 	cc
 # Standard compilation checks
-CFLAGS 				:= 	-Wall -Wextra -Werror
-## Compability checks
-#CFLAGS				+= -Wpedantic
-## Dependency management
-#CFLAGS				+= -MD -MP
-## Warns when a variable declaration shadows another variable
-#CFLAGS				+= -Wshadow
-## More thorough than -Wunused-result
-#CFLAGS				+= -Wunused-result
-## Implicit conversions that may change value
-#CFLAGS				+= -Wconversion
-## Implicit conversions between signed and unsigned
-#CFLAGS				+= -Wsign-conversion
-## Disables pointer arithmetics
-## (no `*ptr++`)
-#CFLAGS				+= -Wpointer-arith
-## Catches more printf/scanf format mismatches
-#CFLAGS				+= -Wformat=2
-## Warns about == for floats which is sus
-#CFLAGS				+= -Wfloat-equal
-## Makes strings const char*
-#CFLAGS				+= -Wwrite-strings
-## Keeps the frame pointer in registers
-## Minor performance cost
-#CFLAGS				+= -fno-omit-frame-pointer
+CFLAGS 				:= 	-Wall -Wextra -Werror -g3
+# Compability checks
+CFLAGS				+= -Wpedantic
+# Dependency management
+CFLAGS				+= -MD -MP
+# Warns when a variable declaration shadows another variable
+CFLAGS				+= -Wshadow
+# More thorough than -Wunused-result
+CFLAGS				+= -Wunused-result
+# Disables pointer arithmetics
+# (no `*ptr++`)
+CFLAGS				+= -Wpointer-arith
+# Catches more printf/scanf format mismatches
+CFLAGS				+= -Wformat=2
+# Warns about == for floats which is sus
+CFLAGS				+= -Wfloat-equal
+# Makes strings const char*
+CFLAGS				+= -Wwrite-strings
+# Keeps the frame pointer in registers
+# Minor performance cost
+CFLAGS				+= -fno-omit-frame-pointer
 AR					:=	ar rcs
 RM					:=	rm -f
 
 include files.mk
 
 SRC					=	$(addprefix $(SRC_DIR), $(addsuffix .c, $(SRC_F)))
+TSRC 				= 	$(addprefix $(SRC_DIR), $(addsuffix .o, $(TSRC_F)))
 OBJ 				= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(SRC_F)))
+TOBJ 				= 	$(addprefix $(OBJ_DIR), $(addsuffix .o, $(TSRC_F)))
 DEP 				= 	$(addprefix $(OBJ_DIR), $(addsuffix .d, $(SRC_F)))
 
 ########################################################################################################################
@@ -104,9 +102,12 @@ $(NAME):				$(LIBFT) $(OBJ)
 
 $(LIBFT):				make_libft
 
+minishell_test:			$(LIBFT) $(TOBJ)
+							@$(CC) $(CFLAGS) $(TOBJ) $(LIBFT) -o $@ -lreadline
+
 $(OBJ_DIR)%.o: 			$(SRC_DIR)%.c $(HEADER)
 							@mkdir -p $(dir $@)
-							@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -c $< -o $@
+							@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -c $< -o $@
 							$(call PROGRESS_BAR_PERCENTAGE)
 							$(if $(filter $(COMPILED_SRCS),$(SRCS_TO_COMPILE)),$(call SEPARATOR))
 

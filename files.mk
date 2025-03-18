@@ -1,14 +1,46 @@
-SRC_F				=	env/env \
-						free/free \
+SRC_F				= env/env \
 						free/free_env \
+						free/free_2d_array \
+						free/free_ctx \
+						free/ctx_exit \
+						free/pipes_utils \
+						free/free_command \
 						init/init_ctx \
 						init/init_parse \
 						lexer/lexer_read \
 						lexer/lexer_token \
+						lexer/lexer_tokenize \
 						lexer/lexer_token_utils \
 						lexer/lexer_utils \
+						lexer/lexer_token_is \
 						parser/parser_command \
 						parser/parser_pipeline \
 						parser/parser_utils \
-						debug \
+						command/command_execute \
+						command/command_execute_utils \
+						command/command_parse \
+						command/command_add \
+						command/command_new \
+						command/command_redirections \
+						command/command_bin \
+						error/error \
+						error/ctx_error_exit \
+						debug/debug \
+						debug/debug_utils \
+						exec/exec_cmdas \
+						exec/exec_cmdas_utils \
+						exec/exec_cmdas_utils2 \
+						exec/exec_cmdas_get_fds \
+						path/bin_find \
+						path/bin_find_path \
+						builtins/builtins_try \
+						env/env_find \
+						env/env_find_bin \
+						signals/signals \
+						redir/heredoc \
+						redir/redirections \
+						memory/memory \
+						validation/validation \
+						main_utils \
 						main
+TSRC_F			=	$(subst main,test/main,$(SRC_F))

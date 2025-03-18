@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init_parsing.c                                     :+:      :+:    :+:   */
+/*   init_parse.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 19:14:26 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/05 19:14:29 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/18 11:36:12 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@
  * @return New lexer pointer or NULL if allocation fails
  * @note Caller must free the returned lexer
  */
-t_lexer *create_lexer(char *input)
+t_lexer	*create_lexer(char *input)
 {
-	t_lexer *lexer;
+	t_lexer	*lexer;
 
 	lexer = malloc(sizeof(t_lexer));
 	if (!lexer)
@@ -42,7 +42,7 @@ t_lexer *create_lexer(char *input)
  */
 t_token	*create_token(t_token_type type, char *value)
 {
-	t_token *token;
+	t_token	*token;
 
 	token = malloc(sizeof(t_token));
 	if (!token)
@@ -59,13 +59,13 @@ t_token	*create_token(t_token_type type, char *value)
  * @return New command pointer or NULL if allocation fails
  * @note Caller must free the returned token
  */
-t_command *create_command(void)
+t_command	*create_command(void)
 {
-	t_command *cmd;
+	t_command	*cmd;
 
 	cmd = malloc(sizeof(t_command));
 	if (!cmd)
-		return NULL;
+		return (NULL);
 	cmd->redirection = NULL;
 	cmd->next = NULL;
 	cmd->args = NULL;

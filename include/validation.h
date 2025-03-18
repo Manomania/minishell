@@ -1,0 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   validation.h                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/17 15:39:18 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/17 15:39:19 by elagouch         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+
+#ifndef VALIDATION_H
+# define VALIDATION_H
+
+# include "minishell.h"
+
+# define MAX_INPUT_LEN 4096
+# define MAX_VAR_NAME_LEN 255
+
+t_bool	validate_input_length(char *input, t_ctx *ctx);
+t_bool	validate_env_var_name(char *name, t_ctx *ctx);
+t_bool	validate_filename(char *filename, t_ctx *ctx);
+t_bool	validate_command(t_command *cmd, t_ctx *ctx);
+
+#endif

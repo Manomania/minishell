@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_token_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 15:53:31 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/13 15:55:37 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/18 11:39:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ t_token	*handle_pipe_and_token(t_lexer *lexer)
 			advance_lexer(lexer);
 			return (create_token(TOK_AND, ft_strdup("&&")));
 		}
-		ft_printf(RED"Error:\nUnexpected '&'\n"RESET);
+		ft_printf(RED "Error:\nUnexpected '&'\n" RESET);
 		return (create_token(TOK_EOF, NULL));
 	}
 	return (NULL);
@@ -71,7 +71,7 @@ t_token	*handle_redir_from_and_to_token(t_lexer *lexer)
 		}
 		return (create_token(TOK_REDIR_FROM, ft_strdup("<")));
 	}
-	if (current == '>')
+	else if (current == '>')
 	{
 		advance_lexer(lexer);
 		if (get_lexer(lexer) == '>')
@@ -82,7 +82,6 @@ t_token	*handle_redir_from_and_to_token(t_lexer *lexer)
 		return (create_token(TOK_REDIR_TO, ft_strdup(">")));
 	}
 	return (NULL);
-
 }
 
 /**
