@@ -111,9 +111,9 @@ typedef struct s_quote_state
 *                             Function Prototypes                              *
 *******************************************************************************/
 
-
 // env.c
 char			*expand_var(t_ctx *ctx, char *var_name);
+char			*get_env_value(t_env *env_list, char *key);
 char			*handle_quotes_and_vars(t_ctx *ctx, char *str);
 
 // init.c

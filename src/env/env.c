@@ -13,6 +13,28 @@
 #include "minishell.h"
 
 /**
+ * @brief Gets the value of an environment variable
+ *
+ * @param env_list Environment variable list
+ * @param key Key to look for
+ * @return Value of the variable or NULL if not found
+ */
+char	*get_env_value(t_env *env_list, char *key)
+{
+	t_env	*current;
+
+	current = env_list;
+	while (current)
+	{
+		if (ft_strncmp(current->key, key, ft_strlen(key)) == 0
+			&& ft_strlen(current->key) == ft_strlen(key))
+			return (current->value);
+		current = current->next;
+	}
+	return (NULL);
+}
+
+/**
  * @brief Gets a variable name from a string
  *
  * @param str String containing the variable
