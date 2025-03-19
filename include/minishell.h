@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/19 17:02:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:37:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,7 @@ typedef struct s_ctx
 {
 	t_env					*env_list;
 	int						exit_status;
+	t_bool					exit_requested;
 	int						interactive;
 	int						argc;
 	char					**argv;
@@ -231,7 +232,7 @@ char						*env_find_bin(t_ctx *ctx, char *bin);
 char						*handle_quotes_and_vars(t_ctx *ctx, char *str);
 
 // exec_cmdas.c
-t_bool						exec_cmdas(t_ctx *ctx);
+int							exec_cmdas(t_ctx *ctx);
 
 // exec_cmdas_utils.c
 pid_t						exec_piped_command(t_ctx *ctx, t_command *cmd,

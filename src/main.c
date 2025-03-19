@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/19 17:02:47 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:35:19 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,19 +24,13 @@
  */
 static int	process_command(t_ctx *ctx, int prev_status)
 {
-	int		status;
-	t_bool	should_exit;
+	int	status;
 
-	should_exit = false;
 	status = prev_status;
 	if (ctx->cmd && ctx->cmd->args && ctx->cmd->args[0]
 		&& ft_strncmp(ctx->cmd->args[0], "exit", __INT_MAX__) == 0)
-	{
 		ft_putstr("exit\n");
-		should_exit = true;
-	}
-	if (!should_exit)
-		status = command_execute(ctx);
+	status = command_execute(ctx);
 	if (ctx->cmd)
 		free_all_commands(ctx->cmd);
 	ctx->cmd = NULL;
@@ -45,8 +39,8 @@ static int	process_command(t_ctx *ctx, int prev_status)
 	ctx->tokens = NULL;
 	if (status == -1)
 		status = prev_status;
-	if (should_exit)
-		ctx->exit_status = 1;
+	if (!ctx->exit_requested)
+		ctx->exit_status = status;
 	return (status);
 }
 
@@ -107,7 +101,7 @@ static void	command_loop(t_ctx *ctx, int prev_status)
 		debug_log(DEBUG_INFO, "main", "Processing user input");
 		if (parse_user_input(ctx, input))
 			status = process_command(ctx, status);
-		if (ctx->exit_status)
+		if (ctx->exit_requested)
 			running = 0;
 	}
 }
