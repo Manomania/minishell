@@ -117,7 +117,7 @@ t_token	*handle_env_token(t_lexer *lexer)
 		{
 			if (word)
 				free(word);
-			return (create_token(TOK_WORD, ft_strdup(" $")));
+			return (create_token(TOK_WORD, ft_strdup("$")));
 		}
 		return (create_token(TOK_ENV, word));
 	}

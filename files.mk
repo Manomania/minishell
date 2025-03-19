@@ -39,6 +39,7 @@ SRC_F				= 	builtins/builtins_try \
 						parser/parser_utils \
 						path/bin_find \
 						path/bin_find_path \
+						redir/expand_variable \
 						redir/heredoc \
 						redir/redirections \
 						signals/signals \
