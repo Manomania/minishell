@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:19:14 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 18:09:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:34:16 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 t_bool	builtins_try(t_ctx *ctx, t_command *cmd)
 {
 	char	cmd_name[64];
+	int		exit_code;
 
 	if (!ctx || !cmd || !cmd->args || !cmd->args[0])
 	{
@@ -36,7 +37,11 @@ t_bool	builtins_try(t_ctx *ctx, t_command *cmd)
 	if (ft_strncmp(cmd->args[0], "exit", __INT_MAX__) == 0)
 	{
 		debug_log(DEBUG_INFO, "builtin", "Executing exit builtin");
-		ctx->exit_status = 1;
+		exit_code = 0;
+		if (cmd->arg_count >= 1 && cmd->args[1])
+			exit_code = ft_atoi(cmd->args[1]);
+		ctx->exit_status = exit_code;
+		ctx->exit_requested = true;
 		return (true);
 	}
 	debug_log(DEBUG_INFO, "builtin", "No matching builtin found");

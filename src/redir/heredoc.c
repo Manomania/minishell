@@ -6,10 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 15:56:25 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:57:55 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "debug.h"
 #include "error.h"
 #include "minishell.h"
 
@@ -81,6 +82,7 @@ static char	*expand_variables(t_ctx *ctx, char *line)
 		while (result[j] && (ft_isalnum(result[j]) || result[j] == '_'))
 			j++;
 		var_name = ft_substr(result, i + 1, j - i - 1);
+		var_name = ft_strjoin(var_name, "=");
 		if (!var_name)
 		{
 			free(result);

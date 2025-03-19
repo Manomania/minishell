@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/18 12:37:35 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:36:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ static t_bool	init_pipe_data(t_pipe_data *data, t_ctx *ctx)
  * @param ctx Context
  * @return Exit status of the last command
  */
-t_bool	exec_cmdas(t_ctx *ctx)
+int	exec_cmdas(t_ctx *ctx)
 {
 	t_pipe_data	data;
 	int			exit_status;
@@ -111,7 +111,8 @@ t_bool	exec_cmdas(t_ctx *ctx)
 	if (!init_pipe_data(&data, ctx))
 	{
 		error_print(ERROR, "pipeline", "Failed to initialize pipeline data");
-		return (error_code(ERR_ALLOC));
+		ctx->exit_status = error_code(ERR_ALLOC);
+		return (ctx->exit_status);
 	}
 	setup_parent_signals();
 	i = 0;
@@ -123,7 +124,8 @@ t_bool	exec_cmdas(t_ctx *ctx)
 		{
 			free(data.pids);
 			error_print(ERROR, "pipeline", "Pipe processing failed");
-			return (error_code(ERR_PIPE));
+			ctx->exit_status = error_code(ERR_PIPE);
+			return (ctx->exit_status);
 		}
 		data.current = data.current->next;
 		data.i++;
