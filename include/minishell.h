@@ -24,52 +24,6 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 
-// pipes_utils.c NON UTILISÉ POURQUOI
-// void						close_all_pipes(int pipes[2][2]);
-// void						close_previous_pipe(int pipes[2][2], int cmd_index);
-
-// free.c NON UTILISÉ POURQUOI ??????????????
-
-// exec_cmdas_get_fds.c NON UTILISEEE
-// int							get_fd_in(t_ctx *ctx, t_list *fd_pipes,
-//int cmd_index);
-// int							get_fd_out(t_ctx *ctx, t_list *fd_pipes,
-// int cmd_index, int cmd_count);
-
-// main.c NON UTILISÉ POURQUOI ?????????????????????????
-
-// command_execute_utils.c
-// int							setup_child_redirections(t_ctx *ctx,
-// t_command *cmd);
-// int							check_command_executable(t_command *cmd);
-
-// free_commands.c
-// void						free_redirection(t_redirection *redirection);
-// void						free_all_redirections(t_redirection *redirection);
-// void						free_command_args(char **args, int arg_count);
-
-// init_ctx.c
-// void						init_ctx_envp(t_ctx *ctx, char **envp);
-// t_env					*create_env_node(char *key, char *value);
-
-// exec_cmdas_utils2.c
-// void						execute_command(t_ctx *ctx, t_command *cmd);
-
-// lexer_read.c
-// char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char);
-
-// lexer_token.c
-// void	free_token(t_token *token);
-
-// heredoc.c
-// int	create_heredoc(t_ctx *ctx, char *delimiter);
-
-// signals.c
-// void	set_child_mode(int in_child);
-
-// error.c
-// void			error_print_sys(t_error_level level, const char *module);
-
 // *************************************************************************** #
 //                                   Macros                                    #
 // *************************************************************************** #
@@ -372,13 +326,15 @@ void			setup_signals(void);
 void			reset_signals(void);
 void			setup_parent_signals(void);
 
+// main.c
+// A REMPLIR
+
 // main_utils.c
 char			*get_user_input(t_ctx *ctx, int prev_status);
 
 // A REMPLACER EN FONCTION SI TU UTILISES MES FONCTIONS
 // // parser_command.c
 t_command		*parse_command(t_parse *parse, t_ctx *ctx);
-// int				add_argument(t_command *cmd, char *value);
 // int				parse_redirection(t_parse *parse, t_command *cmd,
 	// 					t_ctx *ctx);
 // void			add_redirection(t_command *cmd, t_redirection *redirection);

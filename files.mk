@@ -18,7 +18,6 @@ SRC_F				= 	builtins/builtins_try \
 						exec/exec_cmdas \
 						exec/exec_cmdas_utils \
 						exec/exec_cmdas_utils2 \
-						exec/exec_cmdas_get_fds \
 						free/free_env \
 						free/free_2d_array \
 						free/free_ctx \
