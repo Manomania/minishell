@@ -92,11 +92,13 @@ t_token	*handle_redir_from_and_to_token(t_lexer *lexer)
  */
 static int	is_lone_dollar(t_lexer *lexer)
 {
-	return (get_lexer(lexer) == ' ' || get_lexer(lexer) == '\t'
-		|| get_lexer(lexer) == '\0' || get_lexer(lexer) == '<'
-		|| get_lexer(lexer) == '>' || get_lexer(lexer) == '|'
-		|| get_lexer(lexer) == '"' || get_lexer(lexer) == '\''
-		|| get_lexer(lexer) == '&' || get_lexer(lexer) == '\n');
+	char	current;
+
+	current = get_lexer(lexer);
+	return (current == ' ' || current == '\t' || current == '\0'
+		|| current == '<' || current == '>' || current == '|'
+		|| current == '"' || current == '\'' || current == '&'
+		|| current == '\n');
 }
 
 t_token	*handle_env_token(t_lexer *lexer)

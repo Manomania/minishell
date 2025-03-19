@@ -36,6 +36,21 @@ t_bool	validate_input_length(char *input, t_ctx *ctx)
 	return (true);
 }
 
+static t_bool	is_valid_env_name(const char *name)
+{
+	if (!name || !name[0])
+	{
+		error_print(ERROR, "env", "Empty variable name");
+		return (false);
+	}
+	if (!ft_isalpha(name[0]) && name[0] != '_')
+	{
+		error_print(ERROR, "env", "Variable name must start with letter or _");
+		return (false);
+	}
+	return (true);
+}
+
 /**
  * @brief Validates that an environment variable name is valid
  *
@@ -48,16 +63,8 @@ t_bool	validate_env_var_name(char *name, t_ctx *ctx)
 	int	i;
 
 	(void)ctx;
-	if (!name || !name[0])
-	{
-		error_print(ERROR, "env", "Empty variable name");
+	if (!is_valid_env_name(name))
 		return (false);
-	}
-	if (!ft_isalpha(name[0]) && name[0] != '_')
-	{
-		error_print(ERROR, "env", "Variable name must start with letter or _");
-		return (false);
-	}
 	i = 1;
 	while (name[i])
 	{

@@ -32,12 +32,9 @@ int	add_argument(t_command *cmd, char *value)
 	new_args = malloc(sizeof(char *) * (size_t)(cmd->arg_count + 2));
 	if (!new_args)
 		return (0);
-	i = 0;
-	while (i < cmd->arg_count)
-	{
+	i = -1;
+	while (++i < cmd->arg_count)
 		new_args[i] = cmd->args[i];
-		i++;
-	}
 	new_args[i] = ft_strdup(value);
 	if (!new_args[i])
 	{
@@ -112,21 +109,6 @@ int	parse_redirection(t_parse *parse, t_command *cmd, t_ctx *ctx)
 }
 
 /**
- * @brief Process token value with environment variable expansion
- *
- * @param ctx Shell context
- * @param token_value Token value to process
- * @return Processed value with environment variables expanded
- */
-char	*process_token(t_ctx *ctx, char *token_value)
-{
-	char	*expanded;
-
-	expanded = handle_quotes_and_vars(ctx, token_value);
-	return (expanded);
-}
-
-/**
  * @brief Parses a command with environment variable expansion
  *
  * @param parse Parser context
@@ -182,37 +164,6 @@ t_command	*parse_command(t_parse *parse, t_ctx *ctx)
 		}
 		else
 			advance_parse(parse);
-	}
-	return (cmd);
-}
-
-/**
- * @brief Parses a token list with environment variable expansion
- *
- * @param token Token list
- * @param ctx Shell context
- * @return Command structure or NULL on error
- */
-t_command	*parse_token(t_token *token, t_ctx *ctx)
-{
-	t_parse		parse;
-	t_command	*cmd;
-
-	init_parse_context(&parse, token);
-	if (parse.current->type == TOK_AND || parse.current->type == TOK_OR
-		|| parse.current->type == TOK_PIPE)
-	{
-		ft_printf(RED "Error: Unexpected token at start of command\n" RESET);
-		return (NULL);
-	}
-	cmd = parse_command_sequence(ctx, &parse);
-	if (!cmd)
-		return (NULL);
-	if (parse.current->type != TOK_EOF)
-	{
-		ft_printf(RED "Error:\nUnexpected token\n" RESET);
-		free_all_commands(cmd);
-		return (NULL);
 	}
 	return (cmd);
 }

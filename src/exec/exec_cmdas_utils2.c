@@ -40,7 +40,7 @@ int	count_commands(t_command *cmd)
  * @param cmd Command to execute
  * @return void
  */
-void	execute_command(t_ctx *ctx, t_command *cmd)
+static void	execute_command(t_ctx *ctx, t_command *cmd)
 {
 	char	*bin_path;
 

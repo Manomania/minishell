@@ -12,6 +12,21 @@
 
 #include "minishell.h"
 
+static t_token	*handle_word_token(t_lexer *lexer)
+{
+	char	*word;
+
+	word = read_complex_word(lexer);
+	if (!word)
+		return (NULL);
+	if (word[0] == '\0' && get_lexer(lexer) == '$')
+	{
+		free(word);
+		return (handle_env_token(lexer));
+	}
+	return (create_token(TOK_WORD, word));
+}
+
 /**
  * @brief Extracts the next token from the lexer
  *
@@ -22,7 +37,6 @@
 t_token	*next_token_lexer(t_lexer *lexer)
 {
 	t_token	*token;
-	char	*word;
 
 	skip_whitespace_lexer(lexer);
 	token = handle_basics_token(lexer);
@@ -40,18 +54,13 @@ t_token	*next_token_lexer(t_lexer *lexer)
 		if (token)
 			return (token);
 	}
-	word = read_complex_word(lexer);
-	if (!word)
-		return (NULL);
-	if (word[0] == '\0' && get_lexer(lexer) == '$')
-	{
-		free(word);
-		return (handle_env_token(lexer));
-	}
-	return (create_token(TOK_WORD, word));
+	token = handle_word_token(lexer);
+	if (token)
+		return (token);
+	return (NULL);
 }
 
-void	free_token(t_token *token)
+static void	free_token(t_token *token)
 {
 	if (token)
 	{

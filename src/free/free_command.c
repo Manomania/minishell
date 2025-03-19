@@ -20,7 +20,7 @@
  *
  * @param redirection Redirection structure to free
  */
-void	free_redirection(t_redirection *redirection)
+static void	free_redirection(t_redirection *redirection)
 {
 	if (!redirection)
 		return ;
@@ -36,7 +36,7 @@ void	free_redirection(t_redirection *redirection)
  *
  * @param redirection First redirection in the linked list
  */
-void	free_all_redirections(t_redirection *redirection)
+static void	free_all_redirections(t_redirection *redirection)
 {
 	t_redirection	*current;
 	t_redirection	*next;
@@ -58,7 +58,7 @@ void	free_all_redirections(t_redirection *redirection)
  * @param args Array of argument strings
  * @param arg_count Number of arguments in the array
  */
-void	free_command_args(char **args, int arg_count)
+static void	free_command_args(char **args, int arg_count)
 {
 	int	i;
 

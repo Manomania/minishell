@@ -18,7 +18,7 @@
  * @param ctx Context
  * @param envp Environment
  */
-void	init_ctx_envp(t_ctx *ctx, char **envp)
+static void	init_ctx_envp(t_ctx *ctx, char **envp)
 {
 	int	i;
 
@@ -70,7 +70,7 @@ t_ctx	*init_ctx(int argc, char **argv, char **envp)
  * @param value Value of the environment variable
  * @return New environment variable node or NULL if allocation fails
  */
-t_env	*create_env_node(char *key, char *value)
+static t_env	*create_env_node(char *key, char *value)
 {
 	t_env	*new_node;
 

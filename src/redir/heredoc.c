@@ -169,7 +169,7 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
  * @param delimiter String marking end of heredoc
  * @return File descriptor to read from, or -1 on error
  */
-int	create_heredoc(t_ctx *ctx, char *delimiter)
+static int	create_heredoc(t_ctx *ctx, char *delimiter)
 {
 	int	pipe_fds[2];
 	int	result;

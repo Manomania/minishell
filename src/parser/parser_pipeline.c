@@ -45,6 +45,18 @@ t_command	*parse_pipeline(t_ctx *ctx, t_parse *parse)
 	return (first_cmd);
 }
 
+static void	connect_commands(t_command *left_cmd, t_command *right_cmd,
+	t_token_type op_type)
+{
+	t_command	*last_cmd;
+
+	last_cmd = left_cmd;
+	while (last_cmd->next)
+		last_cmd = last_cmd->next;
+	last_cmd->next = right_cmd;
+	last_cmd->operator = op_type;
+}
+
 /**
  * @brief Parses a command sequence with environment variable expansion
  *
@@ -73,16 +85,4 @@ t_command	*parse_command_sequence(t_ctx *ctx, t_parse *parse)
 	}
 	connect_commands(left_cmd, right_cmd, op_type);
 	return (left_cmd);
-}
-
-void	connect_commands(t_command *left_cmd, t_command *right_cmd,
-		t_token_type op_type)
-{
-	t_command	*last_cmd;
-
-	last_cmd = left_cmd;
-	while (last_cmd->next)
-		last_cmd = last_cmd->next;
-	last_cmd->next = right_cmd;
-	last_cmd->operator = op_type;
 }
