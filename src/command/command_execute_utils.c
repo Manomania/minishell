@@ -23,7 +23,7 @@
  * @param cmd Command containing redirections
  * @return 0 on success, non-zero on error
  */
-int	setup_child_redirections(t_ctx *ctx, t_command *cmd)
+static int	setup_child_redirections(t_ctx *ctx, t_command *cmd)
 {
 	int	result;
 
@@ -42,7 +42,7 @@ int	setup_child_redirections(t_ctx *ctx, t_command *cmd)
  * @param cmd Command to check
  * @return 0 on success, non-zero on error
  */
-int	check_command_executable(t_command *cmd)
+static int	check_command_executable(t_command *cmd)
 {
 	if (!cmd->args[0] || access(cmd->args[0], X_OK) != 0)
 	{
