@@ -7,27 +7,29 @@ NAME				:=	minishell
 HEADER				=	$(INC_DIR)minishell.h
 CC 					?= 	cc
 # Standard compilation checks
-CFLAGS 				:= 	-Wall -Wextra -Werror -g3
+CFLAGS 				:= 	-Wall -Wextra -Werror
+# Debug
+CFLAGS				+=	-g3
 # Compability checks
-CFLAGS				+= -Wpedantic
+CFLAGS				+=	-Wpedantic
 # Dependency management
-CFLAGS				+= -MD -MP
+CFLAGS				+=	-MD -MP
 # Warns when a variable declaration shadows another variable
-CFLAGS				+= -Wshadow
+CFLAGS				+=	-Wshadow
 # More thorough than -Wunused-result
-CFLAGS				+= -Wunused-result
+CFLAGS				+=	-Wunused-result
 # Disables pointer arithmetics
 # (no `*ptr++`)
-CFLAGS				+= -Wpointer-arith
+CFLAGS				+=	-Wpointer-arith
 # Catches more printf/scanf format mismatches
-CFLAGS				+= -Wformat=2
+CFLAGS				+=	-Wformat=2
 # Warns about == for floats which is sus
-CFLAGS				+= -Wfloat-equal
+CFLAGS				+=	-Wfloat-equal
 # Makes strings const char*
-CFLAGS				+= -Wwrite-strings
+CFLAGS				+=	-Wwrite-strings
 # Keeps the frame pointer in registers
 # Minor performance cost
-CFLAGS				+= -fno-omit-frame-pointer
+CFLAGS				+=	-fno-omit-frame-pointer
 AR					:=	ar rcs
 RM					:=	rm -f
 
@@ -105,9 +107,9 @@ $(LIBFT):				make_libft
 minishell_test:			$(LIBFT) $(TOBJ)
 							@$(CC) $(CFLAGS) $(TOBJ) $(LIBFT) -o $@ -lreadline
 
-$(OBJ_DIR)%.o: 			$(SRC_DIR)%.c $(HEADER)
+$(OBJ_DIR)%.o: 			$(SRC_DIR)%.c $(INC_DIR)
 							@mkdir -p $(dir $@)
-							@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -c $< -o $@
+							@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)$(INC_DIR) -I$(INC_DIR) -c $< -o $@
 							$(call PROGRESS_BAR_PERCENTAGE)
 							$(if $(filter $(COMPILED_SRCS),$(SRCS_TO_COMPILE)),$(call SEPARATOR))
 
