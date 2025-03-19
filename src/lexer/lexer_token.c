@@ -90,17 +90,3 @@ void	free_all_token(t_token *token)
 		current = next;
 	}
 }
-
-void	freemescouille(t_token *token)
-{
-	t_token	*current;
-	t_token	*next;
-
-	current = token;
-	while (current)
-	{
-		next = current->next;
-		free_token(current);
-		current = next;
-	}
-}
