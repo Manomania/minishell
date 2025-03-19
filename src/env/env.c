@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 12:30:04 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/14 11:11:24 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/19 17:08:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,16 @@
 char	*append_part(char *result, char *str, int start, int end)
 {
 	char	*part;
+	char	*new_result;
 
 	if (end <= start)
 		return (result);
 	part = ft_substr(str, start, end - start);
 	if (!part)
 		return (result);
-	return (join_and_free(result, part));
+	new_result = join_and_free(result, part);
+	free(part);
+	return (new_result);
 }
 
 /**
