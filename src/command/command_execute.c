@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 18:16:00 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:37:17 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@ static int	execute_single_command(t_ctx *ctx)
 	pid_t	pid;
 	int		status;
 
-	if (builtins_try(ctx, ctx->cmd))
-		return (0);
 	if (!command_bin(ctx))
 	{
 		if (ctx->cmd->args && ctx->cmd->args[0] && (ft_strchr(ctx->cmd->args[0],
@@ -68,15 +66,29 @@ static t_bool	is_pipeline(t_command *cmd)
  */
 int	command_execute(t_ctx *ctx)
 {
+	int	status;
+
 	if (!ctx || !ctx->cmd)
-		return (ctx_error(ERR_ALLOC));
+	{
+		status = ctx_error(ERR_ALLOC);
+		ctx->exit_status = status;
+		return (status);
+	}
 	if (!ctx->cmd->args || !ctx->cmd->args[0])
+	{
+		ctx->exit_status = -1;
 		return (-1);
+	}
 	debug_log(DEBUG_INFO, "execute", "Executing command");
+	if (builtins_try(ctx, ctx->cmd))
+		return (ctx->exit_status);
 	if (is_pipeline(ctx->cmd))
 	{
 		debug_log(DEBUG_INFO, "execute", "Pipeline detected");
-		return (exec_cmdas(ctx));
+		status = exec_cmdas(ctx);
 	}
-	return (execute_single_command(ctx));
+	else
+		status = execute_single_command(ctx);
+	ctx->exit_status = status;
+	return (status);
 }

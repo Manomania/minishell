@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 12:30:04 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/14 11:11:24 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:22:14 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,16 @@
 char	*append_part(char *result, char *str, int start, int end)
 {
 	char	*part;
+	char	*new_result;
 
 	if (end <= start)
 		return (result);
 	part = ft_substr(str, start, end - start);
 	if (!part)
 		return (result);
-	return (join_and_free(result, part));
+	new_result = join_and_free(result, part);
+	free(part);
+	return (new_result);
 }
 
 /**
@@ -56,11 +59,11 @@ char	*get_env_value(t_env *env_list, char *key)
 }
 
 /**
- * @brief Expands a single environment variable
+ * @brief Expands a variable name to its value
  *
- * @param ctx Shell context
+ * @param ctx Context containing the current shell state
  * @param var_name Name of the variable to expand
- * @return New allocated string with variable value or empty string
+ * @return char* Expanded value as a new string (caller must free)
  */
 char	*expand_var(t_ctx *ctx, char *var_name)
 {
@@ -125,6 +128,11 @@ char	*expand_variable(t_ctx *ctx, char *str, int *i, int in_squote)
 	(*i)++;
 	if (in_squote)
 		return (ft_strdup("$"));
+	if (str[*i] == '?')
+	{
+		(*i)++;
+		return (ft_itoa(ctx->exit_status));
+	}
 	var_name = get_var_name(str, i);
 	var_value = expand_var(ctx, var_name);
 	free(var_name);

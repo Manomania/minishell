@@ -6,11 +6,26 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 14:36:02 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/18 13:04:44 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/19 18:30:02 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "debug.h"
 #include "minishell.h"
+
+/**
+ * @brief Debug utility to display the current exit status
+ *
+ * @param ctx Context containing the shell state
+ */
+void	debug_exit_status(t_ctx *ctx)
+{
+	char	buffer[64];
+
+	ft_strlcpy(buffer, "Exit status: ", sizeof(buffer));
+	ft_strlcat(buffer, ft_itoa(ctx->exit_status), sizeof(buffer));
+	debug_log(DEBUG_VERBOSE, "exit_status", buffer);
+}
 
 void	print_tokens_list(t_token *tokens)
 {
