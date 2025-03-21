@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:48:09 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/13 11:47:37 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/21 10:51:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ t_command	*command_new(void)
 	cmd->args = NULL;
 	cmd->arg_count = 0;
 	cmd->redirection = NULL;
+	cmd->operator = TOK_NONE;
 	cmd->next = NULL;
 	return (cmd);
 }

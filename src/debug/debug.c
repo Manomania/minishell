@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 19:20:06 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/18 13:45:03 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/21 10:53:14 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,8 @@ static const char	*get_token_type_str(t_token_type type)
 		return ("NEW_LINE");
 	if (type == TOK_EOF)
 		return ("EOF");
+	else if (type == TOK_NONE)
+		return ("NONE");
 	return ("UNKNOWN");
 }
 

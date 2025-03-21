@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/19 18:37:49 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/21 10:52:19 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,19 +48,20 @@ typedef enum e_bool
 
 typedef enum e_token_type
 {
-	TOK_WORD,          // Commands, args, filename
-	TOK_OPEN_PAR,      // (
-	TOK_CLOSE_PAR,     // )
-	TOK_REDIR_FROM,    // <
-	TOK_REDIR_TO,      // >
-	TOK_HERE_DOC_FROM, // <<
-	TOK_HERE_DOC_TO,   // >>
-	TOK_PIPE,          // |
-	TOK_ENV,           // $
-	TOK_AND,           // &&
-	TOK_OR,            // ||
-	TOK_NEW_LINE,      // \n
-	TOK_EOF,           // '\0'
+	TOK_NONE,
+	TOK_WORD,
+	TOK_OPEN_PAR,
+	TOK_CLOSE_PAR,
+	TOK_REDIR_FROM,
+	TOK_REDIR_TO,
+	TOK_HERE_DOC_FROM,
+	TOK_HERE_DOC_TO,
+	TOK_PIPE,
+	TOK_ENV,
+	TOK_AND,
+	TOK_OR,
+	TOK_NEW_LINE,
+	TOK_EOF,
 }							t_token_type;
 
 typedef struct s_token
