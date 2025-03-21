@@ -6,10 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/19 18:37:17 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/21 10:23:02 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "builtins.h"
 #include "debug.h"
 #include "error.h"
 #include "minishell.h"
@@ -80,15 +81,17 @@ int	command_execute(t_ctx *ctx)
 		return (-1);
 	}
 	debug_log(DEBUG_INFO, "execute", "Executing command");
-	if (builtins_try(ctx, ctx->cmd))
-		return (ctx->exit_status);
 	if (is_pipeline(ctx->cmd))
 	{
 		debug_log(DEBUG_INFO, "execute", "Pipeline detected");
 		status = exec_cmdas(ctx);
 	}
 	else
+	{
+		if (builtins_try(ctx, ctx->cmd))
+			return (ctx->exit_status);
 		status = execute_single_command(ctx);
+	}
 	ctx->exit_status = status;
 	return (status);
 }

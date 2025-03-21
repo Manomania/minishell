@@ -1,4 +1,14 @@
-SRC_F				= 	builtins/builtins_try \
+SRC_F				= \
+						builtins/builtins_try \
+      			builtins/builtins_redirect \
+      			builtins/builtin_echo \
+      			builtins/builtin_cd \
+      			builtins/builtin_pwd \
+      			builtins/builtin_export \
+      			builtins/builtin_unset \
+      			builtins/builtin_env \
+      			builtins/builtin_exit \
+						builtins/builtin_pipeline \
 						command/command_execute \
 						command/command_execute_utils \
 						command/command_parse \
