@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 17:55:13 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/19 18:21:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/21 15:02:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,9 +100,11 @@ static char	*process_string(t_ctx *ctx, char *str, char *result)
 		{
 			temp_result = append_part(result, str, start, i);
 			if (!temp_result)
-				return (result);
+				return (NULL);
 			result = temp_result;
 			result = handle_var_expansion(ctx, str, &i, result);
+			if (!result)
+				return (NULL);
 			start = i;
 			continue ;
 		}
@@ -130,5 +132,9 @@ char	*handle_quotes_and_vars(t_ctx *ctx, char *str)
 	if (!result)
 		return (NULL);
 	processed = process_string(ctx, str, result);
+	if (!processed && result)
+	{
+		free(result);
+	}
 	return (processed);
 }

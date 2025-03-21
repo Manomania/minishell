@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 18:15:25 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/21 15:08:29 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static t_bool	is_path(const char *str)
 	while (str[i])
 	{
 		if (str[i] == '/' || (str[i] == '.' && (str[i + 1] == '/' || str[i
-						+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
+					+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
 							|| str[i + 2] == '\0')))))
 			return (true);
 		i++;
@@ -45,6 +45,7 @@ static t_bool	is_path(const char *str)
  * @brief Tries to execute file directly if it's a path
  *
  * @param bin Binary path to check
+ * @param error_state Pointer to error state variable
  * @return char* strdup of bin if executable, NULL otherwise
  */
 static char	*try_direct_path(char *bin, t_path_error *error_state)
@@ -89,6 +90,44 @@ static char	*resolve_relative_path(char *bin)
 }
 
 /**
+ * @brief Handles the case when the binary is a path
+ *
+ * @param bin Binary path to check
+ * @param error_state Pointer to error state variable
+ * @return char* Path to binary if found, NULL otherwise
+ */
+static char	*handle_bin_as_path(char *bin, t_path_error *error_state)
+{
+	char	*path;
+
+	path = try_direct_path(bin, error_state);
+	if (path)
+		return (path);
+	if (bin[0] != '/' && *error_state == PATH_ERR_NONE)
+	{
+		path = resolve_relative_path(bin);
+		if (path && access(path, X_OK) == 0)
+			return (path);
+		if (path)
+		{
+			if (access(path, F_OK) == 0)
+				*error_state = PATH_ERR_NO_PERMISSION;
+			else
+				*error_state = PATH_ERR_NOT_FOUND;
+			free(path);
+		}
+	}
+	path = bin_find_path(".", bin);
+	if (path)
+		return (path);
+	if (*error_state == PATH_ERR_NOT_FOUND)
+		error_print(ERROR, bin, "No such file or directory");
+	else if (*error_state == PATH_ERR_NO_PERMISSION)
+		error_print(ERROR, bin, "Permission denied");
+	return (NULL);
+}
+
+/**
  * @brief Finds a binary in the PATH or current directory
  *
  * @param ctx Context
@@ -104,30 +143,7 @@ char	*bin_find(t_ctx *ctx, char *bin)
 	if (!bin)
 		return (NULL);
 	if (is_path(bin))
-	{
-		path = try_direct_path(bin, &error_state);
-		if (path)
-			return (path);
-		if (bin[0] != '/' && error_state == PATH_ERR_NONE)
-		{
-			path = resolve_relative_path(bin);
-			if (path && access(path, X_OK) == 0)
-				return (path);
-			if (path && access(path, F_OK) == 0)
-				error_state = PATH_ERR_NO_PERMISSION;
-			else
-				error_state = PATH_ERR_NOT_FOUND;
-			free(path);
-		}
-		path = bin_find_path(".", bin);
-		if (path)
-			return (path);
-		if (error_state == PATH_ERR_NOT_FOUND)
-			error_print(ERROR, bin, "No such file or directory");
-		else if (error_state == PATH_ERR_NO_PERMISSION)
-			error_print(ERROR, bin, "Permission denied");
-		return (NULL);
-	}
+		return (handle_bin_as_path(bin, &error_state));
 	else
 	{
 		path = env_find_bin(ctx, bin);

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 10:22:40 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/21 14:58:15 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ static int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i,
 static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 {
 	pid_t	pid;
+	t_bool	bin_found;
 
 	if (handle_pipe_setup(data->pipe_fds, data->i, data->cmd_count) == -1)
 		return (-1);
@@ -74,8 +75,14 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 	if (data->current->args && data->current->args[0]
 		&& !is_builtin_command(data->current->args[0]))
 	{
-		if (command_bin(ctx) == false)
+		bin_found = command_bin(ctx);
+		if (bin_found == false)
 		{
+			if (data->current->args[0])
+			{
+				free(data->current->args[0]);
+				data->current->args[0] = NULL;
+			}
 			data->pids[data->i] = -1;
 			return (handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
 					data->cmd_count));

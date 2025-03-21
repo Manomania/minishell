@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:49:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 14:04:10 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/21 15:16:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,50 +51,33 @@ static void	free_all_redirections(t_redirection *redirection)
 }
 
 /**
- * @brief Frees memory allocated for command arguments
- *
- * This function releases all memory associated with the args array.
- *
- * @param args Array of argument strings
- * @param arg_count Number of arguments in the array
- */
-static void	free_command_args(char **args, int arg_count)
-{
-	int	i;
-
-	if (!args)
-		return ;
-	i = 0;
-	while (i <= arg_count)
-	{
-		if (args[i])
-			free(args[i]);
-		i++;
-	}
-	free(args);
-}
-
-/**
  * @brief Frees memory allocated for a command structure
- *
- * This function releases all memory associated with a command structure
- * including arguments and redirections.
  *
  * @param cmd Command structure to free
  */
 void	free_command(t_command *cmd)
 {
+	int	i;
+
 	if (!cmd)
 		return ;
-	free_command_args(cmd->args, cmd->arg_count);
+	if (cmd->args)
+	{
+		i = 0;
+		while (i <= cmd->arg_count)
+		{
+			if (cmd->args[i])
+				free(cmd->args[i]);
+			i++;
+		}
+		free(cmd->args);
+	}
 	free_all_redirections(cmd->redirection);
 	free(cmd);
 }
 
 /**
  * @brief Frees memory allocated for all commands in a pipeline
- *
- * This function traverses a linked list of commands and frees each one.
  *
  * @param cmd First command in the linked list
  */

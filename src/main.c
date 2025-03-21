@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/19 18:35:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/21 15:02:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,19 @@ static void	command_loop(t_ctx *ctx, int prev_status)
 		debug_log(DEBUG_INFO, "main", "Processing user input");
 		if (parse_user_input(ctx, input))
 			status = process_command(ctx, status);
+		else
+		{
+			if (ctx->tokens)
+			{
+				free_all_token(ctx->tokens);
+				ctx->tokens = NULL;
+			}
+			if (ctx->cmd)
+			{
+				free_all_commands(ctx->cmd);
+				ctx->cmd = NULL;
+			}
+		}
 		if (ctx->exit_requested)
 			running = 0;
 	}
