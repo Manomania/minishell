@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/21 10:52:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 11:17:09 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,15 +236,16 @@ char						*handle_quotes_and_vars(t_ctx *ctx, char *str);
 int							exec_cmdas(t_ctx *ctx);
 
 // exec_cmdas_utils.c
-pid_t						exec_piped_command(t_ctx *ctx, t_command *cmd,
-								int input_fd, int output_fd);
 int							setup_pipe(int pipe_fds[2]);
 int							wait_for_pids(pid_t *pids, int count);
+t_bool						init_pipe_data(t_pipe_data *data, t_ctx *ctx);
+int							wait_for_pipeline_processes(pid_t *pids, int count);
 
 // exec_cmdas_utils2.c
 int							count_commands(t_command *cmd);
 void						setup_child_process(t_ctx *ctx, t_command *cmd,
 								int input_fd, int output_fd);
+void						debug_exit_status_cmdas(int exit_status);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);

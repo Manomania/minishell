@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 14:58:15 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 11:20:22 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,54 +95,30 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 			data->cmd_count));
 }
 
-/**
- * @brief Initialize pipe data structure
- *
- * @param data Pipe data structure to initialize
- * @param ctx Context with command info
- * @return t_bool TRUE on success, FALSE on failure
- */
-static t_bool	init_pipe_data(t_pipe_data *data, t_ctx *ctx)
-{
-	data->current = ctx->cmd;
-	data->cmd_count = count_commands(data->current);
-	data->i = 0;
-	data->prev_pipe = STDIN_FILENO;
-	data->pids = malloc(sizeof(pid_t) * (size_t)data->cmd_count);
-	if (!data->pids)
-		return (false);
-	return (true);
-}
-
-/**
- * @brief Handle waiting for pipeline processes
- *
- * @param pids Array of process IDs
- * @param count Number of processes
- * @return int Exit status of the last command
- */
-static int	wait_for_pipeline_processes(pid_t *pids, int count)
+static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
+		t_command **cmd_head)
 {
 	int	i;
-	int	status;
-	int	last_status;
 
 	i = 0;
-	last_status = 0;
-	while (i < count)
+	while (i < data.cmd_count)
 	{
-		if (pids[i] > 0)
-			waitpid(pids[i], &status, 0);
-		if (i == count - 1 && pids[i] > 0)
+		debug_log(DEBUG_INFO, "pipeline", "Processing command in pipeline");
+		ctx->cmd = data.current;
+		data.prev_pipe = process_pipeline_cmd(ctx, &data);
+		if (data.prev_pipe == -1)
 		{
-			if (WIFEXITED(status))
-				last_status = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status))
-				last_status = 128 + WTERMSIG(status);
+			ctx->cmd = *cmd_head;
+			free(data.pids);
+			error_print(ERROR, "pipeline", "Pipe processing failed");
+			ctx->exit_status = error_code(ERR_PIPE);
+			return (false);
 		}
+		data.current = data.current->next;
+		data.i++;
 		i++;
 	}
-	return (last_status);
+	return (true);
 }
 
 /**
@@ -155,9 +131,7 @@ int	exec_cmdas(t_ctx *ctx)
 {
 	t_pipe_data	data;
 	int			exit_status;
-	int			i;
-	char		*a;
-	char		error_buf[64];
+	t_command	*cmd_head;
 
 	debug_log(DEBUG_INFO, "pipeline", "Starting pipeline execution");
 	if (!init_pipe_data(&data, ctx))
@@ -167,31 +141,14 @@ int	exec_cmdas(t_ctx *ctx)
 		return (ctx->exit_status);
 	}
 	setup_parent_signals();
-	i = 0;
-	while (i < data.cmd_count)
-	{
-		debug_log(DEBUG_INFO, "pipeline", "Processing command in pipeline");
-		ctx->cmd = data.current;
-		data.prev_pipe = process_pipeline_cmd(ctx, &data);
-		if (data.prev_pipe == -1)
-		{
-			free(data.pids);
-			error_print(ERROR, "pipeline", "Pipe processing failed");
-			ctx->exit_status = error_code(ERR_PIPE);
-			return (ctx->exit_status);
-		}
-		data.current = data.current->next;
-		data.i++;
-		i++;
-	}
+	cmd_head = ctx->cmd;
+	if (!exec_all_cmdas(ctx, data, &cmd_head))
+		return (ctx->exit_status);
 	debug_log(DEBUG_INFO, "pipeline", "Waiting for child processes");
 	exit_status = wait_for_pipeline_processes(data.pids, data.cmd_count);
-	ft_strlcpy(error_buf, "Pipeline exit status: ", sizeof(error_buf));
-	a = ft_itoa(exit_status);
-	ft_strlcat(error_buf, a, sizeof(error_buf));
-	free(a);
-	debug_log(DEBUG_INFO, "pipeline", error_buf);
+	debug_exit_status_cmdas(exit_status);
 	setup_signals();
 	free(data.pids);
+	ctx->cmd = cmd_head;
 	return (exit_status);
 }

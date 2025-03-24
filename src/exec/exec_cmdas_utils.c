@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:33:08 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 10:22:06 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 11:16:17 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ int	wait_for_pids(pid_t *pids, int count)
 	last_status = 0;
 	while (i < count)
 	{
-		if (pids[i] > 0) // Skip built-ins (which have pid = -2)
+		if (pids[i] > 0)
 			waitpid(pids[i], &status, 0);
 		if (i == count - 1)
 		{
@@ -57,8 +57,58 @@ int	wait_for_pids(pid_t *pids, int count)
 				else if (WIFSIGNALED(status))
 					last_status = 128 + WTERMSIG(status);
 			}
-			else if (pids[i] == -2) // This was a built-in
+			else if (pids[i] == -2)
 				last_status = 0;
+		}
+		i++;
+	}
+	return (last_status);
+}
+
+/**
+ * @brief Initialize pipe data structure
+ *
+ * @param data Pipe data structure to initialize
+ * @param ctx Context with command info
+ * @return t_bool TRUE on success, FALSE on failure
+ */
+t_bool	init_pipe_data(t_pipe_data *data, t_ctx *ctx)
+{
+	data->current = ctx->cmd;
+	data->cmd_count = count_commands(data->current);
+	data->i = 0;
+	data->prev_pipe = STDIN_FILENO;
+	data->pids = malloc(sizeof(pid_t) * (size_t)data->cmd_count);
+	if (!data->pids)
+		return (false);
+	return (true);
+}
+
+/**
+ * @brief Handle waiting for pipeline processes
+ *
+ * @param pids Array of process IDs
+ * @param count Number of processes
+ * @return int Exit status of the last command
+ */
+int	wait_for_pipeline_processes(pid_t *pids, int count)
+{
+	int	i;
+	int	status;
+	int	last_status;
+
+	i = 0;
+	last_status = 0;
+	while (i < count)
+	{
+		if (pids[i] > 0)
+			waitpid(pids[i], &status, 0);
+		if (i == count - 1 && pids[i] > 0)
+		{
+			if (WIFEXITED(status))
+				last_status = WEXITSTATUS(status);
+			else if (WIFSIGNALED(status))
+				last_status = 128 + WTERMSIG(status);
 		}
 		i++;
 	}
