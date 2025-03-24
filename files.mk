@@ -5,6 +5,7 @@ SRC_F				= \
       			builtins/builtins_redirect_utils \
       			builtins/builtin_echo \
       			builtins/builtin_cd \
+      			builtins/builtin_cd_utils \
       			builtins/builtin_pwd \
       			builtins/builtin_export \
       			builtins/builtin_export_utils \

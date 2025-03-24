@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:45:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 16:07:07 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 16:09:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,29 +86,6 @@ static int	process_redirection(t_redirection *redir)
 }
 
 /**
- * @brief Process all redirections in a linked list
- *
- * @param redirections List of redirections to process
- * @return 0 on success, -1 on error
- */
-int	setup_redirections(t_redirection *redirections)
-{
-	int	result;
-
-	if (!redirections)
-	{
-		debug_log(DEBUG_INFO, "redir", "No redirections to process");
-		return (0);
-	}
-	debug_log(DEBUG_INFO, "redir", "Setting up redirections");
-	result = process_redirection_list(redirections);
-	if (result != 0)
-		return (result);
-	debug_log(DEBUG_INFO, "redir", "All redirections processed successfully");
-	return (0);
-}
-
-/**
  * @brief Process each redirection in a linked list
  *
  * @param redirections Redirection list to process
@@ -134,5 +111,28 @@ int	process_redirection_list(t_redirection *redirections)
 		}
 		redir = redir->next;
 	}
+	return (0);
+}
+
+/**
+ * @brief Process all redirections in a linked list
+ *
+ * @param redirections List of redirections to process
+ * @return 0 on success, -1 on error
+ */
+int	setup_redirections(t_redirection *redirections)
+{
+	int	result;
+
+	if (!redirections)
+	{
+		debug_log(DEBUG_INFO, "redir", "No redirections to process");
+		return (0);
+	}
+	debug_log(DEBUG_INFO, "redir", "Setting up redirections");
+	result = process_redirection_list(redirections);
+	if (result != 0)
+		return (result);
+	debug_log(DEBUG_INFO, "redir", "All redirections processed successfully");
 	return (0);
 }

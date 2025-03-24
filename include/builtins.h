@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:51:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:21:36 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 16:52:02 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,33 @@
 # define BUILTINS_H
 
 # include "minishell.h"
+
+/**
+ * @brief Determines the target directory for cd command
+ *
+ * @param ctx Context for shell environment
+ * @param cmd Command containing arguments
+ * @return char* Target directory path (must be freed by caller)
+ */
+char	*get_target_directory(t_ctx *ctx, t_command *cmd);
+
+/**
+ * @brief Updates PWD environment variable
+ *
+ * @param env_node Current environment node
+ * @param new_pwd New PWD value
+ * @return t_env* Pointer to OLDPWD node if found, NULL otherwise
+ */
+t_env	*update_pwd_variable(t_env *env_node, char *new_pwd);
+
+/**
+ * @brief Updates OLDPWD environment variable
+ *
+ * @param old_pwd_node OLDPWD environment node
+ * @param old_pwd Old PWD value
+ * @return void
+ */
+void	update_oldpwd_variable(t_env *old_pwd_node, char *old_pwd);
 
 /**
  * @brief Restores original file descriptors
