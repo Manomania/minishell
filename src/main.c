@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 15:02:49 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 13:59:23 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,70 +14,6 @@
 #include "error.h"
 #include "minishell.h"
 #include "validation.h"
-
-/**
- * @brief Processes a command after parsing
- *
- * @param ctx Shell context
- * @param prev_status Previous command exit status
- * @return Exit status of the command
- */
-static int	process_command(t_ctx *ctx, int prev_status)
-{
-	int	status;
-
-	status = prev_status;
-	if (ctx->cmd && ctx->cmd->args && ctx->cmd->args[0]
-		&& ft_strncmp(ctx->cmd->args[0], "exit", __INT_MAX__) == 0)
-		ft_putstr("exit\n");
-	status = command_execute(ctx);
-	if (ctx->cmd)
-		free_all_commands(ctx->cmd);
-	ctx->cmd = NULL;
-	if (ctx->tokens)
-		free_all_token(ctx->tokens);
-	ctx->tokens = NULL;
-	if (status == -1)
-		status = prev_status;
-	if (!ctx->exit_requested)
-		ctx->exit_status = status;
-	return (status);
-}
-
-/**
- * @brief Tokenizes and parses user input
- *
- * @param ctx Shell context
- * @param input User input string
- * @return true if successful, false on error
- */
-static t_bool	parse_user_input(t_ctx *ctx, char *input)
-{
-	ctx->tokens = tokenize(ctx, input);
-	if (g_debug_level > INFO)
-		print_tokens(ctx->tokens);
-	free(input);
-	if (!ctx->tokens)
-		return (false);
-	debug_print_tokens(DEBUG_VERBOSE, ctx->tokens);
-	ctx->cmd = command_parse(ctx, ctx->tokens);
-	if (!ctx->cmd)
-	{
-		free_all_token(ctx->tokens);
-		ctx->tokens = NULL;
-		return (false);
-	}
-	debug_print_commands(DEBUG_VERBOSE, ctx->cmd);
-	if (!validate_command(ctx->cmd, ctx))
-	{
-		free_all_token(ctx->tokens);
-		ctx->tokens = NULL;
-		free_all_commands(ctx->cmd);
-		ctx->cmd = NULL;
-		return (false);
-	}
-	return (true);
-}
 
 /**
  * @brief Main command loop for the shell
@@ -99,21 +35,7 @@ static void	command_loop(t_ctx *ctx, int prev_status)
 		if (!input)
 			ctx_exit(ctx);
 		debug_log(DEBUG_INFO, "main", "Processing user input");
-		if (parse_user_input(ctx, input))
-			status = process_command(ctx, status);
-		else
-		{
-			if (ctx->tokens)
-			{
-				free_all_token(ctx->tokens);
-				ctx->tokens = NULL;
-			}
-			if (ctx->cmd)
-			{
-				free_all_commands(ctx->cmd);
-				ctx->cmd = NULL;
-			}
-		}
+		status = handle_command_in_main_loop(ctx, status, input);
 		if (ctx->exit_requested)
 			running = 0;
 	}

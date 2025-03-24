@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 15:08:29 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 15:38:44 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static t_bool	is_path(const char *str)
 	while (str[i])
 	{
 		if (str[i] == '/' || (str[i] == '.' && (str[i + 1] == '/' || str[i
-					+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
+						+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
 							|| str[i + 2] == '\0')))))
 			return (true);
 		i++;
@@ -69,7 +69,7 @@ static char	*try_direct_path(char *bin, t_path_error *error_state)
  * @param bin Path to resolve
  * @return char* Absolute path or NULL on error
  */
-static char	*resolve_relative_path(char *bin)
+char	*resolve_relative_path(char *bin)
 {
 	char	*cwd;
 	char	*absolute_path;
@@ -103,27 +103,13 @@ static char	*handle_bin_as_path(char *bin, t_path_error *error_state)
 	path = try_direct_path(bin, error_state);
 	if (path)
 		return (path);
-	if (bin[0] != '/' && *error_state == PATH_ERR_NONE)
-	{
-		path = resolve_relative_path(bin);
-		if (path && access(path, X_OK) == 0)
-			return (path);
-		if (path)
-		{
-			if (access(path, F_OK) == 0)
-				*error_state = PATH_ERR_NO_PERMISSION;
-			else
-				*error_state = PATH_ERR_NOT_FOUND;
-			free(path);
-		}
-	}
+	path = check_relative_path(bin, error_state);
+	if (path)
+		return (path);
 	path = bin_find_path(".", bin);
 	if (path)
 		return (path);
-	if (*error_state == PATH_ERR_NOT_FOUND)
-		error_print(ERROR, bin, "No such file or directory");
-	else if (*error_state == PATH_ERR_NO_PERMISSION)
-		error_print(ERROR, bin, "Permission denied");
+	display_path_error(bin, *error_state);
 	return (NULL);
 }
 

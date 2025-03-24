@@ -6,13 +6,13 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 19:20:06 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/21 10:53:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 14:00:43 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "debug.h"
 
-int					g_debug_level = DEBUG_NONE;
+int		g_debug_level = DEBUG_NONE;
 
 /**
  * @brief Initialize debug system with specified verbosity level
@@ -46,41 +46,6 @@ void	debug_log(int level, const char *module, const char *msg)
 		ft_putstr_fd((char *)RESET, STDERR_FILENO);
 		ft_putstr_fd((char *)"\n", STDERR_FILENO);
 	}
-}
-
-/**
- * @brief Get string representation of token type
- *
- * @param type Token type to convert
- * @return String representing the token type
- */
-static const char	*get_token_type_str(t_token_type type)
-{
-	if (type == TOK_WORD)
-		return ("WORD");
-	if (type == TOK_REDIR_FROM)
-		return ("REDIR_FROM");
-	if (type == TOK_REDIR_TO)
-		return ("REDIR_TO");
-	if (type == TOK_HERE_DOC_FROM)
-		return ("HERE_DOC_FROM");
-	if (type == TOK_HERE_DOC_TO)
-		return ("HERE_DOC_TO");
-	if (type == TOK_PIPE)
-		return ("PIPE");
-	if (type == TOK_ENV)
-		return ("ENV");
-	if (type == TOK_AND)
-		return ("AND");
-	if (type == TOK_OR)
-		return ("OR");
-	if (type == TOK_NEW_LINE)
-		return ("NEW_LINE");
-	if (type == TOK_EOF)
-		return ("EOF");
-	else if (type == TOK_NONE)
-		return ("NONE");
-	return ("UNKNOWN");
 }
 
 /**

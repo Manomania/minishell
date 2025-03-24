@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:36:47 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/08 17:37:44 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 15:22:41 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ int	handle_redirections(t_redirection *redirections)
 		}
 		else if (redir->type == TOK_HERE_DOC_FROM)
 		{
+			ft_printf("TEST");
 			// TODO: Implement heredoc with a pipe rather than a temp file
 		}
 		redir = redir->next;

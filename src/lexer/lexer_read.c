@@ -75,8 +75,8 @@ static int	peek_lexer(t_lexer *lexer)
 
 	current = get_lexer(lexer);
 	return (current != '\0' && current != ' ' && current != '\t'
-		&& current != '\n' && current != '|' && current != '<'
-		&& current != '>' && current != '&');
+		&& current != '\n' && current != '|' && current != '<' && current != '>'
+		&& current != '&');
 }
 
 /**

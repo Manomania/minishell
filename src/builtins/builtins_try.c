@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:19:14 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 10:00:31 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 11:45:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,6 @@
 #include "debug.h"
 #include "error.h"
 #include "minishell.h"
-
-/**
- * @brief Compares a command name with a potential built-in
- *
- * @param cmd_name Command name to check
- * @param builtin_name Built-in name to compare against
- * @return int 0 if they match, non-zero otherwise
- */
-static int	is_builtin(char *cmd_name, char *builtin_name)
-{
-	if (!cmd_name || !builtin_name)
-		return (1);
-	return (ft_strncmp(cmd_name, builtin_name, __INT_MAX__));
-}
 
 /**
  * @brief Executes a built-in command with proper redirection handling
@@ -40,34 +26,52 @@ static int	is_builtin(char *cmd_name, char *builtin_name)
 static t_bool	execute_builtin(t_ctx *ctx, t_command *cmd, int *exit_status)
 {
 	int	saved_fds[2];
-	int	result;
 
 	saved_fds[0] = dup(STDIN_FILENO);
 	saved_fds[1] = dup(STDOUT_FILENO);
 	if (saved_fds[0] == -1 || saved_fds[1] == -1)
-		return (ctx_error(ERR_IO_ERROR), false);
-	result = builtin_setup_redirections(cmd, saved_fds);
-	if (result == -1)
 	{
-		close(saved_fds[0]);
-		close(saved_fds[1]);
+		ctx_error(ERR_IO_ERROR);
 		return (false);
 	}
-	if (is_builtin(cmd->args[0], (char *)"exit") == 0)
-		*exit_status = builtin_exit(ctx, cmd);
-	else if (is_builtin(cmd->args[0], (char *)"echo") == 0)
-		*exit_status = builtin_echo(ctx, cmd);
-	else if (is_builtin(cmd->args[0], (char *)"cd") == 0)
-		*exit_status = builtin_cd(ctx, cmd);
-	else if (is_builtin(cmd->args[0], (char *)"pwd") == 0)
-		*exit_status = builtin_pwd(ctx, cmd);
-	else if (is_builtin(cmd->args[0], (char *)"export") == 0)
-		*exit_status = builtin_export(ctx, cmd);
-	else if (is_builtin(cmd->args[0], (char *)"unset") == 0)
-		*exit_status = builtin_unset(ctx, cmd);
-	else if (is_builtin(cmd->args[0], (char *)"env") == 0)
-		*exit_status = builtin_env(ctx, cmd);
+	if (setup_builtin_redirections(cmd, saved_fds) == -1)
+		return (false);
+	run_builtin_command(ctx, cmd, exit_status);
 	builtin_restore_redirections(saved_fds);
+	return (true);
+}
+
+/**
+ * @brief Checks if the command is a recognized builtin
+ *
+ * @param cmd_name Name of the command to check
+ * @return t_bool true if command is a builtin, false otherwise
+ */
+static t_bool	is_recognized_builtin(char *cmd_name)
+{
+	if (is_builtin(cmd_name, (char *)"exit") == 0 || is_builtin(cmd_name,
+			(char *)"echo") == 0 || is_builtin(cmd_name, (char *)"cd") == 0
+		|| is_builtin(cmd_name, (char *)"pwd") == 0 || is_builtin(cmd_name,
+			(char *)"export") == 0 || is_builtin(cmd_name, (char *)"unset") == 0
+		|| is_builtin(cmd_name, (char *)"env") == 0)
+		return (true);
+	return (false);
+}
+
+/**
+ * @brief Validates the command arguments
+ *
+ * @param ctx Context for shell environment
+ * @param cmd Command to validate
+ * @return t_bool true if valid, false otherwise
+ */
+static t_bool	validate_command(t_ctx *ctx, t_command *cmd)
+{
+	if (!ctx || !cmd || !cmd->args || !cmd->args[0])
+	{
+		error_print(ERROR, "builtin", "Invalid command");
+		return (false);
+	}
 	return (true);
 }
 
@@ -83,21 +87,12 @@ t_bool	builtins_try(t_ctx *ctx, t_command *cmd)
 	char	cmd_name[64];
 	int		exit_status;
 
-	if (!ctx || !cmd || !cmd->args || !cmd->args[0])
-	{
-		error_print(ERROR, "builtin", "Invalid command");
+	if (!validate_command(ctx, cmd))
 		return (false);
-	}
 	ft_strlcpy(cmd_name, "Checking builtin: ", sizeof(cmd_name));
 	ft_strlcat(cmd_name, cmd->args[0], sizeof(cmd_name));
 	debug_log(DEBUG_INFO, "builtin", cmd_name);
-	if (is_builtin(cmd->args[0], (char *)"exit") == 0
-		|| is_builtin(cmd->args[0], (char *)"echo") == 0
-		|| is_builtin(cmd->args[0], (char *)"cd") == 0
-		|| is_builtin(cmd->args[0], (char *)"pwd") == 0
-		|| is_builtin(cmd->args[0], (char *)"export") == 0
-		|| is_builtin(cmd->args[0], (char *)"unset") == 0
-		|| is_builtin(cmd->args[0], (char *)"env") == 0)
+	if (is_recognized_builtin(cmd->args[0]))
 	{
 		debug_log(DEBUG_INFO, "builtin", "Found builtin command");
 		if (execute_builtin(ctx, cmd, &exit_status))

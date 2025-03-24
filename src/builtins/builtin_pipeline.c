@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:20:14 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 10:20:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 15:20:23 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,31 +36,41 @@ t_bool	is_builtin_command(char *cmd_name)
 }
 
 /**
- * @brief Executes a built-in command in a pipeline
+ * @brief Saves and redirects file descriptors for pipeline execution
  *
- * @param ctx Context for shell environment
- * @param cmd Command to execute
+ * @param saved_in Pointer to store the saved stdin
+ * @param saved_out Pointer to store the saved stdout
  * @param input_fd Input file descriptor
  * @param output_fd Output file descriptor
- * @return int Exit status of the built-in
+ * @return int Status code (0 for success, error code otherwise)
  */
-static int	execute_pipeline_builtin(t_ctx *ctx, t_command *cmd, int input_fd,
+static int	setup_pipeline_fds(int *saved_in, int *saved_out, int input_fd,
 		int output_fd)
 {
-	int	saved_in;
-	int	saved_out;
-	int	exit_status;
-
-	saved_in = dup(STDIN_FILENO);
-	saved_out = dup(STDOUT_FILENO);
-	if (saved_in == -1 || saved_out == -1)
-		return (ctx_error(ERR_IO_ERROR));
+	*saved_in = dup(STDIN_FILENO);
+	*saved_out = dup(STDOUT_FILENO);
+	if (*saved_in == -1 || *saved_out == -1)
+		return (ERR_IO_ERROR);
 	dup2(input_fd, STDIN_FILENO);
 	dup2(output_fd, STDOUT_FILENO);
 	if (input_fd != STDIN_FILENO)
 		close(input_fd);
 	if (output_fd != STDOUT_FILENO)
 		close(output_fd);
+	return (0);
+}
+
+/**
+ * @brief Determines which built-in command to execute
+ *
+ * @param ctx Context for shell environment
+ * @param cmd Command to execute
+ * @return int Exit status of the built-in
+ */
+static int	execute_builtin_command(t_ctx *ctx, t_command *cmd)
+{
+	int	exit_status;
+
 	if (ft_strncmp(cmd->args[0], "exit", __INT_MAX__) == 0)
 		exit_status = builtin_exit(ctx, cmd);
 	else if (ft_strncmp(cmd->args[0], "echo", __INT_MAX__) == 0)
@@ -77,10 +87,31 @@ static int	execute_pipeline_builtin(t_ctx *ctx, t_command *cmd, int input_fd,
 		exit_status = builtin_env(ctx, cmd);
 	else
 		exit_status = 127;
-	dup2(saved_in, STDIN_FILENO);
-	dup2(saved_out, STDOUT_FILENO);
-	close(saved_in);
-	close(saved_out);
+	return (exit_status);
+}
+
+/**
+ * @brief Executes a built-in command in a pipeline
+ *
+ * @param ctx Context for shell environment
+ * @param cmd Command to execute
+ * @param input_fd Input file descriptor
+ * @param output_fd Output file descriptor
+ * @return int Exit status of the built-in
+ */
+static int	execute_pipeline_builtin(t_ctx *ctx, t_command *cmd, int input_fd,
+		int output_fd)
+{
+	int	saved_in;
+	int	saved_out;
+	int	fd_status;
+	int	exit_status;
+
+	fd_status = setup_pipeline_fds(&saved_in, &saved_out, input_fd, output_fd);
+	if (fd_status != 0)
+		return (ctx_error(fd_status));
+	exit_status = execute_builtin_command(ctx, cmd);
+	restore_pipeline_fds(saved_in, saved_out);
 	return (exit_status);
 }
 

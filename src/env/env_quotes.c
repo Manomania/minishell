@@ -6,33 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 17:55:13 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/21 15:02:34 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 11:32:12 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-/**
- * @brief Checks if a character is a single quote
- *
- * @param c Character to check
- * @return 1 if single quote, 0 otherwise
- */
-static int	is_single_quote(char c)
-{
-	return (c == '\'');
-}
-
-/**
- * @brief Checks if a character is a double quote
- *
- * @param c Character to check
- * @return 1 if double quote, 0 otherwise
- */
-static int	is_double_quote(char c)
-{
-	return (c == '"');
-}
 
 /**
  * @brief Updates quote state based on current character
@@ -43,9 +21,9 @@ static int	is_double_quote(char c)
  */
 static void	update_quote_state(char c, int *in_squote, int *in_dquote)
 {
-	if (is_single_quote(c) && !(*in_dquote))
+	if (c == '\'' && !(*in_dquote))
 		*in_squote = !(*in_squote);
-	else if (is_double_quote(c) && !(*in_squote))
+	else if (c == '"' && !(*in_squote))
 		*in_dquote = !(*in_dquote);
 }
 
@@ -74,6 +52,31 @@ static char	*handle_var_expansion(t_ctx *ctx, char *str, int *i, char *result)
 }
 
 /**
+ * @brief Handles variable expansion during string processing
+ *
+ * @param ctx Context containing variable information
+ * @param str String to process
+ * @param i Current index pointer (modified in function)
+ * @param result Current result string
+ * @return Updated result string or NULL on error
+ */
+static char	*process_variables(t_ctx *ctx, char *str, int *i, char *result)
+{
+	char	*temp_result;
+	int		start;
+
+	start = *i;
+	temp_result = append_part(result, str, start, *i);
+	if (!temp_result)
+		return (NULL);
+	result = temp_result;
+	result = handle_var_expansion(ctx, str, i, result);
+	if (!result)
+		return (NULL);
+	return (result);
+}
+
+/**
  * @brief Processes a string, handling quotes and variable expansion
  *
  * @param ctx Context containing variable information
@@ -98,11 +101,7 @@ static char	*process_string(t_ctx *ctx, char *str, char *result)
 		update_quote_state(str[i], &in_squote, &in_dquote);
 		if (str[i] == '$' && !in_squote)
 		{
-			temp_result = append_part(result, str, start, i);
-			if (!temp_result)
-				return (NULL);
-			result = temp_result;
-			result = handle_var_expansion(ctx, str, &i, result);
+			result = process_variables(ctx, str, &i, result);
 			if (!result)
 				return (NULL);
 			start = i;

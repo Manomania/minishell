@@ -96,9 +96,8 @@ static int	is_lone_dollar(t_lexer *lexer)
 
 	current = get_lexer(lexer);
 	return (current == ' ' || current == '\t' || current == '\0'
-		|| current == '<' || current == '>' || current == '|'
-		|| current == '"' || current == '\'' || current == '&'
-		|| current == '\n');
+		|| current == '<' || current == '>' || current == '|' || current == '"'
+		|| current == '\'' || current == '&' || current == '\n');
 }
 
 t_token	*handle_env_token(t_lexer *lexer)

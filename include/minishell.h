@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/24 11:17:09 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 15:38:54 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,11 +210,26 @@ t_command					*command_new(void);
 // command_parse.c
 t_command					*command_parse(t_ctx *ctx, t_token *tokens);
 
+// command_parse_utils.c
+t_bool						handle_first_arg(t_command *cmd,
+								char *expanded_value);
+t_bool						add_to_existing_args(t_command *cmd,
+								char *expanded_value);
+t_bool						process_word_token(t_command *cmd, t_token *token,
+								t_ctx *ctx);
+
 // command_redirection.c
 int							handle_redirections(t_redirection *redirections);
 
 // debug_utils.c
 void						print_tokens(t_token *tokens);
+
+// debug_utils2.c
+char						*get_token_type_str(t_token_type type);
+void						debug_exit_status(t_ctx *ctx);
+void						print_token(t_token *current, int token_count);
+void						print_tokens_list(t_token *tokens);
+void						print_redirection_type(t_token_type type);
 
 // env.c
 char						*expand_var(t_ctx *ctx, char *var_name);
@@ -233,6 +248,8 @@ char						*env_find_bin(t_ctx *ctx, char *bin);
 char						*handle_quotes_and_vars(t_ctx *ctx, char *str);
 
 // exec_cmdas.c
+int							handle_descriptors(int prev_pipe, int pipe_fds[2],
+								int i, int cmd_count);
 int							exec_cmdas(t_ctx *ctx);
 
 // exec_cmdas_utils.c
@@ -246,6 +263,11 @@ int							count_commands(t_command *cmd);
 void						setup_child_process(t_ctx *ctx, t_command *cmd,
 								int input_fd, int output_fd);
 void						debug_exit_status_cmdas(int exit_status);
+
+// exec_cmdas_utils3.c
+t_bool						check_command_binary(t_ctx *ctx, t_pipe_data *data);
+t_bool						validate_pipeline_command(t_pipe_data *data);
+int							handle_non_builtin(t_ctx *ctx, t_pipe_data *data);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);
@@ -319,12 +341,30 @@ void						advance_parse(t_parse *parse);
 
 // bin_find.c
 char						*bin_find(t_ctx *ctx, char *bin);
+char						*resolve_relative_path(char *bin);
+
+// bin_find_utils.c
+char						*check_relative_path(char *bin,
+								t_path_error *error_state);
+void						display_path_error(char *bin,
+								t_path_error error_state);
 
 // bin_find_path.c
 char						*bin_find_path(const char *dir, char *bin);
 
 // heredoc.c
 int							setup_heredocs(t_ctx *ctx, t_command *cmd);
+
+// heredoc_utils.c
+char						*replace_substring(char *str, int start, int end,
+								char *replacement);
+
+// heredoc_expand.c
+char						*expand_variables_in_line(t_ctx *ctx, char *line);
+
+// heredoc_expand_utils.c
+char						*init_expansion(char *line);
+char						*extract_var_name(char *str, int start, int end);
 
 // redirections.c
 int							setup_redirections(t_redirection *redirections);
@@ -334,19 +374,24 @@ void						setup_signals(void);
 void						reset_signals(void);
 void						setup_parent_signals(void);
 
+// parser_command.c
+t_command					*parse_command(t_parse *parse, t_ctx *ctx);
+int							parse_redirection(t_parse *parse, t_command *cmd,
+								t_ctx *ctx);
+void						add_redirection(t_command *cmd,
+								t_redirection *redirection);
+
+// parser_command_utils.c
+int							add_argument(t_command *cmd, char *value);
+
 // main.c
 // A REMPLIR
 
 // main_utils.c
 char						*get_user_input(t_ctx *ctx, int prev_status);
+int							handle_command_in_main_loop(t_ctx *ctx, int status,
+								char *input);
 
-// A REMPLACER EN FONCTION SI TU UTILISES MES FONCTIONS
-// // parser_command.c
-t_command					*parse_command(t_parse *parse, t_ctx *ctx);
-// int				parse_redirection(t_parse *parse, t_command *cmd,
-// 					t_ctx *ctx);
-// void			add_redirection(t_command *cmd, t_redirection *redirection);
-//
 // // parser_pipeline.c
 // t_command		*parse_pipeline(t_ctx *ctx, t_parse *parse);
 // t_command		*parse_command_sequence(t_ctx *ctx, t_parse *parse);

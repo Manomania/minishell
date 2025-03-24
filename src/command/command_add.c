@@ -6,11 +6,36 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:48:41 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 14:54:56 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 15:24:40 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+/**
+ * @brief Creates a new arguments array with space for one more argument
+ *
+ * @param cmd Command containing the current arguments
+ * @return char** New array or NULL on failure
+ */
+static char	**create_new_args_array(t_command *cmd)
+{
+	char	**new_args;
+	int		i;
+
+	new_args = malloc(sizeof(char *) * (cmd->arg_count + 3));
+	if (!new_args)
+		return (NULL);
+	i = 0;
+	while (i <= cmd->arg_count)
+	{
+		new_args[i] = cmd->args[i];
+		i++;
+	}
+	new_args[cmd->arg_count + 1] = NULL;
+	new_args[cmd->arg_count + 2] = NULL;
+	return (new_args);
+}
 
 /**
  * @brief Adds an argument to a command
@@ -25,19 +50,12 @@ int	command_add_argument(t_command *cmd, char *arg)
 {
 	char	**new_args;
 	char	*arg_copy;
-	int		i;
 
 	if (!cmd || !arg)
 		return (-1);
-	new_args = malloc(sizeof(char *) * (cmd->arg_count + 3));
+	new_args = create_new_args_array(cmd);
 	if (!new_args)
 		return (-1);
-	i = 0;
-	while (i <= cmd->arg_count)
-	{
-		new_args[i] = cmd->args[i];
-		i++;
-	}
 	arg_copy = ft_strdup(arg);
 	if (!arg_copy)
 	{
@@ -45,7 +63,6 @@ int	command_add_argument(t_command *cmd, char *arg)
 		return (-1);
 	}
 	new_args[cmd->arg_count + 1] = arg_copy;
-	new_args[cmd->arg_count + 2] = NULL;
 	free(cmd->args);
 	cmd->args = new_args;
 	cmd->arg_count++;

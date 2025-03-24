@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 11:20:22 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 15:38:03 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,7 @@ static int	handle_pipe_setup(int pipe_fds[2], int i, int cmd_count)
  * @param cmd_count Total command count
  * @return int Updated previous pipe file descriptor
  */
-static int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i,
-		int cmd_count)
+int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i, int cmd_count)
 {
 	if (prev_pipe != STDIN_FILENO)
 		close(prev_pipe);
@@ -67,27 +66,16 @@ static int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i,
 static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 {
 	pid_t	pid;
-	t_bool	bin_found;
+	int		result;
 
 	if (handle_pipe_setup(data->pipe_fds, data->i, data->cmd_count) == -1)
 		return (-1);
 	setup_parent_signals();
-	if (data->current->args && data->current->args[0]
-		&& !is_builtin_command(data->current->args[0]))
-	{
-		bin_found = command_bin(ctx);
-		if (bin_found == false)
-		{
-			if (data->current->args[0])
-			{
-				free(data->current->args[0]);
-				data->current->args[0] = NULL;
-			}
-			data->pids[data->i] = -1;
-			return (handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
-					data->cmd_count));
-		}
-	}
+	result = handle_non_builtin(ctx, data);
+	if (result == -1)
+		return (-1);
+	else if (result > 0)
+		return (result);
 	pid = execute_pipeline_command(ctx, data->current, data->prev_pipe,
 			data->pipe_fds[1]);
 	data->pids[data->i] = pid;

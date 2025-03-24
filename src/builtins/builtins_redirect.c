@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:52:58 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 10:01:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 13:51:47 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
  * @param redir Redirection information
  * @return int File descriptor or -1 on error
  */
-static int	open_redirection_file(t_redirection *redir)
+int	open_redirection_file(t_redirection *redir)
 {
 	int	fd;
 
@@ -51,31 +51,20 @@ static int	open_redirection_file(t_redirection *redir)
 int	builtin_setup_redirections(t_command *cmd, int saved_fds[2])
 {
 	t_redirection	*redir;
-	int				fd;
+	int				result;
 
 	(void)saved_fds;
 	redir = cmd->redirection;
 	while (redir)
 	{
-		if (redir->type == TOK_HERE_DOC_FROM)
+		if (is_here_doc_input(redir))
 		{
 			redir = redir->next;
 			continue ;
 		}
-		fd = open_redirection_file(redir);
-		if (fd == -1)
+		result = apply_redirection(redir);
+		if (result == -1)
 			return (-1);
-		if (redir->type == TOK_REDIR_FROM)
-		{
-			if (dup2(fd, STDIN_FILENO) == -1)
-				return (close(fd), -1);
-		}
-		else if (redir->type == TOK_REDIR_TO || redir->type == TOK_HERE_DOC_TO)
-		{
-			if (dup2(fd, STDOUT_FILENO) == -1)
-				return (close(fd), -1);
-		}
-		close(fd);
 		redir = redir->next;
 	}
 	return (0);

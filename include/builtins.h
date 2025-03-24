@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:51:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 10:20:36 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 15:21:36 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,123 @@
 # define BUILTINS_H
 
 # include "minishell.h"
+
+/**
+ * @brief Restores original file descriptors
+ *
+ * @param saved_in Saved stdin file descriptor
+ * @param saved_out Saved stdout file descriptor
+ */
+void	restore_pipeline_fds(int saved_in, int saved_out);
+
+/**
+ * @brief Opens a file for redirection
+ *
+ * @param redir Redirection information
+ * @return int File descriptor or -1 on error
+ */
+int		open_redirection_file(t_redirection *redir);
+
+/**
+ * @brief Checks if a character is valid for env variable name
+ *
+ * @param c Character to check
+ * @return t_bool true if valid, false otherwise
+ */
+t_bool	is_valid_env_char(char c);
+
+/**
+ * @brief Gets the value part of an environment variable
+ *
+ * @param arg Argument string (key=value)
+ * @return char* Value part or NULL if no value
+ */
+char	*get_env_value(char *arg);
+
+/**
+ * @brief Gets the key part of an environment variable
+ *
+ * @param arg Argument string (key=value)
+ * @return char* Key part (caller must free)
+ */
+char	*get_env_key(char *arg);
+
+/**
+ * @brief Prints all environment variables in export format
+ *
+ * @param ctx Context for shell environment
+ * @return void
+ */
+void	print_export_env(t_ctx *ctx);
+
+/**
+ * @brief Updates an existing environment variable
+ *
+ * @param env_list Environment list
+ * @param key Key to update
+ * @param value New value
+ * @return t_bool true if updated, false if not found
+ */
+t_bool	update_env_var(t_env *env_list, char *key, char *value);
+
+/**
+ * @brief Checks if redirection is a here-doc input
+ *
+ * @param redir Redirection to check
+ * @return t_bool true if here-doc input, false otherwise
+ */
+t_bool	is_here_doc_input(t_redirection *redir);
+
+/**
+ * @brief Applies input redirection
+ *
+ * @param fd File descriptor to redirect from
+ * @return int 0 on success, -1 on error
+ */
+int		apply_input_redirection(int fd);
+
+/**
+ * @brief Applies output redirection
+ *
+ * @param fd File descriptor to redirect to
+ * @return int 0 on success, -1 on error
+ */
+int		apply_output_redirection(int fd);
+
+/**
+ * @brief Applies a single redirection
+ *
+ * @param redir Redirection to apply
+ * @return int 0 on success, -1 on error
+ */
+int		apply_redirection(t_redirection *redir);
+
+/**
+ * @brief Compares a command name with a potential built-in
+ *
+ * @param cmd_name Command name to check
+ * @param builtin_name Built-in name to compare against
+ * @return int 0 if they match, non-zero otherwise
+ */
+int		is_builtin(char *cmd_name, char *builtin_name);
+
+/**
+ * @brief Sets up redirections for builtin command execution
+ *
+ * @param cmd Command to set up redirections for
+ * @param saved_fds Array of saved file descriptors
+ * @return int 0 on success, -1 on failure
+ */
+int		setup_builtin_redirections(t_command *cmd, int *saved_fds);
+
+/**
+ * @brief Executes the appropriate builtin command
+ *
+ * @param ctx Context for shell environment
+ * @param cmd Command to execute
+ * @param exit_status Pointer to store exit status
+ */
+void	run_builtin_command(t_ctx *ctx, t_command *cmd, int *exit_status);
 
 /**
  * @brief Checks if a command is a built-in and executes it

@@ -6,64 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 15:02:20 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 15:30:30 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-/**
- * @brief Processes a word token during command parsing
- *
- * @param cmd Command structure being built
- * @param token Current token being processed
- * @param ctx Context containing environment information
- * @return t_bool true on success, false on failure
- */
-static t_bool	process_word_token(t_command *cmd, t_token *token, t_ctx *ctx)
-{
-	char	*expanded_value;
-	char	**new_args;
-	int		i;
-
-	expanded_value = handle_quotes_and_vars(ctx, token->value);
-	if (!expanded_value)
-		return (false);
-	if (!cmd->args)
-	{
-		new_args = malloc(sizeof(char *) * 2);
-		if (!new_args)
-		{
-			free(expanded_value);
-			return (false);
-		}
-		new_args[0] = expanded_value;
-		new_args[1] = NULL;
-		cmd->args = new_args;
-		cmd->arg_count = 0;
-	}
-	else
-	{
-		i = 0;
-		new_args = malloc(sizeof(char *) * (cmd->arg_count + 3));
-		if (!new_args)
-		{
-			free(expanded_value);
-			return (false);
-		}
-		while (i <= cmd->arg_count)
-		{
-			new_args[i] = cmd->args[i];
-			i++;
-		}
-		new_args[i] = expanded_value;
-		new_args[i + 1] = NULL;
-		free(cmd->args);
-		cmd->args = new_args;
-		cmd->arg_count++;
-	}
-	return (true);
-}
 
 /**
  * @brief Processes an environment variable token during command parsing
@@ -81,26 +28,13 @@ static t_bool	process_env_token(t_command *cmd, t_token *token, t_ctx *ctx)
 	if (!expanded_value)
 		return (false);
 	if (!cmd->args)
+		return (handle_first_arg(cmd, expanded_value));
+	if (command_add_argument(cmd, expanded_value) != 0)
 	{
-		cmd->args = malloc(sizeof(char *) * 2);
-		if (!cmd->args)
-		{
-			free(expanded_value);
-			return (false);
-		}
-		cmd->args[0] = expanded_value;
-		cmd->args[1] = NULL;
-		cmd->arg_count = 0;
-	}
-	else
-	{
-		if (command_add_argument(cmd, expanded_value) != 0)
-		{
-			free(expanded_value);
-			return (false);
-		}
 		free(expanded_value);
+		return (false);
 	}
+	free(expanded_value);
 	return (true);
 }
 
@@ -193,7 +127,7 @@ static t_bool	create_pipeline(t_command **cmd, t_token **current, t_ctx *ctx)
 	if (!new_cmd)
 		return (false);
 	prev_cmd->next = new_cmd;
-	prev_cmd->operator= TOK_PIPE;
+	prev_cmd->operator = TOK_PIPE;
 	*cmd = new_cmd;
 	*current = (*current)->next;
 	if (!process_command_tokens(current, *cmd, ctx))

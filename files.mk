@@ -1,23 +1,30 @@
 SRC_F				= \
 						builtins/builtins_try \
+						builtins/builtins_try2 \
       			builtins/builtins_redirect \
+      			builtins/builtins_redirect_utils \
       			builtins/builtin_echo \
       			builtins/builtin_cd \
       			builtins/builtin_pwd \
       			builtins/builtin_export \
+      			builtins/builtin_export_utils \
       			builtins/builtin_unset \
       			builtins/builtin_env \
       			builtins/builtin_exit \
 						builtins/builtin_pipeline \
+						builtins/builtin_pipeline_utils \
 						command/command_execute \
 						command/command_execute_utils \
 						command/command_parse \
+						command/command_parse_utils \
 						command/command_add \
 						command/command_new \
 						command/command_redirections \
 						command/command_bin \
 						debug/debug \
 						debug/debug_utils \
+						debug/debug_utils2 \
+						debug/debug_utils3 \
 						env/env \
 						env/env_find \
 						env/env_find_bin \
@@ -28,6 +35,7 @@ SRC_F				= \
 						exec/exec_cmdas \
 						exec/exec_cmdas_utils \
 						exec/exec_cmdas_utils2 \
+						exec/exec_cmdas_utils3 \
 						free/free_env \
 						free/free_2d_array \
 						free/free_ctx \
@@ -45,11 +53,16 @@ SRC_F				= \
 						lexer/lexer_token_is \
 						memory/memory \
 						parser/parser_command \
+						parser/parser_command_utils \
 						parser/parser_pipeline \
 						parser/parser_utils \
 						path/bin_find \
+						path/bin_find_utils \
 						path/bin_find_path \
 						redir/heredoc \
+						redir/heredoc_utils \
+						redir/heredoc_expand \
+						redir/heredoc_expand_utils \
 						redir/redirections \
 						signals/signals \
 						validation/validation \

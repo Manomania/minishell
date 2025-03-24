@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:32:19 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 17:45:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 11:25:21 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ typedef enum e_error_level
 	WARNING,
 	ERROR,
 	FATAL
-}	t_error_level;
+}				t_error_level;
 
 // *************************************************************************** #
 //                            Function Prototypes                              #
@@ -36,7 +36,8 @@ void			ctx_error_exit(t_ctx *ctx, t_error_type err);
 
 // error.c
 int				error_code(t_error_type err);
-void			error_print(t_error_level level, const char *module, const char *msg);
+void			error_print(t_error_level level, const char *module,
+					const char *msg);
 
 // error_utils.c
 t_error_info	*get_error_table(void);
