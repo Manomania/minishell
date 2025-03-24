@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:51:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 16:52:02 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 18:14:08 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,14 +65,6 @@ int		open_redirection_file(t_redirection *redir);
  * @return t_bool true if valid, false otherwise
  */
 t_bool	is_valid_env_char(char c);
-
-/**
- * @brief Gets the value part of an environment variable
- *
- * @param arg Argument string (key=value)
- * @return char* Value part or NULL if no value
- */
-char	*get_env_value(char *arg);
 
 /**
  * @brief Gets the key part of an environment variable

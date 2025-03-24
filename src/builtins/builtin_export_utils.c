@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 12:37:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 14:01:03 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 18:23:50 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	print_export_env(t_ctx *ctx)
 	env = ctx->env_list;
 	while (env)
 	{
-		ft_printf("declare -x %s", env->key);
+		ft_printf("export %s", env->key);
 		if (env->value)
 			ft_printf("=\"%s\"", env->value);
 		ft_printf("\n");

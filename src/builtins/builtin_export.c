@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:55:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 12:37:57 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 18:15:12 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ static int	process_export_arg(t_ctx *ctx, char *arg)
 		free(key);
 		return (1);
 	}
-	value = get_env_value(arg);
+	value = get_env_value(ctx->env_list, arg);
 	if (!update_env_var(ctx->env_list, key, value))
 	{
 		result = add_env_var(&ctx->env_list, key, value);

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/24 15:38:54 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 18:14:20 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,6 +237,7 @@ char						*append_part(char *result, char *str, int start,
 								int end);
 char						*expand_variable(t_ctx *ctx, char *str, int *i,
 								int in_squote);
+char						*get_env_value(t_env *env_list, char *key);
 
 // env_find.c
 char						*env_find(t_ctx *ctx, char *var);

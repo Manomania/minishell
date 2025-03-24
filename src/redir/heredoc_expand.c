@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:09:18 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:10:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 18:19:36 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,24 +27,6 @@ static int	find_var_end(char *str, int start)
 	while (str[end] && (ft_isalnum(str[end]) || str[end] == '_'))
 		end++;
 	return (end);
-}
-
-/**
- * @brief Gets the value of an environment variable
- *
- * @param ctx Context containing environment info
- * @param var_name Variable name to look up
- * @return Newly allocated variable value or NULL on error
- */
-static char	*get_var_value(t_ctx *ctx, char *var_name)
-{
-	char	*var_value;
-
-	var_value = env_find(ctx, var_name);
-	free(var_name);
-	if (!var_value)
-		var_value = ft_strdup("");
-	return (var_value);
 }
 
 /**
@@ -71,7 +53,7 @@ static char	*process_one_variable(t_ctx *ctx, char *result, char *var_start)
 		free(result);
 		return (NULL);
 	}
-	var_value = get_var_value(ctx, var_name);
+	var_value = get_env_value(ctx->env_list, var_name);
 	if (!var_value)
 	{
 		free(result);
