@@ -99,7 +99,7 @@ static char	*get_var_name(char *str, int *pos)
 		return (ft_strdup("?"));
 	}
 	len = 0;
-	while (ft_isalnum(str[i + len]) || str[i + len] == '_')
+	while (str[i + len] && (ft_isalnum(str[i + len]) || str[i + len] == '_'))
 		len++;
 	if (len == 0)
 		return (NULL);
@@ -124,17 +124,22 @@ char	*expand_variable(t_ctx *ctx, char *str, int *i, int in_squote)
 {
 	char	*var_name;
 	char	*var_value;
+	char	*full_varname;
 
-	(*i)++;
 	if (in_squote)
 		return (ft_strdup("$"));
+	(*i)++;
 	if (str[*i] == '?')
 	{
 		(*i)++;
 		return (ft_itoa(ctx->exit_status));
 	}
 	var_name = get_var_name(str, i);
+	if (!var_name)
+		return (ft_strdup("$"));
+	full_varname = ft_strjoin(var_name, "=");
 	var_value = expand_var(ctx, var_name);
 	free(var_name);
-	return (var_value);
+	free(full_varname);
+	return (var_value ? var_value : ft_strdup(""));
 }

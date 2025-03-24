@@ -62,7 +62,7 @@ static void	*main_loop(t_ctx *ctx, int prev_status) {
     ctx_exit(ctx);
   if (input[0] != '\0')
     add_history(input);
-  ctx->tokens = tokenize(input);
+  ctx->tokens = tokenize(ctx, input);
   free(input);
   if (!ctx->tokens)
     return (main_loop(ctx, 0));

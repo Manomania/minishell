@@ -84,23 +84,6 @@ t_token	*handle_redir_from_and_to_token(t_lexer *lexer)
 	return (NULL);
 }
 
-/**
- * Checks if the current lexer character is a lone '$' symbol.
- *
- * @param lexer Pointer to the lexer structure
- * @return 1 if lone '$', 0 otherwise
- */
-static int	is_lone_dollar(t_lexer *lexer)
-{
-	char	current;
-
-	current = get_lexer(lexer);
-	return (current == ' ' || current == '\t' || current == '\0'
-		|| current == '<' || current == '>' || current == '|'
-		|| current == '"' || current == '\'' || current == '&'
-		|| current == '\n');
-}
-
 t_token	*handle_env_token(t_lexer *lexer)
 {
 	char	*word;
@@ -109,17 +92,8 @@ t_token	*handle_env_token(t_lexer *lexer)
 	current = get_lexer(lexer);
 	if (current == '$')
 	{
-		advance_lexer(lexer);
-		if (is_lone_dollar(lexer))
-			return (create_token(TOK_WORD, ft_strdup("$")));
 		word = read_word_lexer(lexer);
-		if (!word || word[0] == '\0')
-		{
-			if (word)
-				free(word);
-			return (create_token(TOK_WORD, ft_strdup(" $")));
-		}
-		return (create_token(TOK_ENV, word));
+		return (create_token(TOK_WORD, word));
 	}
 	return (NULL);
 }
