@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:55:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 18:15:12 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/25 14:16:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,25 @@ static t_bool	validate_env_key(char *key)
 }
 
 /**
+ * @brief Gets the value part of an environment variable
+ *
+ * @param arg Export argument in form key=value
+ * @return char* Value part (caller must free) or NULL if no value
+ */
+static char	*get_env_value_from_export(char *arg)
+{
+	char	*equals;
+
+	equals = ft_strchr(arg, '=');
+	if (!equals)
+		return (NULL);
+	return (ft_strdup(equals + 1));
+}
+
+/**
  * @brief Processes a single export argument
  *
- * @param ctx Context for shell environment
+ * @param ctx Context containing environment
  * @param arg Argument to process
  * @return int 0 on success, 1 on error
  */
@@ -51,9 +67,10 @@ static int	process_export_arg(t_ctx *ctx, char *arg)
 {
 	char	*key;
 	char	*value;
+	t_bool	has_equals;
 	int		result;
 
-	key = get_env_key(arg);
+	key = get_env_key_from_export(arg);
 	if (!key)
 		return (1);
 	if (!validate_env_key(key))
@@ -64,15 +81,20 @@ static int	process_export_arg(t_ctx *ctx, char *arg)
 		free(key);
 		return (1);
 	}
-	value = get_env_value(ctx->env_list, arg);
-	if (!update_env_var(ctx->env_list, key, value))
-	{
+	has_equals = (ft_strchr(arg, '=') != NULL);
+	value = NULL;
+	if (has_equals)
+		value = get_env_value_from_export(arg);
+	if (!update_env_var(&ctx->env_list, key, value, has_equals))
 		result = add_env_var(&ctx->env_list, key, value);
-		free(key);
-		return (!!result);
-	}
+	else
+		result = 1;
 	free(key);
-	return (0);
+	if (value)
+		free(value);
+	if (result)
+		return (0);
+	return (1);
 }
 
 /**
