@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 15:53:31 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/18 11:39:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/25 13:05:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,22 +82,6 @@ t_token	*handle_redir_from_and_to_token(t_lexer *lexer)
 		return (create_token(TOK_REDIR_TO, ft_strdup(">")));
 	}
 	return (NULL);
-}
-
-/**
- * Checks if the current lexer character is a lone '$' symbol.
- *
- * @param lexer Pointer to the lexer structure
- * @return 1 if lone '$', 0 otherwise
- */
-static int	is_lone_dollar(t_lexer *lexer)
-{
-	char	current;
-
-	current = get_lexer(lexer);
-	return (current == ' ' || current == '\t' || current == '\0'
-		|| current == '<' || current == '>' || current == '|' || current == '"'
-		|| current == '\'' || current == '&' || current == '\n');
 }
 
 t_token	*handle_env_token(t_lexer *lexer)
