@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:51:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 18:14:08 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/25 14:15:26 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,16 @@ t_bool	is_valid_env_char(char c);
  * @param arg Argument string (key=value)
  * @return char* Key part (caller must free)
  */
-char	*get_env_key(char *arg);
+char	*get_env_key_from_export(char *arg);
+
+/**
+ * @brief Removes an environment variable from the list
+ *
+ * @param env_list Pointer to environment list
+ * @param key Key to remove
+ * @return t_bool true if removed, false if not found
+ */
+t_bool	remove_env_var(t_env **env_list, char *key);
 
 /**
  * @brief Prints all environment variables in export format
@@ -85,12 +94,14 @@ void	print_export_env(t_ctx *ctx);
 /**
  * @brief Updates an existing environment variable
  *
- * @param env_list Environment list
+ * @param env_list Pointer to environment list
  * @param key Key to update
  * @param value New value
+ * @param has_equals Whether the variable has an equals sign
  * @return t_bool true if updated, false if not found
  */
-t_bool	update_env_var(t_env *env_list, char *key, char *value);
+t_bool	update_env_var(t_env **env_list, char *key, char *value,
+			t_bool has_equals);
 
 /**
  * @brief Checks if redirection is a here-doc input

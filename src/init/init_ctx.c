@@ -6,10 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/19 18:38:37 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/25 13:47:03 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "debug.h"
 #include "minishell.h"
 
 /**
@@ -69,7 +70,7 @@ t_ctx	*init_ctx(int argc, char **argv, char **envp)
  *
  * @param key Key of the environment variable
  * @param value Value of the environment variable
- * @return New environment variable node or NULL if allocation fails
+ * @return t_env* New environment variable node or NULL if allocation fails
  */
 static t_env	*create_env_node(char *key, char *value)
 {
@@ -106,13 +107,18 @@ static t_env	*create_env_node(char *key, char *value)
  * @param env_list Pointer to the list head
  * @param key Key of the environment variable
  * @param value Value of the environment variable
- * @return 1 if successful, 0 on error
+ * @return int 1 if successful, 0 on error
  */
 int	add_env_var(t_env **env_list, char *key, char *value)
 {
 	t_env	*new_node;
 	t_env	*current;
 
+	if (!key)
+		return (0);
+	debug_log(DEBUG_VERBOSE, "add_env_var key", key);
+	if (value)
+		debug_log(DEBUG_VERBOSE, "add_env_var value", value);
 	new_node = create_env_node(key, value);
 	if (!new_node)
 		return (0);

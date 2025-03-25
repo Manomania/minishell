@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:56:32 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 10:03:10 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/25 14:16:45 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,15 +44,15 @@ static t_bool	is_valid_env_name(char *name)
  *
  * @param env_list Pointer to environment list
  * @param key Key to remove
- * @return void
+ * @return t_bool true if removed, false if not found
  */
-static void	remove_env_var(t_env **env_list, char *key)
+t_bool	remove_env_var(t_env **env_list, char *key)
 {
 	t_env	*current;
 	t_env	*prev;
 
 	if (!env_list || !*env_list || !key)
-		return ;
+		return (false);
 	current = *env_list;
 	prev = NULL;
 	while (current)
@@ -67,11 +67,12 @@ static void	remove_env_var(t_env **env_list, char *key)
 			if (current->value)
 				free(current->value);
 			free(current);
-			return ;
+			return (true);
 		}
 		prev = current;
 		current = current->next;
 	}
+	return (false);
 }
 
 /**

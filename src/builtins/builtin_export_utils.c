@@ -6,10 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 12:37:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 18:23:50 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/25 14:15:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "builtins.h"
+#include "debug.h"
 #include "minishell.h"
 
 /**
@@ -29,7 +31,7 @@ t_bool	is_valid_env_char(char c)
  * @param arg Argument string (key=value)
  * @return char* Key part (caller must free)
  */
-char	*get_env_key(char *arg)
+char	*get_env_key_from_export(char *arg)
 {
 	char	*equals;
 	char	*key;
@@ -48,10 +50,9 @@ char	*get_env_key(char *arg)
 }
 
 /**
- * @brief Prints all environment variables in export format
+ * @brief Prints the environment in export format
  *
  * @param ctx Context for shell environment
- * @return void
  */
 void	print_export_env(t_ctx *ctx)
 {
@@ -60,7 +61,7 @@ void	print_export_env(t_ctx *ctx)
 	env = ctx->env_list;
 	while (env)
 	{
-		ft_printf("export %s", env->key);
+		ft_printf("declare -x %s", env->key);
 		if (env->value)
 			ft_printf("=\"%s\"", env->value);
 		ft_printf("\n");
@@ -71,25 +72,36 @@ void	print_export_env(t_ctx *ctx)
 /**
  * @brief Updates an existing environment variable
  *
- * @param env_list Environment list
+ * @param env_list Pointer to environment list
  * @param key Key to update
  * @param value New value
+ * @param has_equals Whether the variable has an equals sign
  * @return t_bool true if updated, false if not found
  */
-t_bool	update_env_var(t_env *env_list, char *key, char *value)
+t_bool	update_env_var(t_env **env_list, char *key, char *value,
+		t_bool has_equals)
 {
 	t_env	*current;
 
-	current = env_list;
+	debug_log(DEBUG_VERBOSE, "export key", key);
+	if (value)
+		debug_log(DEBUG_VERBOSE, "export value", value);
+	if (has_equals && (!value || value[0] == '\0'))
+		return (remove_env_var(env_list, key));
+	current = *env_list;
 	while (current)
 	{
 		if (ft_strncmp(current->key, key, ft_strlen(key) + 1) == 0)
 		{
-			if (value)
+			if (has_equals)
 			{
 				if (current->value)
 					free(current->value);
-				current->value = ft_strdup(value);
+				current->value = NULL;
+				if (value)
+					current->value = ft_strdup(value);
+				if (value && !current->value)
+					return (false);
 			}
 			return (true);
 		}
