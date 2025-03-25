@@ -30,8 +30,7 @@ char	*read_word_lexer(t_lexer *lexer)
 		&& get_lexer(lexer) != '\t' && get_lexer(lexer) != '\n'
 		&& get_lexer(lexer) != '|' && get_lexer(lexer) != '<'
 		&& get_lexer(lexer) != '>' && get_lexer(lexer) != '&'
-		&& get_lexer(lexer) != '"' && get_lexer(lexer) != '$'
-		&& get_lexer(lexer) != '\'')
+		&& get_lexer(lexer) != '"' && get_lexer(lexer) != '\'')
 		advance_lexer(lexer);
 	length = lexer->position - start;
 	if (length == 0)

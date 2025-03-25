@@ -108,17 +108,8 @@ t_token	*handle_env_token(t_lexer *lexer)
 	current = get_lexer(lexer);
 	if (current == '$')
 	{
-		advance_lexer(lexer);
-		if (is_lone_dollar(lexer))
-			return (create_token(TOK_WORD, ft_strdup("$")));
 		word = read_word_lexer(lexer);
-		if (!word || word[0] == '\0')
-		{
-			if (word)
-				free(word);
-			return (create_token(TOK_WORD, ft_strdup(" $")));
-		}
-		return (create_token(TOK_ENV, word));
+		return (create_token(TOK_WORD, word));
 	}
 	return (NULL);
 }
