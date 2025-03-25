@@ -46,7 +46,7 @@ t_command	*parse_pipeline(t_ctx *ctx, t_parse *parse)
 }
 
 static void	connect_commands(t_command *left_cmd, t_command *right_cmd,
-	t_token_type op_type)
+		t_token_type op_type)
 {
 	t_command	*last_cmd;
 

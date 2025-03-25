@@ -6,12 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:40:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 17:46:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/21 14:46:44 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "error.h"
+#include "minishell.h"
 
 /**
  * @brief Creates default path directories when PATH env var is not set
