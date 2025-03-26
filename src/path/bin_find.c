@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:38:44 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 12:29:24 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static t_bool	is_path(const char *str)
 	while (str[i])
 	{
 		if (str[i] == '/' || (str[i] == '.' && (str[i + 1] == '/' || str[i
-						+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
+					+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
 							|| str[i + 2] == '\0')))))
 			return (true);
 		i++;
@@ -53,6 +53,11 @@ static char	*try_direct_path(char *bin, t_path_error *error_state)
 	if (access(bin, F_OK) != 0)
 	{
 		*error_state = PATH_ERR_NOT_FOUND;
+		return (NULL);
+	}
+	if (is_directory(bin))
+	{
+		*error_state = PATH_ERR_IS_DIR;
 		return (NULL);
 	}
 	if (access(bin, X_OK) != 0)
@@ -103,14 +108,15 @@ static char	*handle_bin_as_path(char *bin, t_path_error *error_state)
 	path = try_direct_path(bin, error_state);
 	if (path)
 		return (path);
+	if (*error_state == PATH_ERR_IS_DIR)
+		return (display_path_error(bin, *error_state), NULL);
 	path = check_relative_path(bin, error_state);
 	if (path)
 		return (path);
 	path = bin_find_path(".", bin);
-	if (path)
-		return (path);
-	display_path_error(bin, *error_state);
-	return (NULL);
+	if (!path)
+		display_path_error(bin, *error_state);
+	return (path);
 }
 
 /**

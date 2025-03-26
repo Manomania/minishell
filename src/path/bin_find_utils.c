@@ -6,12 +6,28 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:34:50 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:35:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 10:27:42 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
 #include "minishell.h"
+#include <sys/stat.h>
+
+/**
+ * @brief Checks if a path is a directory
+ *
+ * @param path Path to check
+ * @return t_bool true if it's a directory, false otherwise
+ */
+t_bool	is_directory(const char *path)
+{
+	struct stat	path_stat;
+
+	if (stat(path, &path_stat) != 0)
+		return (false);
+	return (S_ISDIR(path_stat.st_mode));
+}
 
 /**
  * @brief Checks and resolves a relative path binary
@@ -51,4 +67,6 @@ void	display_path_error(char *bin, t_path_error error_state)
 		error_print(ERROR, bin, "No such file or directory");
 	else if (error_state == PATH_ERR_NO_PERMISSION)
 		error_print(ERROR, bin, "Permission denied");
+	else if (error_state == PATH_ERR_IS_DIR)
+		error_print(ERROR, bin, "Is a directory");
 }
