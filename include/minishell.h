@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/26 12:37:22 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 13:10:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -390,7 +390,7 @@ int							add_argument(t_command *cmd, char *value);
 
 // main_utils.c
 char						*get_user_input(t_ctx *ctx, int prev_status);
-int							handle_command_in_main_loop(t_ctx *ctx, int status,
+void						handle_command_in_main_loop(t_ctx *ctx,
 								char *input);
 
 // // parser_pipeline.c

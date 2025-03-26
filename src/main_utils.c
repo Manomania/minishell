@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:47:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 12:39:56 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 13:13:20 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,29 +19,20 @@
  * @brief Processes a command after parsing
  *
  * @param ctx Shell context
- * @param prev_status Previous command exit status
  * @return Exit status of the command
  */
-static int	process_command(t_ctx *ctx, int prev_status)
+static void	process_command(t_ctx *ctx)
 {
-	int	status;
-
-	status = prev_status;
 	if (ctx->cmd && ctx->cmd->args && ctx->cmd->args[0]
 		&& ft_strncmp(ctx->cmd->args[0], "exit", __INT_MAX__) == 0)
 		ft_putstr("exit\n");
-	status = command_execute(ctx);
+	ctx->exit_status = command_execute(ctx);
 	if (ctx->cmd)
 		free_all_commands(ctx->cmd);
 	ctx->cmd = NULL;
 	if (ctx->tokens)
 		free_all_token(ctx->tokens);
 	ctx->tokens = NULL;
-	if (status == -1)
-		status = prev_status;
-	if (!ctx->exit_requested)
-		ctx->exit_status = status;
-	return (status);
 }
 
 /**
@@ -58,6 +49,7 @@ static t_bool	parse_user_input(t_ctx *ctx, char *input)
 	{
 		free_all_token(ctx->tokens);
 		ctx->tokens = NULL;
+		ctx->exit_status = 2;
 		return (false);
 	}
 	if (g_debug_level > INFO)
@@ -153,17 +145,12 @@ char	*get_user_input(t_ctx *ctx, int prev_status)
  * @brief Process the parsed command
  *
  * @param ctx Shell context
- * @param status Previous command exit status
  * @param input User input line
- * @return int New command exit status
  */
-int	handle_command_in_main_loop(t_ctx *ctx, int status, char *input)
+void	handle_command_in_main_loop(t_ctx *ctx, char *input)
 {
-	int	new_status;
-
-	new_status = status;
 	if (parse_user_input(ctx, input))
-		new_status = process_command(ctx, status);
+		process_command(ctx);
 	else
 	{
 		if (ctx->tokens)
@@ -177,5 +164,4 @@ int	handle_command_in_main_loop(t_ctx *ctx, int status, char *input)
 			ctx->cmd = NULL;
 		}
 	}
-	return (new_status);
 }

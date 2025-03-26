@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 12:40:23 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 13:11:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,21 +21,20 @@
  * @param ctx Shell context
  * @param prev_status Previous command exit status
  */
-static void	command_loop(t_ctx *ctx, int prev_status)
+static void	command_loop(t_ctx *ctx)
 {
 	char	*input;
-	int		status;
 	int		running;
 
-	status = prev_status;
+	ctx->exit_status = 0;
 	running = 1;
 	while (running)
 	{
-		input = get_user_input(ctx, status);
+		input = get_user_input(ctx, ctx->exit_status);
 		if (!input)
 			ctx_exit(ctx);
 		debug_log(DEBUG_INFO, "main", "Processing user input");
-		status = handle_command_in_main_loop(ctx, status, input);
+		handle_command_in_main_loop(ctx, input);
 		if (ctx->exit_requested)
 			running = 0;
 	}
@@ -81,7 +80,7 @@ int	main(int argc, char **argv, char **envp)
 		error_exit(NULL, ERR_ALLOC, "context initialization");
 	setup_signals();
 	debug_log(DEBUG_INFO, "main", "Starting command loop");
-	command_loop(ctx, 0);
+	command_loop(ctx);
 	ctx_clear(ctx);
 	return (EXIT_SUCCESS);
 }

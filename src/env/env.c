@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 12:30:04 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/19 18:22:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 13:15:40 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,5 +141,7 @@ char	*expand_variable(t_ctx *ctx, char *str, int *i, int in_squote)
 	var_value = expand_var(ctx, var_name);
 	free(var_name);
 	free(full_varname);
-	return (var_value ? var_value : ft_strdup(""));
+	if (!var_value)
+		return (ft_strdup(""));
+	return (var_value);
 }
