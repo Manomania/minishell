@@ -124,24 +124,11 @@ t_command	*parse_command(t_parse *parse, t_ctx *ctx)
 	if (!cmd)
 		return (NULL);
 	while (parse->current && parse->current->type != TOK_PIPE
-		&& parse->current->type != TOK_AND && parse->current->type != TOK_OR
 		&& parse->current->type != TOK_EOF)
 	{
 		if (parse->current->type == TOK_WORD)
 		{
 			expanded = handle_quotes_and_vars(ctx, parse->current->value);
-			if (!add_argument(cmd, expanded))
-			{
-				free(expanded);
-				free_command(cmd);
-				return (NULL);
-			}
-			free(expanded);
-			advance_parse(parse);
-		}
-		else if (parse->current->type == TOK_ENV)
-		{
-			expanded = expand_var(ctx, parse->current->value);
 			if (!add_argument(cmd, expanded))
 			{
 				free(expanded);

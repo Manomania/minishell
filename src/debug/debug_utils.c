@@ -59,15 +59,6 @@ void	print_tokens_list(t_token *tokens)
 		case TOK_PIPE:
 			ft_printf("PIPE");
 			break ;
-		case TOK_ENV:
-			ft_printf("ENV");
-			break ;
-		case TOK_AND:
-			ft_printf("AND");
-			break ;
-		case TOK_OR:
-			ft_printf("OR");
-			break ;
 		case TOK_NEW_LINE:
 			ft_printf("NEW_LINE");
 			break ;
@@ -184,10 +175,6 @@ void	print_operator_type(t_token_type op_type)
 {
 	if (op_type == TOK_PIPE)
 		ft_printf(BLUE "  Piped to next command (|)\n" RESET);
-	else if (op_type == TOK_OR)
-		ft_printf(BLUE "  OR operator to next command (||)\n" RESET);
-	else if (op_type == TOK_AND)
-		ft_printf(BLUE "  AND operator to next command (&&)\n" RESET);
 }
 
 void	print_commands(t_command *cmd)
@@ -230,12 +217,6 @@ void	print_token_type(t_token_type type)
 		ft_printf("HERE_DOC_TO");
 	else if (type == TOK_PIPE)
 		ft_printf("PIPE");
-	else if (type == TOK_ENV)
-		ft_printf("ENV");
-	else if (type == TOK_AND)
-		ft_printf("AND");
-	else if (type == TOK_OR)
-		ft_printf("OR");
 	else if (type == TOK_NEW_LINE)
 		ft_printf("NEW_LINE");
 	else if (type == TOK_EOF)

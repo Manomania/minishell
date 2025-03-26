@@ -53,44 +53,44 @@ static t_bool	process_word_token(t_command *cmd, t_token *token, t_ctx *ctx)
 	return (true);
 }
 
-/**
- * @brief Processes an environment variable token during command parsing
- *
- * @param cmd Command structure being built
- * @param token Current token being processed
- * @param ctx Context containing environment information
- * @return t_bool true on success, false on failure
- */
-static t_bool	process_env_token(t_command *cmd, t_token *token, t_ctx *ctx)
-{
-	char	*expanded_value;
-
-	expanded_value = expand_var(ctx, token->value);
-	if (!expanded_value)
-		return (false);
-	if (!cmd->args)
-	{
-		cmd->args = malloc(sizeof(char *) * 2);
-		if (!cmd->args)
-		{
-			free(expanded_value);
-			return (false);
-		}
-		cmd->args[0] = expanded_value;
-		cmd->args[1] = NULL;
-		cmd->arg_count = 0;
-	}
-	else
-	{
-		if (command_add_argument(cmd, expanded_value) != 0)
-		{
-			free(expanded_value);
-			return (false);
-		}
-		free(expanded_value);
-	}
-	return (true);
-}
+// /**
+//  * @brief Processes an environment variable token during command parsing
+//  *
+//  * @param cmd Command structure being built
+//  * @param token Current token being processed
+//  * @param ctx Context containing environment information
+//  * @return t_bool true on success, false on failure
+//  */
+// static t_bool	process_env_token(t_command *cmd, t_token *token, t_ctx *ctx)
+// {
+// 	char	*expanded_value;
+//
+// 	expanded_value = expand_var(ctx, token->value);
+// 	if (!expanded_value)
+// 		return (false);
+// 	if (!cmd->args)
+// 	{
+// 		cmd->args = malloc(sizeof(char *) * 2);
+// 		if (!cmd->args)
+// 		{
+// 			free(expanded_value);
+// 			return (false);
+// 		}
+// 		cmd->args[0] = expanded_value;
+// 		cmd->args[1] = NULL;
+// 		cmd->arg_count = 0;
+// 	}
+// 	else
+// 	{
+// 		if (command_add_argument(cmd, expanded_value) != 0)
+// 		{
+// 			free(expanded_value);
+// 			return (false);
+// 		}
+// 		free(expanded_value);
+// 	}
+// 	return (true);
+// }
 
 /**
  * @brief Processes a redirection token during command parsing
@@ -110,15 +110,12 @@ static int	handle_redirection_token(t_command *cmd, t_token *token,
 
 	if (!cmd || !token || !next_token)
 		return (-1);
-	if (next_token->type != TOK_WORD && next_token->type != TOK_ENV)
+	if (next_token->type != TOK_WORD)
 		return (-1);
 	fd = 1;
 	if (token->type == TOK_REDIR_FROM || token->type == TOK_HERE_DOC_FROM)
 		fd = 0;
-	if (next_token->type == TOK_ENV)
-		expanded_filename = expand_var(ctx, next_token->value);
-	else
-		expanded_filename = handle_quotes_and_vars(ctx, next_token->value);
+	expanded_filename = handle_quotes_and_vars(ctx, next_token->value);
 	if (!expanded_filename)
 		return (-1);
 	result = command_add_redirection(cmd, token->type, fd, expanded_filename);
@@ -142,11 +139,6 @@ static t_bool	process_command_tokens(t_token **current, t_command *cmd,
 		if ((*current)->type == TOK_WORD)
 		{
 			if (!process_word_token(cmd, *current, ctx))
-				return (false);
-		}
-		else if ((*current)->type == TOK_ENV)
-		{
-			if (!process_env_token(cmd, *current, ctx))
 				return (false);
 		}
 		else if (token_is_redirection((*current)->type))

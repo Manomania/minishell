@@ -68,12 +68,6 @@ static const char	*get_token_type_str(t_token_type type)
 		return ("HERE_DOC_TO");
 	if (type == TOK_PIPE)
 		return ("PIPE");
-	if (type == TOK_ENV)
-		return ("ENV");
-	if (type == TOK_AND)
-		return ("AND");
-	if (type == TOK_OR)
-		return ("OR");
 	if (type == TOK_NEW_LINE)
 		return ("NEW_LINE");
 	if (type == TOK_EOF)

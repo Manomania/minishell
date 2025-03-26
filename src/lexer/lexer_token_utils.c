@@ -35,21 +35,11 @@ t_token	*handle_pipe_and_token(t_lexer *lexer)
 	if (current == '|')
 	{
 		advance_lexer(lexer);
-		if (get_lexer(lexer) == '|')
-		{
-			advance_lexer(lexer);
-			return (create_token(TOK_OR, ft_strdup("||")));
-		}
 		return (create_token(TOK_PIPE, ft_strdup("|")));
 	}
 	if (current == '&')
 	{
 		advance_lexer(lexer);
-		if (get_lexer(lexer) == '&')
-		{
-			advance_lexer(lexer);
-			return (create_token(TOK_AND, ft_strdup("&&")));
-		}
 		ft_printf(RED "Error:\nUnexpected '&'\n" RESET);
 		return (create_token(TOK_EOF, NULL));
 	}

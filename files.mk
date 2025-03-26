@@ -1,4 +1,5 @@
 SRC_F				= 	builtins/builtins_try \
+						checker/token_checker \
 						command/command_execute \
 						command/command_execute_utils \
 						command/command_parse \

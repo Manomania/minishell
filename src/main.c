@@ -54,6 +54,13 @@ static int	process_command(t_ctx *ctx, int prev_status)
 static t_bool	parse_user_input(t_ctx *ctx, char *input)
 {
 	ctx->tokens = tokenize(ctx, input);
+	if (!validate_token_sequence(ctx->tokens))
+	{
+		// Handle syntax error
+		free_all_token(ctx->tokens);
+		ctx->tokens = NULL;
+		return (false);
+	}
 	if (g_debug_level > INFO)
 		print_tokens(ctx->tokens);
 	free(input);

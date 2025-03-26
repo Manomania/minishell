@@ -49,16 +49,13 @@ typedef enum e_bool
 typedef enum e_token_type
 {
 	TOK_WORD,          // Commands, args, filename
-	TOK_OPEN_PAR,      // (
-	TOK_CLOSE_PAR,     // )
 	TOK_REDIR_FROM,    // <
 	TOK_REDIR_TO,      // >
 	TOK_HERE_DOC_FROM, // <<
 	TOK_HERE_DOC_TO,   // >>
 	TOK_PIPE,          // |
-	TOK_ENV,           // $
-	TOK_AND,           // &&
-	TOK_OR,            // ||
+	TOK_OR,				// ||
+	TOK_AND,			// &&
 	TOK_NEW_LINE,      // \n
 	TOK_EOF,           // '\0'
 }							t_token_type;
@@ -187,6 +184,9 @@ typedef enum e_path_error
 
 // builtins_try.c
 t_bool						builtins_try(t_ctx *ctx, t_command *cmd);
+
+// token_checker.c
+t_bool	validate_token_sequence(t_token *tokens);
 
 // command_add.c
 int							command_add_argument(t_command *cmd, char *arg);
