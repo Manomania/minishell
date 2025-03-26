@@ -6,48 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:37:01 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/18 11:47:01 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 12:51:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-/**
- * @brief Adds an argument to a command
- *
- * This function adds a new argument to a command's argument list,
- * allocating memory as needed.
- *
- * @param cmd Command to add the argument to
- * @param value Value of the argument to add
- * @return 1 on success, 0 on failure
- */
-int	add_argument(t_command *cmd, char *value)
-{
-	char	**new_args;
-	int		i;
-
-	if (!cmd || !value)
-		return (0);
-	new_args = malloc(sizeof(char *) * (size_t)(cmd->arg_count + 2));
-	if (!new_args)
-		return (0);
-	i = -1;
-	while (++i < cmd->arg_count)
-		new_args[i] = cmd->args[i];
-	new_args[i] = ft_strdup(value);
-	if (!new_args[i])
-	{
-		free(new_args);
-		return (0);
-	}
-	new_args[i + 1] = NULL;
-	if (cmd->args)
-		free(cmd->args);
-	cmd->args = new_args;
-	cmd->arg_count++;
-	return (1);
-}
 
 /**
  * @brief Adds a redirection to a command
@@ -109,6 +72,57 @@ int	parse_redirection(t_parse *parse, t_command *cmd, t_ctx *ctx)
 }
 
 /**
+ * @brief Handles token expansion and adds to command arguments
+ *
+ * @param cmd Command structure to update
+ * @param ctx Shell context
+ * @param parse Parser context
+ * @return int 1 on success, 0 on failure
+ */
+static int	handle_token_expansion(t_command *cmd, t_ctx *ctx, t_parse *parse)
+{
+	char	*expanded;
+
+	if (parse->current->type == TOK_WORD)
+		expanded = handle_quotes_and_vars(ctx, parse->current->value);
+	else
+		expanded = expand_var(ctx, parse->current->value);
+	if (!add_argument(cmd, expanded))
+	{
+		free(expanded);
+		return (0);
+	}
+	free(expanded);
+	advance_parse(parse);
+	return (1);
+}
+
+/**
+ * @brief Processes a single token in the command parsing
+ *
+ * @param cmd Command structure to update
+ * @param ctx Shell context
+ * @param parse Parser context
+ * @return int 1 on success, 0 on failure
+ */
+static int	process_command_token(t_command *cmd, t_ctx *ctx, t_parse *parse)
+{
+	if (!handle_token_expansion(cmd, ctx, parse))
+		return (0);
+	else if (parse->current->type == TOK_REDIR_FROM
+		|| parse->current->type == TOK_REDIR_TO
+		|| parse->current->type == TOK_HERE_DOC_FROM
+		|| parse->current->type == TOK_HERE_DOC_TO)
+	{
+		if (!parse_redirection(parse, cmd, ctx))
+			return (0);
+	}
+	else
+		advance_parse(parse);
+	return (1);
+}
+
+/**
  * @brief Parses a command with environment variable expansion
  *
  * @param parse Parser context
@@ -118,7 +132,7 @@ int	parse_redirection(t_parse *parse, t_command *cmd, t_ctx *ctx)
 t_command	*parse_command(t_parse *parse, t_ctx *ctx)
 {
 	t_command	*cmd;
-	char		*expanded;
+	int			status;
 
 	cmd = create_command();
 	if (!cmd)
@@ -126,31 +140,12 @@ t_command	*parse_command(t_parse *parse, t_ctx *ctx)
 	while (parse->current && parse->current->type != TOK_PIPE
 		&& parse->current->type != TOK_EOF)
 	{
-		if (parse->current->type == TOK_WORD)
+		status = process_command_token(cmd, ctx, parse);
+		if (!status)
 		{
-			expanded = handle_quotes_and_vars(ctx, parse->current->value);
-			if (!add_argument(cmd, expanded))
-			{
-				free(expanded);
-				free_command(cmd);
-				return (NULL);
-			}
-			free(expanded);
-			advance_parse(parse);
+			free_command(cmd);
+			return (NULL);
 		}
-		else if (parse->current->type == TOK_REDIR_FROM
-			|| parse->current->type == TOK_REDIR_TO
-			|| parse->current->type == TOK_HERE_DOC_FROM
-			|| parse->current->type == TOK_HERE_DOC_TO)
-		{
-			if (!parse_redirection(parse, cmd, ctx))
-			{
-				free_command(cmd);
-				return (NULL);
-			}
-		}
-		else
-			advance_parse(parse);
 	}
 	return (cmd);
 }

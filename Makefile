@@ -17,7 +17,7 @@ CFLAGS				+=	-MD -MP
 # Warns when a variable declaration shadows another variable
 CFLAGS				+=	-Wshadow
 # More thorough than -Wunused-result
-CFLAGS				+=	-Wunused-result
+CFLAGS				+=	-Wunused
 # Disables pointer arithmetics
 # (no `*ptr++`)
 CFLAGS				+=	-Wpointer-arith
@@ -29,7 +29,7 @@ CFLAGS				+=	-Wfloat-equal
 #CFLAGS				+=	-Wwrite-strings
 # Keeps the frame pointer in registers
 # Minor performance cost
-CFLAGS				+=	-fno-omit-frame-pointer
+# CFLAGS				+=	-fno-omit-frame-pointer
 AR					:=	ar rcs
 RM					:=	rm -f
 

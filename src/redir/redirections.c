@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:45:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 17:23:08 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 16:09:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,24 +86,17 @@ static int	process_redirection(t_redirection *redir)
 }
 
 /**
- * @brief Sets up all redirections for a command
+ * @brief Process each redirection in a linked list
  *
- * @param ctx Context for error handling
- * @param redirections List of redirections
- * @return 0 on success, -1 on error
+ * @param redirections Redirection list to process
+ * @return 0 on success, error code on failure
  */
-int	setup_redirections(t_redirection *redirections)
+int	process_redirection_list(t_redirection *redirections)
 {
 	t_redirection	*redir;
 	int				result;
 
 	redir = redirections;
-	if (!redir)
-	{
-		debug_log(DEBUG_INFO, "redir", "No redirections to process");
-		return (0);
-	}
-	debug_log(DEBUG_INFO, "redir", "Setting up redirections");
 	while (redir)
 	{
 		debug_log(DEBUG_VERBOSE, "redir", "Processing redirection");
@@ -112,6 +105,28 @@ int	setup_redirections(t_redirection *redirections)
 			return (result);
 		redir = redir->next;
 	}
+	return (0);
+}
+
+/**
+ * @brief Process all redirections in a linked list
+ *
+ * @param redirections List of redirections to process
+ * @return 0 on success, -1 on error
+ */
+int	setup_redirections(t_redirection *redirections)
+{
+	int	result;
+
+	if (!redirections)
+	{
+		debug_log(DEBUG_INFO, "redir", "No redirections to process");
+		return (0);
+	}
+	debug_log(DEBUG_INFO, "redir", "Setting up redirections");
+	result = process_redirection_list(redirections);
+	if (result != 0)
+		return (result);
 	debug_log(DEBUG_INFO, "redir", "All redirections processed successfully");
 	return (0);
 }

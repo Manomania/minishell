@@ -6,91 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/19 17:02:35 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 12:43:06 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-/**
- * @brief Processes a word token during command parsing
- *
- * @param cmd Command structure being built
- * @param token Current token being processed
- * @param ctx Context containing environment information
- * @return t_bool true on success, false on failure
- */
-static t_bool	process_word_token(t_command *cmd, t_token *token, t_ctx *ctx)
-{
-	char	*expanded_value;
-
-	if (!cmd->args)
-	{
-		cmd->args = malloc(sizeof(char *) * 2);
-		if (!cmd->args)
-			return (false);
-		expanded_value = handle_quotes_and_vars(ctx, token->value);
-		if (!expanded_value)
-		{
-			free(cmd->args);
-			cmd->args = NULL;
-			return (false);
-		}
-		cmd->args[0] = expanded_value;
-		cmd->args[1] = NULL;
-		cmd->arg_count = 0;
-	}
-	else
-	{
-		expanded_value = handle_quotes_and_vars(ctx, token->value);
-		if (command_add_argument(cmd, expanded_value) != 0)
-		{
-			free(expanded_value);
-			return (false);
-		}
-		free(expanded_value);
-	}
-	return (true);
-}
-
-// /**
-//  * @brief Processes an environment variable token during command parsing
-//  *
-//  * @param cmd Command structure being built
-//  * @param token Current token being processed
-//  * @param ctx Context containing environment information
-//  * @return t_bool true on success, false on failure
-//  */
-// static t_bool	process_env_token(t_command *cmd, t_token *token, t_ctx *ctx)
-// {
-// 	char	*expanded_value;
-//
-// 	expanded_value = expand_var(ctx, token->value);
-// 	if (!expanded_value)
-// 		return (false);
-// 	if (!cmd->args)
-// 	{
-// 		cmd->args = malloc(sizeof(char *) * 2);
-// 		if (!cmd->args)
-// 		{
-// 			free(expanded_value);
-// 			return (false);
-// 		}
-// 		cmd->args[0] = expanded_value;
-// 		cmd->args[1] = NULL;
-// 		cmd->arg_count = 0;
-// 	}
-// 	else
-// 	{
-// 		if (command_add_argument(cmd, expanded_value) != 0)
-// 		{
-// 			free(expanded_value);
-// 			return (false);
-// 		}
-// 		free(expanded_value);
-// 	}
-// 	return (true);
-// }
 
 /**
  * @brief Processes a redirection token during command parsing
@@ -166,20 +86,24 @@ static t_bool	process_command_tokens(t_token **current, t_command *cmd,
 static t_bool	create_pipeline(t_command **cmd, t_token **current, t_ctx *ctx)
 {
 	t_command	*new_cmd;
+	t_command	*prev_cmd;
 
-	if (*current && (*current)->type == TOK_PIPE)
+	prev_cmd = *cmd;
+	new_cmd = command_new();
+	if (!new_cmd)
+		return (false);
+	prev_cmd->next = new_cmd;
+	prev_cmd->operator= TOK_PIPE;
+	*cmd = new_cmd;
+	*current = (*current)->next;
+	if (!process_command_tokens(current, *cmd, ctx))
 	{
-		new_cmd = command_new();
-		if (!new_cmd)
-			return (false);
-		(*cmd)->next = new_cmd;
-		*cmd = new_cmd;
-		*current = (*current)->next;
-		if (!process_command_tokens(current, *cmd, ctx))
-			return (false);
-		if (*current && (*current)->type == TOK_PIPE)
-			return (create_pipeline(cmd, current, ctx));
+		prev_cmd->next = NULL;
+		free_command(new_cmd);
+		return (false);
 	}
+	if (*current && (*current)->type == TOK_PIPE)
+		return (create_pipeline(cmd, current, ctx));
 	return (true);
 }
 
@@ -188,7 +112,7 @@ static t_bool	create_pipeline(t_command **cmd, t_token **current, t_ctx *ctx)
  *
  * @param ctx Context containing environment information
  * @param tokens The tokens array to parse
- * @return t_command* Parsed command structure
+ * @return t_command* Parsed command structure or NULL if parsing fails
  */
 t_command	*command_parse(t_ctx *ctx, t_token *tokens)
 {
@@ -206,10 +130,13 @@ t_command	*command_parse(t_ctx *ctx, t_token *tokens)
 		free_all_commands(first_cmd);
 		return (NULL);
 	}
-	if (!create_pipeline(&cmd, &current, ctx))
+	if (current && current->type == TOK_PIPE)
 	{
-		free_all_commands(first_cmd);
-		return (NULL);
+		if (!create_pipeline(&cmd, &current, ctx))
+		{
+			free_all_commands(first_cmd);
+			return (NULL);
+		}
 	}
 	return (first_cmd);
 }

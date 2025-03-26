@@ -1,33 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   command_new.c                                      :+:      :+:    :+:   */
+/*   builtin_pipeline_utils.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 13:48:09 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 10:51:25 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/24 15:20:37 by elagouch          #+#    #+#             */
+/*   Updated: 2025/03/24 15:21:23 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Creates a new command structure
+ * @brief Restores original file descriptors
  *
- * @return t_command* New initialized command or NULL if allocation fails
+ * @param saved_in Saved stdin file descriptor
+ * @param saved_out Saved stdout file descriptor
  */
-t_command	*command_new(void)
+void	restore_pipeline_fds(int saved_in, int saved_out)
 {
-	t_command	*cmd;
-
-	cmd = (t_command *)malloc(sizeof(t_command));
-	if (!cmd)
-		return (NULL);
-	cmd->args = NULL;
-	cmd->arg_count = 0;
-	cmd->redirection = NULL;
-	cmd->operator = TOK_NONE;
-	cmd->next = NULL;
-	return (cmd);
+	dup2(saved_in, STDIN_FILENO);
+	dup2(saved_out, STDOUT_FILENO);
+	close(saved_in);
+	close(saved_out);
 }

@@ -6,10 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/19 18:37:17 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 15:25:18 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "builtins.h"
 #include "debug.h"
 #include "error.h"
 #include "minishell.h"
@@ -59,36 +60,70 @@ static t_bool	is_pipeline(t_command *cmd)
 }
 
 /**
- * @brief Executes a command or pipeline
+ * @brief Validates if the command context is valid for execution
  *
  * @param ctx Context containing environment and command info
- * @return Exit status of the command
+ * @param status Pointer to store error status
+ * @return int 1 if valid, 0 if invalid
  */
-int	command_execute(t_ctx *ctx)
+static int	validate_command_context(t_ctx *ctx, int *status)
 {
-	int	status;
-
 	if (!ctx || !ctx->cmd)
 	{
-		status = ctx_error(ERR_ALLOC);
-		ctx->exit_status = status;
-		return (status);
+		*status = ctx_error(ERR_ALLOC);
+		ctx->exit_status = *status;
+		return (0);
 	}
 	if (!ctx->cmd->args || !ctx->cmd->args[0])
 	{
 		ctx->exit_status = -1;
-		return (-1);
+		*status = -1;
+		return (0);
 	}
+	return (1);
+}
+
+/**
+ * @brief Determines command type and executes appropriate handler
+ *
+ * @param ctx Context containing environment and command info
+ * @return int Status code from command execution
+ */
+static int	process_command(t_ctx *ctx)
+{
+	int	status;
+
 	debug_log(DEBUG_INFO, "execute", "Executing command");
-	if (builtins_try(ctx, ctx->cmd))
-		return (ctx->exit_status);
 	if (is_pipeline(ctx->cmd))
 	{
 		debug_log(DEBUG_INFO, "execute", "Pipeline detected");
 		status = exec_cmdas(ctx);
 	}
 	else
+	{
+		if (builtins_try(ctx, ctx->cmd))
+			return (ctx->exit_status);
 		status = execute_single_command(ctx);
+	}
+	return (status);
+}
+
+/**
+ * @brief Executes a command or pipeline
+ *
+ * @param ctx Context containing environment and command info
+ * @return int Exit status of the command
+ */
+int	command_execute(t_ctx *ctx)
+{
+	int	status;
+	int	is_valid;
+
+	status = 0;
+	is_valid = validate_command_context(ctx, &status);
+	if (!is_valid)
+		return (status);
+	status = process_command(ctx);
 	ctx->exit_status = status;
 	return (status);
 }
