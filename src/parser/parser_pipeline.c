@@ -28,9 +28,7 @@ t_command	*parse_pipeline(t_ctx *ctx, t_parse *parse)
 	if (!first_cmd)
 		return (NULL);
 	current_cmd = first_cmd;
-	while (parse->current && (parse->current->type == TOK_PIPE
-			|| parse->current->type == TOK_OR
-			|| parse->current->type == TOK_AND))
+	while (parse->current && (parse->current->type == TOK_PIPE))
 	{
 		current_cmd->operator = parse->current->type;
 		advance_parse(parse);
@@ -73,8 +71,6 @@ t_command	*parse_command_sequence(t_ctx *ctx, t_parse *parse)
 	left_cmd = parse_pipeline(ctx, parse);
 	if (!left_cmd)
 		return (NULL);
-	if (parse->current->type != TOK_AND && parse->current->type != TOK_OR)
-		return (left_cmd);
 	op_type = parse->current->type;
 	advance_parse(parse);
 	right_cmd = parse_command_sequence(ctx, parse);

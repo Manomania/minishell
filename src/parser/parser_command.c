@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:37:01 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/24 11:27:11 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 12:51:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,11 +107,8 @@ static int	handle_token_expansion(t_command *cmd, t_ctx *ctx, t_parse *parse)
  */
 static int	process_command_token(t_command *cmd, t_ctx *ctx, t_parse *parse)
 {
-	if (parse->current->type == TOK_WORD || parse->current->type == TOK_ENV)
-	{
-		if (!handle_token_expansion(cmd, ctx, parse))
-			return (0);
-	}
+	if (!handle_token_expansion(cmd, ctx, parse))
+		return (0);
 	else if (parse->current->type == TOK_REDIR_FROM
 		|| parse->current->type == TOK_REDIR_TO
 		|| parse->current->type == TOK_HERE_DOC_FROM
@@ -141,7 +138,6 @@ t_command	*parse_command(t_parse *parse, t_ctx *ctx)
 	if (!cmd)
 		return (NULL);
 	while (parse->current && parse->current->type != TOK_PIPE
-		&& parse->current->type != TOK_AND && parse->current->type != TOK_OR
 		&& parse->current->type != TOK_EOF)
 	{
 		status = process_command_token(cmd, ctx, parse);

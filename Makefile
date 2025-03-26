@@ -25,8 +25,8 @@ CFLAGS				+=	-Wpointer-arith
 CFLAGS				+=	-Wformat=2
 # Warns about == for floats which is sus
 CFLAGS				+=	-Wfloat-equal
-# Makes strings const char*
-CFLAGS				+=	-Wwrite-strings
+## Makes strings const char*
+#CFLAGS				+=	-Wwrite-strings
 # Keeps the frame pointer in registers
 # Minor performance cost
 # CFLAGS				+=	-fno-omit-frame-pointer
