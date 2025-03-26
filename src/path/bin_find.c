@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 12:29:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 18:22:56 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,9 @@ char	*bin_find(t_ctx *ctx, char *bin)
 	{
 		path = env_find_bin(ctx, bin);
 		if (!path)
-			error_print(ERROR, bin, "Command not found");
+			ft_printf_fd(STDERR_FILENO,
+				RED "minishell: %s: command not found\n" RESET,
+				bin);
 	}
 	return (path);
 }

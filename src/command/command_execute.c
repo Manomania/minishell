@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:25:18 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 17:06:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static int	execute_single_command(t_ctx *ctx)
 		if (ctx->cmd->args && ctx->cmd->args[0] && (ft_strchr(ctx->cmd->args[0],
 					'/') || ctx->cmd->args[0][0] == '.'))
 			return (2);
-		return (error_code(ERR_CMD_NOT_FOUND));
+		return (127);
 	}
 	setup_parent_signals();
 	pid = fork();
