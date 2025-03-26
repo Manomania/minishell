@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 11:34:34 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 13:58:12 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 12:47:56 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,6 @@ char	*get_token_type_str(t_token_type type)
 		return ((char *)"HERE_DOC_TO");
 	else if (type == TOK_PIPE)
 		return ((char *)"PIPE");
-	else if (type == TOK_ENV)
-		return ((char *)"ENV");
-	else if (type == TOK_AND)
-		return ((char *)"AND");
-	else if (type == TOK_OR)
-		return ((char *)"OR");
 	else if (type == TOK_NEW_LINE)
 		return ((char *)"NEW_LINE");
 	else if (type == TOK_EOF)

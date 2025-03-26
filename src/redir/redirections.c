@@ -95,7 +95,6 @@ int	process_redirection_list(t_redirection *redirections)
 {
 	t_redirection	*redir;
 	int				result;
-	char			error_msg[256];
 
 	redir = redirections;
 	while (redir)
@@ -103,12 +102,7 @@ int	process_redirection_list(t_redirection *redirections)
 		debug_log(DEBUG_VERBOSE, "redir", "Processing redirection");
 		result = process_redirection(redir);
 		if (result != 0)
-		{
-			ft_strlcpy(error_msg, "Failed to set up redirection for: ", 256);
-			ft_strlcat(error_msg, redir->filename, 256);
-			error_print(ERROR, "redir", error_msg);
 			return (result);
-		}
 		redir = redir->next;
 	}
 	return (0);

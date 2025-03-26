@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 14:36:02 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 11:40:23 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 12:47:37 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,6 @@ void	print_token_type(t_token_type type)
 		ft_printf("HERE_DOC_TO");
 	else if (type == TOK_PIPE)
 		ft_printf("PIPE");
-	else if (type == TOK_ENV)
-		ft_printf("ENV");
-	else if (type == TOK_AND)
-		ft_printf("AND");
-	else if (type == TOK_OR)
-		ft_printf("OR");
 	else if (type == TOK_NEW_LINE)
 		ft_printf("NEW_LINE");
 	else if (type == TOK_EOF)

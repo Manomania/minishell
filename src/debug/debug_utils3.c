@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 11:40:31 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 13:54:05 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 12:48:12 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,10 +105,6 @@ void	print_operator_type(t_token_type op_type)
 {
 	if (op_type == TOK_PIPE)
 		ft_printf(BLUE "  Piped to next command (|)\n" RESET);
-	else if (op_type == TOK_OR)
-		ft_printf(BLUE "  OR operator to next command (||)\n" RESET);
-	else if (op_type == TOK_AND)
-		ft_printf(BLUE "  AND operator to next command (&&)\n" RESET);
 }
 
 void	print_commands(t_command *cmd)

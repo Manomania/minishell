@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/24 18:14:20 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 13:10:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,19 +49,16 @@ typedef enum e_bool
 typedef enum e_token_type
 {
 	TOK_NONE,
-	TOK_WORD,
-	TOK_OPEN_PAR,
-	TOK_CLOSE_PAR,
-	TOK_REDIR_FROM,
-	TOK_REDIR_TO,
-	TOK_HERE_DOC_FROM,
-	TOK_HERE_DOC_TO,
-	TOK_PIPE,
-	TOK_ENV,
-	TOK_AND,
-	TOK_OR,
-	TOK_NEW_LINE,
-	TOK_EOF,
+	TOK_WORD,          // Commands, args, filename
+	TOK_REDIR_FROM,    // <
+	TOK_REDIR_TO,      // >
+	TOK_HERE_DOC_FROM, // <<
+	TOK_HERE_DOC_TO,   // >>
+	TOK_PIPE,          // |
+	TOK_OR,            // ||
+	TOK_AND,           // &&
+	TOK_NEW_LINE,      // \n
+	TOK_EOF,           // '\0'
 }							t_token_type;
 
 typedef struct s_token
@@ -188,6 +185,9 @@ typedef enum e_path_error
 
 // builtins_try.c
 t_bool						builtins_try(t_ctx *ctx, t_command *cmd);
+
+// token_checker.c
+t_bool						validate_token_sequence(t_token *tokens);
 
 // command_add.c
 int							command_add_argument(t_command *cmd, char *arg);
@@ -390,7 +390,7 @@ int							add_argument(t_command *cmd, char *value);
 
 // main_utils.c
 char						*get_user_input(t_ctx *ctx, int prev_status);
-int							handle_command_in_main_loop(t_ctx *ctx, int status,
+void						handle_command_in_main_loop(t_ctx *ctx,
 								char *input);
 
 // // parser_pipeline.c
