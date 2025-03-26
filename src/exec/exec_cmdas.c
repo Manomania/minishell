@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:38:03 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 16:41:45 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,10 @@ static int	handle_pipe_setup(int pipe_fds[2], int i, int cmd_count)
 }
 
 /**
- * @brief Handles descriptor management after fork
+ * @brief Handles descriptor management after fork, avoiding double-close errors
+ *
+ * This function safely manages file descriptors during pipeline execution,
+ * ensuring we don't close the same descriptor twice.
  *
  * @param prev_pipe Previous pipe's read end
  * @param pipe_fds Current pipe file descriptors
@@ -47,13 +50,19 @@ static int	handle_pipe_setup(int pipe_fds[2], int i, int cmd_count)
  */
 int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i, int cmd_count)
 {
-	if (prev_pipe != STDIN_FILENO)
+	if (prev_pipe != STDIN_FILENO && prev_pipe > 0)
+	{
 		close(prev_pipe);
-	if (pipe_fds[1] != STDOUT_FILENO)
+		prev_pipe = -1;
+	}
+	if (pipe_fds[1] != STDOUT_FILENO && pipe_fds[1] > 0)
+	{
 		close(pipe_fds[1]);
+		pipe_fds[1] = -1;
+	}
 	if (i < cmd_count - 1)
 		return (pipe_fds[0]);
-	return (prev_pipe);
+	return (STDIN_FILENO);
 }
 
 /**
@@ -76,8 +85,8 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 		return (-1);
 	else if (result > 0)
 		return (result);
-	pid = execute_pipeline_command(ctx, data->current, data->prev_pipe,
-			data->pipe_fds[1]);
+	pid = execute_pipeline_command(ctx, data->current, &data->prev_pipe,
+			&data->pipe_fds[1]);
 	data->pids[data->i] = pid;
 	return (handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
 			data->cmd_count));

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/25 13:47:03 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 14:46:16 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,9 +116,6 @@ int	add_env_var(t_env **env_list, char *key, char *value)
 
 	if (!key)
 		return (0);
-	debug_log(DEBUG_VERBOSE, "add_env_var key", key);
-	if (value)
-		debug_log(DEBUG_VERBOSE, "add_env_var value", value);
 	new_node = create_env_node(key, value);
 	if (!new_node)
 		return (0);

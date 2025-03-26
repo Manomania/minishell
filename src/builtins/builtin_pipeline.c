@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:20:14 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:20:23 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 16:40:47 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,25 +38,41 @@ t_bool	is_builtin_command(char *cmd_name)
 /**
  * @brief Saves and redirects file descriptors for pipeline execution
  *
+ * This function saves the original standard input and output, then redirects
+ * them to the provided file descriptors. It safely handles the file descriptors
+ * to avoid double-close issues.
+ *
  * @param saved_in Pointer to store the saved stdin
  * @param saved_out Pointer to store the saved stdout
  * @param input_fd Input file descriptor
  * @param output_fd Output file descriptor
  * @return int Status code (0 for success, error code otherwise)
  */
-static int	setup_pipeline_fds(int *saved_in, int *saved_out, int input_fd,
-		int output_fd)
+static int	setup_pipeline_fds(int *saved_in, int *saved_out, int *input_fd,
+		int *output_fd)
 {
 	*saved_in = dup(STDIN_FILENO);
 	*saved_out = dup(STDOUT_FILENO);
 	if (*saved_in == -1 || *saved_out == -1)
 		return (ERR_IO_ERROR);
-	dup2(input_fd, STDIN_FILENO);
-	dup2(output_fd, STDOUT_FILENO);
-	if (input_fd != STDIN_FILENO)
-		close(input_fd);
-	if (output_fd != STDOUT_FILENO)
-		close(output_fd);
+	if (*input_fd != STDIN_FILENO)
+	{
+		dup2(*input_fd, STDIN_FILENO);
+		if (*input_fd > 2)
+		{
+			close(*input_fd);
+			*input_fd = -1;
+		}
+	}
+	if (*output_fd != STDOUT_FILENO)
+	{
+		dup2(*output_fd, STDOUT_FILENO);
+		if (*output_fd > 2)
+		{
+			close(*output_fd);
+			*output_fd = -1;
+		}
+	}
 	return (0);
 }
 
@@ -93,14 +109,17 @@ static int	execute_builtin_command(t_ctx *ctx, t_command *cmd)
 /**
  * @brief Executes a built-in command in a pipeline
  *
+ * This function executes a built-in command as part of a pipeline,
+ * handling file descriptor redirection and restoration.
+ *
  * @param ctx Context for shell environment
  * @param cmd Command to execute
  * @param input_fd Input file descriptor
  * @param output_fd Output file descriptor
  * @return int Exit status of the built-in
  */
-static int	execute_pipeline_builtin(t_ctx *ctx, t_command *cmd, int input_fd,
-		int output_fd)
+static int	execute_pipeline_builtin(t_ctx *ctx, t_command *cmd, int *input_fd,
+		int *output_fd)
 {
 	int	saved_in;
 	int	saved_out;
@@ -119,14 +138,17 @@ static int	execute_pipeline_builtin(t_ctx *ctx, t_command *cmd, int input_fd,
  * @brief Executes a command in a pipeline context,
  * handling built-ins specially
  *
+ * This function manages the execution of commands in a pipeline, handling
+ * built-in commands specially and ensuring proper file descriptor management.
+ *
  * @param ctx Context for shell environment
  * @param cmd Command to execute
  * @param input_fd Input file descriptor
  * @param output_fd Output file descriptor
  * @return pid_t Process ID or -2 for built-in execution
  */
-pid_t	execute_pipeline_command(t_ctx *ctx, t_command *cmd, int input_fd,
-		int output_fd)
+pid_t	execute_pipeline_command(t_ctx *ctx, t_command *cmd, int *input_fd,
+		int *output_fd)
 {
 	pid_t	pid;
 	int		status;
@@ -146,6 +168,6 @@ pid_t	execute_pipeline_command(t_ctx *ctx, t_command *cmd, int input_fd,
 		return (-1);
 	}
 	if (pid == 0)
-		setup_child_process(ctx, cmd, input_fd, output_fd);
+		setup_child_process(ctx, cmd, *input_fd, *output_fd);
 	return (pid);
 }
