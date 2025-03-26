@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/24 18:14:20 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 10:25:02 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,6 +179,7 @@ typedef enum e_path_error
 	PATH_ERR_NONE,
 	PATH_ERR_NOT_FOUND,
 	PATH_ERR_NO_PERMISSION,
+	PATH_ERR_IS_DIR,
 	PATH_ERR_OTHER
 }							t_path_error;
 
@@ -343,6 +344,7 @@ void						advance_parse(t_parse *parse);
 // bin_find.c
 char						*bin_find(t_ctx *ctx, char *bin);
 char						*resolve_relative_path(char *bin);
+t_bool						is_directory(const char *path);
 
 // bin_find_utils.c
 char						*check_relative_path(char *bin,
