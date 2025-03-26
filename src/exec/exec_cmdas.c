@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 16:08:23 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 16:41:45 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,8 +85,8 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 		return (-1);
 	else if (result > 0)
 		return (result);
-	pid = execute_pipeline_command(ctx, data->current, data->prev_pipe,
-			data->pipe_fds[1]);
+	pid = execute_pipeline_command(ctx, data->current, &data->prev_pipe,
+			&data->pipe_fds[1]);
 	data->pids[data->i] = pid;
 	return (handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
 			data->cmd_count));

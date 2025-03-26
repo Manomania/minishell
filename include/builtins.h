@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:51:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/25 14:15:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/26 16:38:57 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,7 +269,7 @@ t_bool	is_builtin_command(char *cmd_name);
  * @param output_fd Output file descriptor
  * @return pid_t Process ID or -2 for built-in execution
  */
-pid_t	execute_pipeline_command(t_ctx *ctx, t_command *cmd, int input_fd,
-			int output_fd);
+pid_t	execute_pipeline_command(t_ctx *ctx, t_command *cmd, int *input_fd,
+			int *output_fd);
 
 #endif
