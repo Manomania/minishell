@@ -57,6 +57,7 @@ typedef enum e_token_type
 	TOK_PIPE,          // |
 	TOK_OR,            // ||
 	TOK_AND,           // &&
+	TOK_ESP,			// &
 	TOK_NEW_LINE,      // \n
 	TOK_EOF,           // '\0'
 }							t_token_type;

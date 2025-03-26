@@ -1,17 +1,17 @@
 SRC_F				= \
 						builtins/builtins_try \
 						builtins/builtins_try2 \
-      			builtins/builtins_redirect \
-      			builtins/builtins_redirect_utils \
-      			builtins/builtin_echo \
-      			builtins/builtin_cd \
-      			builtins/builtin_cd_utils \
-      			builtins/builtin_pwd \
-      			builtins/builtin_export \
-      			builtins/builtin_export_utils \
-      			builtins/builtin_unset \
-      			builtins/builtin_env \
-      			builtins/builtin_exit \
+						builtins/builtins_redirect \
+						builtins/builtins_redirect_utils \
+						builtins/builtin_echo \
+						builtins/builtin_cd \
+						builtins/builtin_cd_utils \
+						builtins/builtin_pwd \
+						builtins/builtin_export \
+						builtins/builtin_export_utils \
+						builtins/builtin_unset \
+						builtins/builtin_env \
+						builtins/builtin_exit \
 						builtins/builtin_pipeline \
 						builtins/builtin_pipeline_utils \
 						checker/token_checker \

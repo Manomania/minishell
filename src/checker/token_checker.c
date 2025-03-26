@@ -27,6 +27,21 @@ static t_bool	check_invalid_tokens(t_token *tokens)
 	current = tokens;
 	while (current && current->next)
 	{
+		if (current->type == TOK_ESP)
+		{
+			ft_putendl_fd(RED"syntax error near unexpected token '&'"RESET, STDERR_FILENO);
+			return (false);
+		}
+		if (current->type == TOK_OR)
+		{
+			ft_putendl_fd(RED"syntax error near unexpected token '||'"RESET, STDERR_FILENO);
+			return (false);
+		}
+		if (current->type == TOK_AND)
+		{
+			ft_putendl_fd(RED"syntax error near unexpected token '&&'"RESET, STDERR_FILENO);
+			return (false);
+		}
 		if (current->type == TOK_REDIR_FROM && current->next->type == TOK_REDIR_TO)
 		{
 			ft_putendl_fd(RED"syntax error near unexpected token 'newline'"RESET, STDERR_FILENO);
