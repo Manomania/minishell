@@ -325,7 +325,7 @@ t_bool						token_is_redirection(t_token_type type);
 t_token						*handle_basics_token(t_lexer *lexer);
 t_token						*handle_pipe_and_token(t_lexer *lexer);
 t_token						*handle_redir_from_and_to_token(t_lexer *lexer);
-t_token						*handle_env_token(t_lexer *lexer);
+// t_token						*handle_env_token(t_lexer *lexer);
 
 // lexer_tokenize.c
 t_token						*tokenize(t_ctx *ctx, char *input);
