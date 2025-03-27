@@ -55,7 +55,7 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 		advance_lexer(lexer);
 	if (get_lexer(lexer) == '\0')
 	{
-		ft_printf(RED "error:\nUnclosed quote\n" RESET);
+		ft_printf(RED "syntax error near unexpected unclosed quote\n" RESET);
 		return (NULL);
 	}
 	end = lexer->position;
@@ -98,11 +98,6 @@ char	*read_complex_word(t_lexer *lexer)
 			result = handle_quoted_part(lexer, result, quote_char);
 			if (!result)
 				return (NULL);
-		}
-		else if (get_lexer(lexer) == '$')
-		{
-			result = handle_dollar_sign(result);
-			break ;
 		}
 		else
 			result = handle_word_part(lexer, result);

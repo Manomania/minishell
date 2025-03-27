@@ -83,16 +83,16 @@ t_token	*handle_redir_from_and_to_token(t_lexer *lexer)
 	return (NULL);
 }
 
-t_token	*handle_env_token(t_lexer *lexer)
-{
-	char	*word;
-	char	current;
-
-	current = get_lexer(lexer);
-	if (current == '$')
-	{
-		word = read_word_lexer(lexer);
-		return (create_token(TOK_WORD, word));
-	}
-	return (NULL);
-}
+// t_token	*handle_env_token(t_lexer *lexer)
+// {
+// 	char	*word;
+// 	char	current;
+//
+// 	current = get_lexer(lexer);
+// 	if (current == '$')
+// 	{
+// 		word = read_word_lexer(lexer);
+// 		return (create_token(TOK_WORD, word));
+// 	}
+// 	return (NULL);
+// }
