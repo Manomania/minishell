@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 11:34:34 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 17:56:07 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/27 17:47:57 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	debug_exit_status(t_ctx *ctx)
 
 	ft_strlcpy(buffer, "Exit status: ", sizeof(buffer));
 	ft_strlcat(buffer, ft_itoa(ctx->exit_status), sizeof(buffer));
-	debug_log(DEBUG_VERBOSE, "exit_status", buffer);
+	debug_log("exit_status", buffer);
 }
 
 /**

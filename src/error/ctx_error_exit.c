@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 17:07:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 17:45:59 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 10:18:29 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,15 @@
  * @brief Frees context, displays an error and quits with the corresponding
  * exit code
  *
- * @param ctx context
- * @param err error code
+ * @param ctx Context
+ * @param proof (optional) Proof that the error occured
+ * @param module (optional) Module where the error occured
+ * @param err Error code
  */
-void	ctx_error_exit(t_ctx *ctx, t_error_type err)
+void	ctx_error_exit(t_ctx *ctx, const char *proof, const char *module,
+		t_error_type err)
 {
 	if (ctx)
 		ctx_clear(ctx);
-	errno = ctx_error(err);
-	exit(errno);
+	exit(error(proof, module, err));
 }

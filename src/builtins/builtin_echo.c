@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:54:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 09:54:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/27 17:49:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ int	builtin_echo(t_ctx *ctx, t_command *cmd)
 	t_bool	new_line;
 
 	(void)ctx;
-	debug_log(DEBUG_INFO, "builtin", "Executing echo builtin");
 	new_line = true;
 	i = 1;
 	while (i <= cmd->arg_count && is_n_option(cmd->args[i]))

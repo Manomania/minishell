@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 12:37:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/25 14:15:48 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:05:32 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,9 +83,6 @@ t_bool	update_env_var(t_env **env_list, char *key, char *value,
 {
 	t_env	*current;
 
-	debug_log(DEBUG_VERBOSE, "export key", key);
-	if (value)
-		debug_log(DEBUG_VERBOSE, "export value", value);
 	if (has_equals && (!value || value[0] == '\0'))
 		return (remove_env_var(env_list, key));
 	current = *env_list;

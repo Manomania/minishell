@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:47:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 13:13:20 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 10:51:32 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,9 @@ static t_bool	parse_user_input(t_ctx *ctx, char *input)
 		ctx->exit_status = 2;
 		return (false);
 	}
-	if (g_debug_level > INFO)
-		print_tokens(ctx->tokens);
 	free(input);
 	if (!ctx->tokens)
 		return (false);
-	debug_print_tokens(DEBUG_VERBOSE, ctx->tokens);
 	ctx->cmd = command_parse(ctx, ctx->tokens);
 	if (!ctx->cmd)
 	{
@@ -65,7 +62,6 @@ static t_bool	parse_user_input(t_ctx *ctx, char *input)
 		ctx->tokens = NULL;
 		return (false);
 	}
-	debug_print_commands(DEBUG_VERBOSE, ctx->cmd);
 	if (!validate_command(ctx->cmd, ctx))
 	{
 		free_all_token(ctx->tokens);
@@ -123,7 +119,7 @@ char	*get_user_input(t_ctx *ctx, int prev_status)
 
 	prompt = create_prompt(prev_status);
 	if (!prompt)
-		error_exit(ctx, ERR_ALLOC, "prompt");
+		ctx_error_exit(ctx, NULL, "prompt", ERR_ALLOC);
 	input = readline(prompt);
 	free(prompt);
 	if (!input)

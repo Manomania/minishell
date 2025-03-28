@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:34:50 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 10:27:42 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:25:30 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ char	*check_relative_path(char *bin, t_path_error *error_state)
 		return (path);
 	if (access(path, F_OK) == 0)
 		*error_state = PATH_ERR_NO_PERMISSION;
+	else if (is_directory(path))
+		*error_state = PATH_ERR_IS_DIR;
 	else
 		*error_state = PATH_ERR_NOT_FOUND;
 	free(path);
@@ -64,9 +66,9 @@ char	*check_relative_path(char *bin, t_path_error *error_state)
 void	display_path_error(char *bin, t_path_error error_state)
 {
 	if (error_state == PATH_ERR_NOT_FOUND)
-		error_print(ERROR, bin, "No such file or directory");
+		(void)error(bin, NULL, ERR_NO_FILE);
 	else if (error_state == PATH_ERR_NO_PERMISSION)
-		error_print(ERROR, bin, "Permission denied");
+		(void)error(bin, NULL, ERR_NO_PERMS);
 	else if (error_state == PATH_ERR_IS_DIR)
-		error_print(ERROR, bin, "Is a directory");
+		(void)error(bin, NULL, ERR_IS_DIR);
 }

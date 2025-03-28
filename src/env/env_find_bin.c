@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:40:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 14:46:44 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 10:12:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ static char	**env_get_path_dirs(t_ctx *ctx)
 	free(path_var);
 	if (!path_dirs)
 	{
-		ctx_error(ERR_ALLOC);
+		error(NULL, "env_get_path_dirs", ERR_ALLOC);
 		return (NULL);
 	}
 	normalize_path_dirs(path_dirs);

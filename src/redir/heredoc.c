@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:13:33 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 10:25:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,8 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
 		line = readline("> ");
 		if (!line)
 		{
-			error_print(WARNING, "heredoc",
-				"here-document delimited by end-of-file");
+			ft_printf_fd(STDERR_FILENO, YELLOW "minishell: warning: heredoc: \
+				here-document delimited by end-of-file" RESET);
 			return (1);
 		}
 		if (ft_strncmp(line, delimiter, delimiter_len + 1) == 0)
@@ -86,7 +86,7 @@ static int	create_heredoc(t_ctx *ctx, char *delimiter)
 
 	if (pipe(pipe_fds) == -1)
 	{
-		error_print(ERROR, "heredoc", "pipe error");
+		(void)error(NULL, "heredoc", ERR_PIPE);
 		return (-1);
 	}
 	result = read_heredoc_content(pipe_fds[1], delimiter, ctx);

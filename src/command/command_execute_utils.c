@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:54:30 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/19 18:22:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:09:45 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,15 +91,12 @@ int	get_exit_status(int status)
 	if (WIFEXITED(status))
 	{
 		exit_code = WEXITSTATUS(status);
-		debug_log(DEBUG_VERBOSE, "exit_status", "Process exited normally");
 		return (exit_code);
 	}
 	if (WIFSIGNALED(status))
 	{
 		exit_code = 128 + WTERMSIG(status);
-		debug_log(DEBUG_VERBOSE, "exit_status", "Process terminated by signal");
 		return (exit_code);
 	}
-	debug_log(DEBUG_VERBOSE, "exit_status", "Process ended in unknown state");
 	return (1);
 }

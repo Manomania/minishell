@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:39:38 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 15:49:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 10:50:50 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ t_bool	validate_input_length(char *input, t_ctx *ctx)
 	len = ft_strlen(input);
 	if (len > MAX_INPUT_LEN)
 	{
-		error_print(ERROR, "input", "Input exceeds maximum length");
+		(void)error(NULL, "validation", ERR_VLD_INPUT_LENGTH);
 		return (false);
 	}
 	return (true);
@@ -40,12 +40,12 @@ static t_bool	is_valid_env_name(const char *name)
 {
 	if (!name || !name[0])
 	{
-		error_print(ERROR, "env", "Empty variable name");
+		(void)error(NULL, "env", ERR_VLD_ENV_VAR_EMPTY);
 		return (false);
 	}
 	if (!ft_isalpha(name[0]) && name[0] != '_')
 	{
-		error_print(ERROR, "env", "Variable name must start with letter or _");
+		(void)error(NULL, "env", ERR_VLD_ENV_VAR_START);
 		return (false);
 	}
 	return (true);
@@ -70,14 +70,14 @@ t_bool	validate_env_var_name(char *name, t_ctx *ctx)
 	{
 		if (!ft_isalnum(name[i]) && name[i] != '_')
 		{
-			error_print(ERROR, "env", "Invalid character in variable name");
+			(void)error(NULL, "env", ERR_VLD_ENV_VAR_BAD_CHAR);
 			return (false);
 		}
 		i++;
 	}
 	if (ft_strlen(name) > MAX_VAR_NAME_LEN)
 	{
-		error_print(ERROR, "env", "Variable name too long");
+		(void)error(NULL, "env", ERR_VLD_ENV_VAR_TOO_LONG);
 		return (false);
 	}
 	return (true);
@@ -95,12 +95,12 @@ t_bool	validate_filename(char *filename, t_ctx *ctx)
 	(void)ctx;
 	if (!filename || !filename[0])
 	{
-		error_print(ERROR, "redir", "Empty filename");
+		(void)error(NULL, "redir", ERR_VLD_REDIR_FILENAME_EMPTY);
 		return (false);
 	}
 	if (ft_strlen(filename) > 255)
 	{
-		error_print(ERROR, "redir", "Filename too long");
+		(void)error(NULL, "redir", ERR_VLD_REDIR_FILENAME_TOO_LONG);
 		return (false);
 	}
 	return (true);

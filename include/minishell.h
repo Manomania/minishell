@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/26 13:10:48 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:20:45 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ typedef enum e_token_type
 	TOK_PIPE,          // |
 	TOK_OR,            // ||
 	TOK_AND,           // &&
-	TOK_ESP,			// &
+	TOK_ESP,           // &
 	TOK_NEW_LINE,      // \n
 	TOK_EOF,           // '\0'
 }							t_token_type;
@@ -114,22 +114,43 @@ typedef struct s_env
 
 typedef enum e_error_type
 {
-	ERR_NONE = 0,
 	ERR_CMD_NOT_FOUND,
-	ERR_NO_PERMISSION,
-	ERR_IO_ERROR,
-	ERR_UNIMPLEMENTED,
+	// Fs
+	ERR_NO_PERMS,
+	ERR_NO_FILE,
+	ERR_IS_DIR,
+	ERR_NO_PWD,
+	// Env
+	ERR_NO_OLDPWD,
+	ERR_NO_HOME,
+	// Validation - input
+	ERR_VLD_INPUT_LENGTH,
+	// Validation - environment
+	ERR_VLD_ENV_VAR_EMPTY,
+	ERR_VLD_ENV_VAR_START,
+	ERR_VLD_ENV_VAR_BAD_CHAR,
+	ERR_VLD_ENV_VAR_TOO_LONG,
+	// Validation - redirection
+	ERR_VLD_REDIR_FILENAME_EMPTY,
+	ERR_VLD_REDIR_FILENAME_TOO_LONG,
+	// Lexer
+	ERR_UNCLOSED_QUOTE,
+	ERR_TOKEN_LIST,
+	// Other
+	ERR_IO,
+	ERR_FD,
 	ERR_ALLOC,
-	ERR_PIPE,
 	ERR_CHILD,
-	ERR_NO_SUCH_FILE,
+	ERR_PIPE,
+	ERR_IDENTIFIER,
+	ERR_NUMERIC,
+	ERR_TOO_MANY_ARGS,
 }							t_error_type;
 
 typedef struct s_error_info
 {
 	int						code;
 	const char				*message;
-	t_bool					use_perror;
 }							t_error_info;
 
 /**
@@ -148,6 +169,7 @@ typedef struct s_ctx
 	t_command				*cmd;
 	int						fd_file_in;
 	int						fd_file_out;
+	t_bool					debug;
 }							t_ctx;
 
 typedef struct s_quote_state
@@ -265,7 +287,6 @@ int							wait_for_pipeline_processes(pid_t *pids, int count);
 int							count_commands(t_command *cmd);
 void						setup_child_process(t_ctx *ctx, t_command *cmd,
 								int input_fd, int output_fd);
-void						debug_exit_status_cmdas(int exit_status);
 
 // exec_cmdas_utils3.c
 t_bool						check_command_binary(t_ctx *ctx, t_pipe_data *data);

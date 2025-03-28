@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:01:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 16:51:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:24:24 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static void	update_pwd_env(t_ctx *ctx, char *old_pwd)
 	new_pwd = getcwd(NULL, 0);
 	if (!new_pwd)
 	{
-		error_print(ERROR, "cd", "Failed to get current directory");
+		(void)error(NULL, "cd", ERR_NO_PWD);
 		return ;
 	}
 	env_node = ctx->env_list;
@@ -55,7 +55,7 @@ int	change_directory(char *target_dir, char *old_pwd)
 	result = chdir(target_dir);
 	if (result != 0)
 	{
-		error_print(ERROR, "cd", strerror(errno));
+		(void)error(NULL, "cd", ERR_NO_FILE);
 		free(target_dir);
 		free(old_pwd);
 		return (1);
@@ -77,7 +77,8 @@ static char	*get_current_pwd(t_ctx *ctx)
 	pwd = getcwd(NULL, 0);
 	if (pwd)
 		return (pwd);
-	error_print(WARNING, "cd", "Failed to get current directory");
+	ft_printf_fd(STDERR_FILENO,
+		YELLOW "minishell: warning: cd: failed to get current directory" RESET);
 	pwd = env_find(ctx, (char *)"PWD=");
 	if (pwd)
 		return (pwd);
@@ -97,7 +98,6 @@ int	builtin_cd(t_ctx *ctx, t_command *cmd)
 	char	*old_pwd;
 	int		result;
 
-	debug_log(DEBUG_INFO, "builtin", "Executing cd builtin");
 	old_pwd = get_current_pwd(ctx);
 	target_dir = get_target_directory(ctx, cmd);
 	result = change_directory(target_dir, old_pwd);
