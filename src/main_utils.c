@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:47:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:51:32 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:29:39 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ static t_bool	parse_user_input(t_ctx *ctx, char *input)
 	free(input);
 	if (!ctx->tokens)
 		return (false);
+	if (ctx->debug)
+		debug_print_tokens(ctx->tokens);
 	ctx->cmd = command_parse(ctx, ctx->tokens);
 	if (!ctx->cmd)
 	{
