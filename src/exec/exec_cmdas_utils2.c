@@ -6,13 +6,31 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 11:04:06 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/30 15:18:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "debug.h"
 #include "error.h"
 #include "minishell.h"
+
+/**
+ * @brief Creates a pipe for the next command
+ *
+ * @param pipe_fds Array to store pipe file descriptors
+ * @return int 0 on success, -1 on error
+ */
+int	setup_pipe(int pipe_fds[2])
+{
+	if (pipe(pipe_fds) == -1)
+	{
+		perror("pipe");
+		return (-1);
+	}
+	fcntl(pipe_fds[0], F_SETFD, FD_CLOEXEC);
+	fcntl(pipe_fds[1], F_SETFD, FD_CLOEXEC);
+	return (0);
+}
 
 /**
  * @brief Counts the number of commands in a pipeline

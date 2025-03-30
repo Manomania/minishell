@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:11:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/30 15:13:39 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,9 @@ static int	execute_single_command(t_ctx *ctx)
 {
 	pid_t	pid;
 	int		status;
+	int		was_signaled;
 
+	was_signaled = 0;
 	if (!command_bin(ctx))
 	{
 		if (ctx->cmd->args && ctx->cmd->args[0] && (ft_strchr(ctx->cmd->args[0],
@@ -42,7 +44,11 @@ static int	execute_single_command(t_ctx *ctx)
 	if (pid == 0)
 		execute_child(ctx);
 	waitpid(pid, &status, 0);
+	if (WIFSIGNALED(status))
+		was_signaled = 1;
 	setup_signals();
+	if (was_signaled && isatty(STDOUT_FILENO))
+		write(STDOUT_FILENO, "\n", 1);
 	return (get_exit_status(status));
 }
 
