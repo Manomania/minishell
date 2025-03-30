@@ -42,7 +42,7 @@ static char	*handle_var_expansion(t_ctx *ctx, char *str, int *i, char *result)
 	char	*temp_result;
 	int		in_squote;
 
-	in_squote = 0;
+	in_squote = 1;
 	var_value = expand_variable(ctx, str, i, in_squote);
 	if (!var_value)
 		return (result);
@@ -87,6 +87,7 @@ static char	*process_variables(t_ctx *ctx, char *str, int *i, char *result)
 static char	*process_string(t_ctx *ctx, char *str, char *result)
 {
 	int		i;
+	int		j;
 	int		start;
 	int		in_squote;
 	int		in_dquote;
@@ -99,8 +100,22 @@ static char	*process_string(t_ctx *ctx, char *str, char *result)
 	while (str[i])
 	{
 		update_quote_state(str[i], &in_squote, &in_dquote);
+		printf("in_squote: %d\n", in_squote);
+		printf("in_dquote: %d\n", in_dquote);
+		printf("string: %c\n", str[i]);
+		j = i;
+		if (str[i] == '$' && str[j - 1] == '\'' && in_squote)
+		{
+			printf(RED"PIPI"RESET);
+			result = process_variables(ctx, str, &i, result);
+			if (!result)
+				return (NULL);
+			start = i;
+			continue ;
+		}
 		if (str[i] == '$' && !in_squote)
 		{
+			printf(RED"CACA"RESET);
 			result = process_variables(ctx, str, &i, result);
 			if (!result)
 				return (NULL);
@@ -131,9 +146,7 @@ char	*handle_quotes_and_vars(t_ctx *ctx, char *str)
 	if (!result)
 		return (NULL);
 	processed = process_string(ctx, str, result);
-	if (!processed && result)
-	{
+	if (!processed)
 		free(result);
-	}
 	return (processed);
 }

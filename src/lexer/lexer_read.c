@@ -100,11 +100,6 @@ char	*read_complex_word(t_lexer *lexer)
 			if (!result)
 				return (NULL);
 		}
-		else if (get_lexer(lexer) == '$')
-		{
-			result = handle_dollar_sign(result);
-			break ;
-		}
 		else
 			result = handle_word_part(lexer, result);
 	}

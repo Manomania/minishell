@@ -134,6 +134,21 @@ char	*expand_variable(t_ctx *ctx, char *str, int *i, int in_squote)
 		(*i)++;
 		return (ft_itoa(ctx->exit_status));
 	}
+	if (str[*i] && (str[*i] == '#'))
+	{
+		(*i)++;
+		return (ft_strdup("0"));
+	}
+	if (str[*i] && (str[*i] == ' '))
+	{
+		(*i)++;
+		return (ft_strdup(""));
+	}
+	if (str[*i] == '@' || str[*i] == '!' || str[*i] == '&' || (str[*i] >= '0' && str[*i] <= '9'))
+	{
+		(*i)++;
+		return (ft_strdup(""));
+	}
 	var_name = get_var_name(str, i);
 	if (!var_name)
 		return (ft_strdup("$"));

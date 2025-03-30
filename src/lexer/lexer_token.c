@@ -19,10 +19,10 @@ static t_token	*handle_word_token(t_lexer *lexer)
 	word = read_complex_word(lexer);
 	if (!word)
 		return (NULL);
-	if (word[0] == '\0' && get_lexer(lexer) == '$')
+	if (word[0] == '\0')
 	{
 		free(word);
-		return (handle_env_token(lexer));
+		return (handle_word_token(lexer));
 	}
 	return (create_token(TOK_WORD, word));
 }
@@ -48,12 +48,6 @@ t_token	*next_token_lexer(t_lexer *lexer)
 	token = handle_redir_from_and_to_token(lexer);
 	if (token)
 		return (token);
-	if (get_lexer(lexer) == '$')
-	{
-		token = handle_env_token(lexer);
-		if (token)
-			return (token);
-	}
 	token = handle_word_token(lexer);
 	if (token)
 		return (token);
