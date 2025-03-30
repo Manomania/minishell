@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 16:47:07 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:05:03 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/30 17:53:43 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
  * @param ctx Context for shell environment
  * @return char* Old PWD or NULL if not found
  */
-static char	*get_old_pwd(t_ctx *ctx)
+char	*get_old_pwd(t_ctx *ctx)
 {
 	t_env	*env_node;
 
@@ -40,7 +40,7 @@ static char	*get_old_pwd(t_ctx *ctx)
  * @param ctx Context for shell environment
  * @return char* Home directory or NULL if not found
  */
-static char	*get_home_dir(t_ctx *ctx)
+char	*get_home_dir(t_ctx *ctx)
 {
 	t_env	*env_node;
 
@@ -101,25 +101,28 @@ void	update_oldpwd_variable(t_env *old_pwd_node, char *old_pwd)
 }
 
 /**
- * @brief Determines the target directory for cd command
+ * @brief Handles cd . when current directory doesn't exist
  *
  * @param ctx Context for shell environment
- * @param cmd Command containing arguments
- * @return char* Target directory path (must be freed by caller)
+ * @return char* Directory path or NULL if not found
  */
-char	*get_target_directory(t_ctx *ctx, t_command *cmd)
+char	*handle_dot_directory(t_ctx *ctx)
 {
+	char	*pwd;
 	char	*target_dir;
 
-	if (cmd->arg_count == 0 || ft_strncmp(cmd->args[1], "~", 2) == 0)
-		target_dir = get_home_dir(ctx);
-	else if (ft_strncmp(cmd->args[1], "-", 2) == 0)
+	pwd = getcwd(NULL, 0);
+	if (pwd)
 	{
-		target_dir = get_old_pwd(ctx);
-		if (target_dir)
-			ft_printf("%s\n", target_dir);
+		free(pwd);
+		return (ft_strdup("."));
 	}
-	else
-		target_dir = ft_strdup(cmd->args[1]);
-	return (target_dir);
+	pwd = env_find(ctx, (char *)"PWD=");
+	if (pwd)
+	{
+		target_dir = ft_strdup(pwd);
+		free(pwd);
+		return (target_dir);
+	}
+	return (ft_strdup("."));
 }
