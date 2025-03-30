@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:01:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 11:24:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/30 17:47:22 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,30 +14,6 @@
 #include "debug.h"
 #include "error.h"
 #include "minishell.h"
-
-/**
- * @brief Updates PWD and OLDPWD environment variables
- *
- * @param ctx Context for shell environment
- * @param old_pwd Old PWD value
- * @return void
- */
-static void	update_pwd_env(t_ctx *ctx, char *old_pwd)
-{
-	char	*new_pwd;
-	t_env	*env_node;
-	t_env	*old_pwd_node;
-
-	new_pwd = getcwd(NULL, 0);
-	if (!new_pwd)
-	{
-		(void)error(NULL, "cd", ERR_NO_PWD);
-		return ;
-	}
-	env_node = ctx->env_list;
-	old_pwd_node = update_pwd_variable(env_node, new_pwd);
-	update_oldpwd_variable(old_pwd_node, old_pwd);
-}
 
 /**
  * @brief Changes directory to the target path
@@ -55,7 +31,14 @@ int	change_directory(char *target_dir, char *old_pwd)
 	result = chdir(target_dir);
 	if (result != 0)
 	{
-		(void)error(NULL, "cd", ERR_NO_FILE);
+		if (errno == ENOENT)
+			(void)error(target_dir, "cd", ERR_NO_FILE);
+		else if (errno == EACCES)
+			(void)error(target_dir, "cd", ERR_NO_PERMS);
+		else if (errno == ENOTDIR)
+			(void)error(target_dir, "cd", ERR_IS_DIR);
+		else
+			(void)error(target_dir, "cd", ERR_NO_FILE);
 		free(target_dir);
 		free(old_pwd);
 		return (1);
@@ -73,15 +56,14 @@ int	change_directory(char *target_dir, char *old_pwd)
 static char	*get_current_pwd(t_ctx *ctx)
 {
 	char	*pwd;
+	char	*env_pwd;
 
 	pwd = getcwd(NULL, 0);
 	if (pwd)
 		return (pwd);
-	ft_printf_fd(STDERR_FILENO,
-		YELLOW "minishell: warning: cd: failed to get current directory" RESET);
-	pwd = env_find(ctx, (char *)"PWD=");
-	if (pwd)
-		return (pwd);
+	env_pwd = env_find(ctx, (char *)"PWD=");
+	if (env_pwd)
+		return (env_pwd);
 	return (ft_strdup(""));
 }
 
@@ -97,12 +79,22 @@ int	builtin_cd(t_ctx *ctx, t_command *cmd)
 	char	*target_dir;
 	char	*old_pwd;
 	int		result;
+	t_env	*old_pwd_node;
 
 	old_pwd = get_current_pwd(ctx);
 	target_dir = get_target_directory(ctx, cmd);
-	result = change_directory(target_dir, old_pwd);
+	if (!target_dir)
+		return (free(old_pwd), 1);
+	result = chdir(target_dir);
 	if (result != 0)
+	{
+		error(target_dir, "cd", ERR_NO_FILE);
+		free(target_dir);
+		free(old_pwd);
 		return (1);
-	update_pwd_env(ctx, old_pwd);
+	}
+	old_pwd_node = update_pwd_variable(ctx->env_list, getcwd(NULL, 0));
+	update_oldpwd_variable(old_pwd_node, old_pwd);
+	free(target_dir);
 	return (0);
 }
