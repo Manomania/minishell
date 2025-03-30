@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:01:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/30 17:47:22 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/30 17:52:37 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,32 @@
 #include "debug.h"
 #include "error.h"
 #include "minishell.h"
+
+/**
+ * @brief Determines the target directory for cd command
+ *
+ * @param ctx Context for shell environment
+ * @param cmd Command containing arguments
+ * @return char* Target directory path (must be freed by caller)
+ */
+char	*get_target_directory(t_ctx *ctx, t_command *cmd)
+{
+	char	*target_dir;
+
+	if (cmd->arg_count == 0 || ft_strncmp(cmd->args[1], "~", 2) == 0)
+		target_dir = get_home_dir(ctx);
+	else if (ft_strncmp(cmd->args[1], "-", 2) == 0)
+	{
+		target_dir = get_old_pwd(ctx);
+		if (target_dir)
+			ft_printf("%s\n", target_dir);
+	}
+	else if (ft_strncmp(cmd->args[1], ".", 2) == 0)
+		target_dir = handle_dot_directory(ctx);
+	else
+		target_dir = ft_strdup(cmd->args[1]);
+	return (target_dir);
+}
 
 /**
  * @brief Changes directory to the target path
