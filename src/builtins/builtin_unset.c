@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:56:32 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/25 14:16:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:17:45 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,16 +87,13 @@ int	builtin_unset(t_ctx *ctx, t_command *cmd)
 	int	i;
 	int	status;
 
-	debug_log(DEBUG_INFO, "builtin", "Executing unset builtin");
 	status = 0;
 	i = 1;
 	while (i <= cmd->arg_count)
 	{
 		if (!is_valid_env_name(cmd->args[i]))
 		{
-			ft_putstr_fd((char *)"minishell: unset: `", STDERR_FILENO);
-			ft_putstr_fd(cmd->args[i], STDERR_FILENO);
-			ft_putstr_fd((char *)"': not a valid identifier\n", STDERR_FILENO);
+			(void)error(cmd->args[i], "unset", ERR_TOO_MANY_ARGS);
 			status = 1;
 		}
 		else

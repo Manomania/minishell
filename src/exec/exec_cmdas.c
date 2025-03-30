@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 16:41:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 10:17:00 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,15 +100,13 @@ static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
 	i = 0;
 	while (i < data.cmd_count)
 	{
-		debug_log(DEBUG_INFO, "pipeline", "Processing command in pipeline");
 		ctx->cmd = data.current;
 		data.prev_pipe = process_pipeline_cmd(ctx, &data);
 		if (data.prev_pipe == -1)
 		{
 			ctx->cmd = *cmd_head;
 			free(data.pids);
-			error_print(ERROR, "pipeline", "Pipe processing failed");
-			ctx->exit_status = error_code(ERR_PIPE);
+			ctx->exit_status = error(NULL, "exec_all_cmdas", ERR_PIPE);
 			return (false);
 		}
 		data.current = data.current->next;
@@ -130,20 +128,16 @@ int	exec_cmdas(t_ctx *ctx)
 	int			exit_status;
 	t_command	*cmd_head;
 
-	debug_log(DEBUG_INFO, "pipeline", "Starting pipeline execution");
 	if (!init_pipe_data(&data, ctx))
 	{
-		error_print(ERROR, "pipeline", "Failed to initialize pipeline data");
-		ctx->exit_status = error_code(ERR_ALLOC);
+		ctx->exit_status = error(NULL, "init_pipe_data", ERR_ALLOC);
 		return (ctx->exit_status);
 	}
 	setup_parent_signals();
 	cmd_head = ctx->cmd;
 	if (!exec_all_cmdas(ctx, data, &cmd_head))
 		return (ctx->exit_status);
-	debug_log(DEBUG_INFO, "pipeline", "Waiting for child processes");
 	exit_status = wait_for_pipeline_processes(data.pids, data.cmd_count);
-	debug_exit_status_cmdas(exit_status);
 	setup_signals();
 	free(data.pids);
 	ctx->cmd = cmd_head;

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 11:34:34 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 12:47:56 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/27 17:47:57 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	debug_exit_status(t_ctx *ctx)
 
 	ft_strlcpy(buffer, "Exit status: ", sizeof(buffer));
 	ft_strlcat(buffer, ft_itoa(ctx->exit_status), sizeof(buffer));
-	debug_log(DEBUG_VERBOSE, "exit_status", buffer);
+	debug_log("exit_status", buffer);
 }
 
 /**
@@ -52,50 +52,6 @@ char	*get_token_type_str(t_token_type type)
 	else if (type == TOK_EOF)
 		return ((char *)"EOF");
 	return ((char *)"UNKNOWN");
-}
-
-/**
- * @brief Prints a single token's information
- *
- * @param current Current token to print
- * @param token_count Token position in list
- */
-void	print_token(t_token *current, int token_count)
-{
-	char	*type_str;
-
-	ft_printf(GREEN "Token %d: " RESET, token_count);
-	ft_printf("Type: " YELLOW);
-	type_str = get_token_type_str(current->type);
-	ft_printf("%s", type_str);
-	ft_printf(RESET);
-	if (current->value)
-		ft_printf(" | Value: " GREEN "%s" RESET, current->value);
-	else
-		ft_printf(" | Value: " GREEN "NULL" RESET);
-	ft_printf("\n");
-}
-
-/**
- * @brief Prints the list of tokens for debugging
- *
- * @param tokens List of tokens to print
- */
-void	print_tokens_list(t_token *tokens)
-{
-	t_token	*current;
-	int		token_count;
-
-	current = tokens;
-	token_count = 0;
-	ft_printf(YELLOW "\n===== TOKEN LIST =====\n" RESET);
-	while (current)
-	{
-		print_token(current, token_count);
-		token_count++;
-		current = current->next;
-	}
-	ft_printf(YELLOW "=====================\n\n" RESET);
 }
 
 /**

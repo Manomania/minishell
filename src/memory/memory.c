@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:34:04 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/17 15:34:09 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 10:19:42 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,7 @@ void	*safe_malloc(t_ctx *ctx, size_t size, const char *module)
 
 	ptr = malloc(size);
 	if (!ptr)
-	{
-		error_print(FATAL, module, "Memory allocation failed");
-		error_exit(ctx, ERR_ALLOC, module);
-	}
+		ctx_error_exit(ctx, NULL, module, ERR_ALLOC);
 	return (ptr);
 }
 
@@ -50,10 +47,7 @@ char	*safe_strdup(t_ctx *ctx, const char *str, const char *module)
 		return (NULL);
 	dup = ft_strdup(str);
 	if (!dup)
-	{
-		error_print(FATAL, module, "String duplication failed");
-		error_exit(ctx, ERR_ALLOC, module);
-	}
+		ctx_error_exit(ctx, NULL, module, ERR_ALLOC);
 	return (dup);
 }
 
@@ -73,10 +67,7 @@ char	*safe_strjoin(t_ctx *ctx, const char *s1, const char *s2,
 
 	result = ft_strjoin(s1, s2);
 	if (!result)
-	{
-		error_print(FATAL, module, "String join failed");
-		error_exit(ctx, ERR_ALLOC, module);
-	}
+		ctx_error_exit(ctx, NULL, module, ERR_ALLOC);
 	return (result);
 }
 
@@ -95,9 +86,6 @@ void	*safe_calloc(t_ctx *ctx, size_t nmemb, size_t size, const char *module)
 
 	ptr = ft_calloc(nmemb, size);
 	if (!ptr)
-	{
-		error_print(FATAL, module, "Memory allocation failed");
-		error_exit(ctx, ERR_ALLOC, module);
-	}
+		ctx_error_exit(ctx, NULL, module, ERR_ALLOC);
 	return (ptr);
 }

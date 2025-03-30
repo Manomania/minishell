@@ -6,10 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:27:07 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/18 11:51:57 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:22:50 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "error.h"
 #include "minishell.h"
 
 /**
@@ -55,7 +56,7 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 		advance_lexer(lexer);
 	if (get_lexer(lexer) == '\0')
 	{
-		ft_printf(RED "syntax error near unexpected unclosed quote\n" RESET);
+		(void)error(NULL, "lexer", ERR_UNCLOSED_QUOTE);
 		return (NULL);
 	}
 	end = lexer->position;

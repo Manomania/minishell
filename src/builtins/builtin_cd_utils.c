@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 16:47:07 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 16:51:50 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 10:05:03 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static char	*get_old_pwd(t_ctx *ctx)
 			return (ft_strdup(env_node->value));
 		env_node = env_node->next;
 	}
-	error_print(ERROR, "cd", "OLDPWD not set");
+	(void)error(NULL, "cd", ERR_NO_OLDPWD);
 	return (NULL);
 }
 
@@ -51,7 +51,7 @@ static char	*get_home_dir(t_ctx *ctx)
 			return (ft_strdup(env_node->value));
 		env_node = env_node->next;
 	}
-	error_print(ERROR, "cd", "HOME not set");
+	(void)error(NULL, "cd", ERR_NO_HOME);
 	return (NULL);
 }
 

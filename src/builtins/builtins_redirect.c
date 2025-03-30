@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:52:58 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 13:51:47 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 09:55:55 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	open_redirection_file(t_redirection *redir)
 		return (-1);
 	if (fd == -1)
 	{
-		error_print(ERROR, "builtin", redir->filename);
+		(void)error(redir->filename, "redir", ERR_FD);
 		return (-1);
 	}
 	return (fd);
