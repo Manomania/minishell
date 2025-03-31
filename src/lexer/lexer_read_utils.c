@@ -56,6 +56,10 @@ char	*handle_word_part(t_lexer *lexer, char *result)
 	char	*part;
 
 	part = read_word_lexer(lexer);
+	if (!part)
+	{
+		return (ft_strdup(""));
+	}
 	result = join_and_free(result, part);
 	free(part);
 	return (result);

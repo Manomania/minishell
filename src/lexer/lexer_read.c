@@ -51,6 +51,11 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 
 	start = lexer->position + 1;
 	advance_lexer(lexer);
+	if (quote_char == '"')
+		lexer->quote.in_double_quote = 1;
+	else if (quote_char == '\'')
+		lexer->quote.in_single_quote = 1;
+	printf(RED"\nDOUBLE: %d && SINGLE %d\n"RESET, lexer->quote.in_double_quote, lexer->quote.in_single_quote);
 	while (get_lexer(lexer) != '\0' && get_lexer(lexer) != quote_char)
 		advance_lexer(lexer);
 	if (get_lexer(lexer) == '\0')
@@ -97,7 +102,7 @@ char	*read_complex_word(t_lexer *lexer)
 			quote_char = get_lexer(lexer);
 			result = handle_quoted_part(lexer, result, quote_char);
 			if (!result)
-				return (NULL);
+				return (ft_strdup(""));
 		}
 		else
 			result = handle_word_part(lexer, result);

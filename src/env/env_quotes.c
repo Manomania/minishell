@@ -13,21 +13,6 @@
 #include "minishell.h"
 
 /**
- * @brief Updates quote state based on current character
- *
- * @param c Current character
- * @param in_squote Pointer to single quote state
- * @param in_dquote Pointer to double quote state
- */
-static void	update_quote_state(char c, int *in_squote, int *in_dquote)
-{
-	if (c == '\'' && !(*in_dquote))
-		*in_squote = !(*in_squote);
-	else if (c == '"' && !(*in_squote))
-		*in_dquote = !(*in_dquote);
-}
-
-/**
  * @brief Handles expanding variables during string processing
  *
  * @param ctx Context containing environment information
@@ -42,7 +27,7 @@ static char	*handle_var_expansion(t_ctx *ctx, char *str, int *i, char *result)
 	char	*temp_result;
 	int		in_squote;
 
-	in_squote = 1;
+	in_squote = 0;
 	var_value = expand_variable(ctx, str, i, in_squote);
 	if (!var_value)
 		return (result);
@@ -87,33 +72,19 @@ static char	*process_variables(t_ctx *ctx, char *str, int *i, char *result)
 static char	*process_string(t_ctx *ctx, char *str, char *result)
 {
 	int		i;
-	int		j;
 	int		start;
-	int		in_squote;
-	int		in_dquote;
 	char	*temp_result;
 
 	i = 0;
 	start = 0;
-	in_squote = 0;
-	in_dquote = 0;
 	while (str[i])
 	{
-		update_quote_state(str[i], &in_squote, &in_dquote);
-		printf("in_squote: %d\n", in_squote);
-		printf("in_dquote: %d\n", in_dquote);
-		printf("string: %c\n", str[i]);
-		j = i;
-		if (str[i] == '$' && str[j - 1] == '\'' && in_squote)
+		if (str[i] == '$' && ctx->quote.in_single_quote == 1 && ctx->quote.in_double_quote == 0)
 		{
-			printf(RED"PIPI"RESET);
-			result = process_variables(ctx, str, &i, result);
-			if (!result)
-				return (NULL);
-			start = i;
+			i++;
 			continue ;
 		}
-		if (str[i] == '$' && !in_squote)
+		if (str[i] == '$')
 		{
 			printf(RED"CACA"RESET);
 			result = process_variables(ctx, str, &i, result);

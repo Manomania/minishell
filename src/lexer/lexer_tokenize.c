@@ -79,12 +79,15 @@ t_token	*tokenize(t_ctx *ctx, char *input)
 	lexer->input = input;
 	lexer->position = 0;
 	lexer->length = (int)ft_strlen(input);
+	lexer->quote.in_double_quote = 0;
+	lexer->quote.in_single_quote = 0;
 	if (!build_token_list(lexer, &head))
 	{
 		error_print(ERROR, "lexer", "Failed to build token list");
 		free(lexer);
 		return (NULL);
 	}
+	sync_quote_state(ctx, lexer);
 	free(lexer);
 	debug_log(DEBUG_INFO, "lexer", "Tokenization complete");
 	return (head);

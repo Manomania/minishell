@@ -46,3 +46,9 @@ void	skip_whitespace_lexer(t_lexer *lexer)
 	while (get_lexer(lexer) == ' ' || get_lexer(lexer) == '\t')
 		advance_lexer(lexer);
 }
+
+void sync_quote_state(t_ctx *ctx, t_lexer *lexer)
+{
+	ctx->quote.in_single_quote = lexer->quote.in_single_quote;
+	ctx->quote.in_double_quote = lexer->quote.in_double_quote;
+}
