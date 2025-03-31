@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 14:36:02 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 12:47:37 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/31 13:28:40 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,10 +81,7 @@ void	cleanup(t_token *tokens)
 {
 	if (tokens)
 		free_all_token(tokens);
-	clear_history();
 	rl_clear_history();
-	rl_free_line_state();
-	rl_cleanup_after_signal();
 }
 
 void	handle_signal(int sig)

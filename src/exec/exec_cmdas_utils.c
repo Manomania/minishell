@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:33:08 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/30 15:18:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/31 13:13:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,7 @@ int	wait_for_pipeline_processes(pid_t *pids, int count)
 		}
 		i++;
 	}
-	if (was_signaled && isatty(STDOUT_FILENO))
-		write(STDOUT_FILENO, "\n", 1);
+	// if (was_signaled && isatty(STDOUT_FILENO))
+	// 	write(STDOUT_FILENO, "\n", 1);
 	return (last_status);
 }

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:32:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:37:47 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/31 13:13:29 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,8 @@ int	handle_non_builtin(t_ctx *ctx, t_pipe_data *data)
 		bin_found = check_command_binary(ctx, data);
 		if (bin_found == false)
 		{
-			return (handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
-					data->cmd_count));
+			return (handle_descriptors(&data->prev_pipe, data->pipe_fds,
+					data->i, data->cmd_count));
 		}
 	}
 	return (0);
