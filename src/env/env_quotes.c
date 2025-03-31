@@ -24,16 +24,13 @@
 static char	*handle_var_expansion(t_ctx *ctx, char *str, int *i, char *result)
 {
 	char	*var_value;
-	char	*temp_result;
-	int		in_squote;
 
-	in_squote = 0;
-	var_value = expand_variable(ctx, str, i, in_squote);
+	var_value = expand_variable(ctx, str, i);
 	if (!var_value)
 		return (result);
-	temp_result = join_and_free(result, var_value);
+	result = join_and_free(result, var_value);
 	free(var_value);
-	return (temp_result);
+	return (result);
 }
 
 /**
@@ -86,7 +83,6 @@ static char	*process_string(t_ctx *ctx, char *str, char *result)
 		}
 		if (str[i] == '$')
 		{
-			printf(RED"CACA"RESET);
 			result = process_variables(ctx, str, &i, result);
 			if (!result)
 				return (NULL);
@@ -98,6 +94,7 @@ static char	*process_string(t_ctx *ctx, char *str, char *result)
 	temp_result = append_part(result, str, start, i);
 	return (temp_result);
 }
+
 
 /**
  * @brief Handles quotes and variables in a string
@@ -118,6 +115,9 @@ char	*handle_quotes_and_vars(t_ctx *ctx, char *str)
 		return (NULL);
 	processed = process_string(ctx, str, result);
 	if (!processed)
+	{
 		free(result);
+		return (ft_strdup(""));
+	}
 	return (processed);
 }

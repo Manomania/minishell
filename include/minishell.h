@@ -239,8 +239,7 @@ void						print_redirection_type(t_token_type type);
 char						*expand_var(t_ctx *ctx, char *var_name);
 char						*append_part(char *result, char *str, int start,
 								int end);
-char						*expand_variable(t_ctx *ctx, char *str, int *i,
-								int in_squote);
+char						*expand_variable(t_ctx *ctx, char *str, int *i);
 char						*get_env_value(t_env *env_list, char *key);
 
 // env_find.c

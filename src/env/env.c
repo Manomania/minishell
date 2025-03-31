@@ -120,14 +120,12 @@ static char	*get_var_name(char *str, int *pos)
  * @param in_squote Whether in single quotes
  * @return Expanded variable or dollar sign
  */
-char	*expand_variable(t_ctx *ctx, char *str, int *i, int in_squote)
+char	*expand_variable(t_ctx *ctx, char *str, int *i)
 {
 	char	*var_name;
 	char	*var_value;
 	char	*full_varname;
 
-	if (in_squote)
-		return (ft_strdup("$"));
 	(*i)++;
 	if (str[*i] == '?')
 	{
