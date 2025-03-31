@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/28 11:20:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/31 12:55:59 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -273,7 +273,7 @@ char						*env_find_bin(t_ctx *ctx, char *bin);
 char						*handle_quotes_and_vars(t_ctx *ctx, char *str);
 
 // exec_cmdas.c
-int							handle_descriptors(int prev_pipe, int pipe_fds[2],
+int							handle_descriptors(int *prev_pipe, int pipe_fds[2],
 								int i, int cmd_count);
 int							exec_cmdas(t_ctx *ctx);
 

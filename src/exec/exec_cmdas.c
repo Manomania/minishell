@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:17:00 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/31 14:38:56 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,12 @@ static int	handle_pipe_setup(int pipe_fds[2], int i, int cmd_count)
  * @param cmd_count Total command count
  * @return int Updated previous pipe file descriptor
  */
-int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i, int cmd_count)
+int	handle_descriptors(int *prev_pipe, int pipe_fds[2], int i, int cmd_count)
 {
-	if (prev_pipe != STDIN_FILENO && prev_pipe > 0)
+	if (*prev_pipe != STDIN_FILENO && *prev_pipe > 0)
 	{
-		close(prev_pipe);
-		prev_pipe = -1;
+		close(*prev_pipe);
+		*prev_pipe = -1;
 	}
 	if (pipe_fds[1] != STDOUT_FILENO && pipe_fds[1] > 0)
 	{
@@ -88,10 +88,18 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 	pid = execute_pipeline_command(ctx, data->current, &data->prev_pipe,
 			&data->pipe_fds[1]);
 	data->pids[data->i] = pid;
-	return (handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
+	return (handle_descriptors(&data->prev_pipe, data->pipe_fds, data->i,
 			data->cmd_count));
 }
 
+/**
+ * @brief Executes all commands in the pipeline
+ *
+ * @param ctx Context information
+ * @param data Pipeline data structure
+ * @param cmd_head Pointer to store original command head
+ * @return t_bool true on success, false on error
+ */
 static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
 		t_command **cmd_head)
 {
