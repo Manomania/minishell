@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/31 12:55:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/31 14:38:56 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,14 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 			data->cmd_count));
 }
 
+/**
+ * @brief Executes all commands in the pipeline
+ *
+ * @param ctx Context information
+ * @param data Pipeline data structure
+ * @param cmd_head Pointer to store original command head
+ * @return t_bool true on success, false on error
+ */
 static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
 		t_command **cmd_head)
 {

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:33:08 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/31 13:13:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/31 14:38:17 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ static int	handle_last_process_status(pid_t *pids, int status, int i)
 	}
 	else if (pids[i] == -2)
 		last_status = 0;
+	else if (pids[i] == -1)
+		last_status = 127;
 	return (last_status);
 }
 
@@ -129,16 +131,19 @@ int	wait_for_pipeline_processes(pid_t *pids, int count)
 	while (i < count)
 	{
 		was_signaled |= process_child_wait(pids[i], &status);
-		if (i == count - 1 && pids[i] > 0)
+		if (i == count - 1)
 		{
-			if (WIFEXITED(status))
-				last_status = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status))
-				last_status = 128 + WTERMSIG(status);
+			if (pids[i] == -1)
+				last_status = 127;
+			else if (pids[i] > 0)
+			{
+				if (WIFEXITED(status))
+					last_status = WEXITSTATUS(status);
+				else if (WIFSIGNALED(status))
+					last_status = 128 + WTERMSIG(status);
+			}
 		}
 		i++;
 	}
-	// if (was_signaled && isatty(STDOUT_FILENO))
-	// 	write(STDOUT_FILENO, "\n", 1);
 	return (last_status);
 }
