@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:32:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/31 14:38:37 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/24 15:37:47 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,6 @@ t_bool	check_command_binary(t_ctx *ctx, t_pipe_data *data)
 			data->current->args[0] = NULL;
 		}
 		data->pids[data->i] = -1;
-		if (data->i == data->cmd_count - 1)
-			ctx->exit_status = 127;
 	}
 	return (bin_found);
 }
@@ -48,10 +46,7 @@ t_bool	check_command_binary(t_ctx *ctx, t_pipe_data *data)
 t_bool	validate_pipeline_command(t_pipe_data *data)
 {
 	if (!data->current->args || !data->current->args[0])
-	{
-		data->pids[data->i] = -1;
 		return (false);
-	}
 	return (true);
 }
 
@@ -67,17 +62,14 @@ int	handle_non_builtin(t_ctx *ctx, t_pipe_data *data)
 	t_bool	bin_found;
 
 	if (!validate_pipeline_command(data))
-	{
-		return (handle_descriptors(&data->prev_pipe, data->pipe_fds, data->i,
-				data->cmd_count));
-	}
+		return (-1);
 	if (!is_builtin_command(data->current->args[0]))
 	{
 		bin_found = check_command_binary(ctx, data);
 		if (bin_found == false)
 		{
-			return (handle_descriptors(&data->prev_pipe, data->pipe_fds,
-					data->i, data->cmd_count));
+			return (handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
+					data->cmd_count));
 		}
 	}
 	return (0);
