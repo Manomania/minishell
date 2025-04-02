@@ -69,8 +69,16 @@ typedef struct s_token
 	char					*value;
 }							t_token;
 
+typedef struct s_quote_state
+{
+	int						in_single_quote;
+	int						in_double_quote;
+}							t_quote_state;
+
 typedef struct s_lexer
 {
+	t_quote_state			quote;
+	t_bool					status;
 	char					*input;
 	int						position;
 	int						length;
@@ -158,6 +166,8 @@ typedef struct s_error_info
  */
 typedef struct s_ctx
 {
+	t_quote_state			quote;
+	t_bool					status;
 	t_env					*env_list;
 	int						exit_status;
 	t_bool					exit_requested;
@@ -171,12 +181,6 @@ typedef struct s_ctx
 	int						fd_file_out;
 	t_bool					debug;
 }							t_ctx;
-
-typedef struct s_quote_state
-{
-	int						in_single_quote;
-	int						in_double_quote;
-}							t_quote_state;
 
 /**
  * @brief Structure to hold pipeline process data
@@ -259,8 +263,7 @@ void						print_redirection_type(t_token_type type);
 char						*expand_var(t_ctx *ctx, char *var_name);
 char						*append_part(char *result, char *str, int start,
 								int end);
-char						*expand_variable(t_ctx *ctx, char *str, int *i,
-								int in_squote);
+char						*expand_variable(t_ctx *ctx, char *str, int *i);
 char						*get_env_value(t_env *env_list, char *key);
 
 // env_find.c
@@ -355,6 +358,7 @@ t_token						*tokenize(t_ctx *ctx, char *input);
 char						get_lexer(t_lexer *lexer);
 void						advance_lexer(t_lexer *lexer);
 void						skip_whitespace_lexer(t_lexer *lexer);
+void						sync_quote_state(t_ctx *ctx, t_lexer *lexer);
 
 // parser_utils.c
 char						*get_token_value(t_parse *parse);

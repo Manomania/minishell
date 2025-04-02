@@ -74,13 +74,17 @@ t_token	*tokenize(t_ctx *ctx, char *input)
 	lexer = safe_malloc(ctx, sizeof(t_lexer), "lexer");
 	lexer->input = input;
 	lexer->position = 0;
+	lexer->status = 0;
 	lexer->length = (int)ft_strlen(input);
+	lexer->quote.in_double_quote = 0;
+	lexer->quote.in_single_quote = 0;
 	if (!build_token_list(lexer, &head))
 	{
 		(void)error(NULL, "lexer", ERR_TOKEN_LIST);
 		free(lexer);
 		return (NULL);
 	}
+	sync_quote_state(ctx, lexer);
 	free(lexer);
 	return (head);
 }

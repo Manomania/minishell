@@ -33,7 +33,6 @@ char	*join_and_free(char *s1, char *s2)
 /**
  * @brief Handle dollar sign during complex word reading
  *
- * @param lexer Pointer to lexer structure
  * @param result Current result buffer
  * @return Updated result buffer with position at dollar sign
  */
@@ -56,6 +55,11 @@ char	*handle_word_part(t_lexer *lexer, char *result)
 	char	*part;
 
 	part = read_word_lexer(lexer);
+	if (!part)
+	{
+		free(result);
+		return (ft_strdup(""));
+	}
 	result = join_and_free(result, part);
 	free(part);
 	return (result);
@@ -75,10 +79,7 @@ char	*handle_quoted_part(t_lexer *lexer, char *result, char quote_char)
 
 	part = read_quoted_string_lexer(lexer, quote_char);
 	if (!part)
-	{
-		free(result);
 		return (NULL);
-	}
 	result = join_and_free(result, part);
 	free(part);
 	return (result);

@@ -55,6 +55,8 @@ t_ctx	*init_ctx(int argc, char **argv, char **envp)
 	ctx->exit_requested = false;
 	ctx->exit_status = 0;
 	ctx->interactive = 1;
+	ctx->quote.in_double_quote = 0;
+	ctx->quote.in_single_quote = 0;
 	ctx->tokens = NULL;
 	ctx->cmd = NULL;
 	ctx->argc = argc;

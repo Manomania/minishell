@@ -13,21 +13,6 @@
 #include "minishell.h"
 
 /**
- * @brief Updates quote state based on current character
- *
- * @param c Current character
- * @param in_squote Pointer to single quote state
- * @param in_dquote Pointer to double quote state
- */
-static void	update_quote_state(char c, int *in_squote, int *in_dquote)
-{
-	if (c == '\'' && !(*in_dquote))
-		*in_squote = !(*in_squote);
-	else if (c == '"' && !(*in_squote))
-		*in_dquote = !(*in_dquote);
-}
-
-/**
  * @brief Handles expanding variables during string processing
  *
  * @param ctx Context containing environment information
@@ -39,40 +24,37 @@ static void	update_quote_state(char c, int *in_squote, int *in_dquote)
 static char	*handle_var_expansion(t_ctx *ctx, char *str, int *i, char *result)
 {
 	char	*var_value;
-	char	*temp_result;
-	int		in_squote;
+	char	dollar[2];
 
-	in_squote = 1;
-	var_value = expand_variable(ctx, str, i, in_squote);
+
+	dollar[0] = '$';
+	dollar[1] = '\0';
+	if (ctx->quote.in_single_quote == 1 && ctx->quote.in_double_quote == 0)
+	{
+		result = join_and_free(result, dollar);
+		(*i)++;
+		return (result);
+	}
+	var_value = expand_variable(ctx, str, i);
 	if (!var_value)
 		return (result);
-	temp_result = join_and_free(result, var_value);
+	result = join_and_free(result, var_value);
 	free(var_value);
-	return (temp_result);
+	return (result);
 }
 
-/**
- * @brief Handles variable expansion during string processing
- *
- * @param ctx Context containing variable information
- * @param str String to process
- * @param i Current index pointer (modified in function)
- * @param result Current result string
- * @return Updated result string or NULL on error
- */
-static char	*process_variables(t_ctx *ctx, char *str, int *i, char *result)
+static char	*append_text_part(int start, int i, char *result, char *str)
 {
 	char	*temp_result;
-	int		start;
 
-	start = *i;
-	temp_result = append_part(result, str, start, *i);
-	if (!temp_result)
-		return (NULL);
-	result = temp_result;
-	result = handle_var_expansion(ctx, str, i, result);
-	if (!result)
-		return (NULL);
+	if (i > start)
+	{
+		temp_result = append_part(result, str, start, i);
+		if (!temp_result)
+			return (NULL);
+		result = temp_result;
+		return (result);
+	}
 	return (result);
 }
 
@@ -89,34 +71,26 @@ static char	*process_string(t_ctx *ctx, char *str, char *result)
 	int		i;
 	int		j;
 	int		start;
-	int		in_squote;
-	int		in_dquote;
-	char	*temp_result;
 
 	i = 0;
 	start = 0;
-	in_squote = 0;
-	in_dquote = 0;
 	while (str[i])
 	{
-		update_quote_state(str[i], &in_squote, &in_dquote);
-		printf("in_squote: %d\n", in_squote);
-		printf("in_dquote: %d\n", in_dquote);
-		printf("string: %c\n", str[i]);
-		j = i;
-		if (str[i] == '$' && str[j - 1] == '\'' && in_squote)
+		if (ctx->quote.in_single_quote == 1 && ctx->quote.in_double_quote == 0)
 		{
-			printf(RED"PIPI"RESET);
-			result = process_variables(ctx, str, &i, result);
+			result = append_text_part(start, i, result, str);
 			if (!result)
 				return (NULL);
 			start = i;
+			i++;
 			continue ;
 		}
-		if (str[i] == '$' && !in_squote)
+		if (str[i] == '$')
 		{
-			printf(RED"CACA"RESET);
-			result = process_variables(ctx, str, &i, result);
+			result = append_text_part(start, i, result, str);
+			if (!result)
+				return (NULL);
+			result = handle_var_expansion(ctx, str, &i, result);
 			if (!result)
 				return (NULL);
 			start = i;
@@ -124,8 +98,10 @@ static char	*process_string(t_ctx *ctx, char *str, char *result)
 		}
 		i++;
 	}
-	temp_result = append_part(result, str, start, i);
-	return (temp_result);
+	result = append_text_part(start, i, result, str);
+	if (!result)
+		return (NULL);
+	return (result);
 }
 
 /**
@@ -147,6 +123,9 @@ char	*handle_quotes_and_vars(t_ctx *ctx, char *str)
 		return (NULL);
 	processed = process_string(ctx, str, result);
 	if (!processed)
+	{
 		free(result);
+		return (ft_strdup(""));
+	}
 	return (processed);
 }
