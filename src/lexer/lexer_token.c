@@ -19,11 +19,6 @@ static t_token	*handle_word_token(t_lexer *lexer)
 	word = read_complex_word(lexer);
 	if (!word)
 		return (NULL);
-	if (word[0] == '\0')
-	{
-		free(word);
-		return (handle_word_token(lexer));
-	}
 	return (create_token(TOK_WORD, word));
 }
 

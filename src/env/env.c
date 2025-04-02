@@ -132,17 +132,13 @@ char	*expand_variable(t_ctx *ctx, char *str, int *i)
 		(*i)++;
 		return (ft_itoa(ctx->exit_status));
 	}
-	if (str[*i] && (str[*i] == '#'))
+	if (str[*i] && str[*i] == '#')
 	{
 		(*i)++;
 		return (ft_strdup("0"));
 	}
-	if (str[*i] && (str[*i] == ' '))
-	{
-		(*i)++;
-		return (ft_strdup(""));
-	}
-	if (str[*i] == '@' || str[*i] == '!' || str[*i] == '&' || (str[*i] >= '0' && str[*i] <= '9'))
+	if (str[*i] == '@' || str[*i] == '!' || str[*i] == '&' || (str[*i] >= '0'
+			&& str[*i] <= '9') || str[*i] == ' ')
 	{
 		(*i)++;
 		return (ft_strdup(""));

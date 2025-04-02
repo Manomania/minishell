@@ -78,6 +78,7 @@ typedef struct s_quote_state
 typedef struct s_lexer
 {
 	t_quote_state			quote;
+	t_bool					status;
 	char					*input;
 	int						position;
 	int						length;
@@ -145,6 +146,7 @@ typedef struct s_error_info
 typedef struct s_ctx
 {
 	t_quote_state			quote;
+	t_bool					status;
 	t_env					*env_list;
 	int						exit_status;
 	t_bool					exit_requested;

@@ -49,23 +49,29 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 	int		end;
 	char	*content;
 
-	if (quote_char == '"')
-		lexer->quote.in_double_quote = 1;
-	else if (quote_char == '\'')
-		lexer->quote.in_single_quote = 1;
 	start = lexer->position + 1;
 	advance_lexer(lexer);
-	while (get_lexer(lexer) != '\0' && get_lexer(lexer) != quote_char)
+	while (get_lexer(lexer) != '\0' && get_lexer(lexer) != quote_char && lexer->position < lexer->length)
 		advance_lexer(lexer);
-	if (get_lexer(lexer) == '\0')
+	if (lexer->position >= lexer->length)
 	{
 		ft_printf(RED "syntax error near unexpected unclosed quote\n" RESET);
 		return (NULL);
 	}
 	end = lexer->position;
-	if (start == end)
-		return (NULL);
+	if (quote_char == '"')
+		lexer->quote.in_double_quote = 1;
+	else if (quote_char == '\'')
+		lexer->quote.in_single_quote = 1;
 	advance_lexer(lexer);
+	if (start == end)
+	{
+		content = malloc(1);
+		if (!content)
+			return (NULL);
+		content[0] = '\0';
+		return (content);
+	}
 	content = malloc((end - start + 1));
 	if (!content)
 		return (NULL);
