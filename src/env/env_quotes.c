@@ -69,7 +69,6 @@ static char	*append_text_part(int start, int i, char *result, char *str)
 static char	*process_string(t_ctx *ctx, char *str, char *result)
 {
 	int		i;
-	int		j;
 	int		start;
 
 	i = 0;

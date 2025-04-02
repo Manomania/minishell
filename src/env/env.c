@@ -140,7 +140,7 @@ char	*expand_variable(t_ctx *ctx, char *str, int *i)
 		return (ft_strdup("0"));
 	}
 	if (str[*i] == '@' || str[*i] == '!' || str[*i] == '&' || (str[*i] >= '0'
-			&& str[*i] <= '9') || str[*i] == ' ')
+			&& str[*i] <= '9'))
 	{
 		(*i)++;
 		return (ft_strdup(""));
