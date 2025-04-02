@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:45:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 16:09:31 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:13:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,6 @@ int	process_redirection_list(t_redirection *redirections)
 	redir = redirections;
 	while (redir)
 	{
-		debug_log(DEBUG_VERBOSE, "redir", "Processing redirection");
 		result = process_redirection(redir);
 		if (result != 0)
 			return (result);
@@ -119,14 +118,9 @@ int	setup_redirections(t_redirection *redirections)
 	int	result;
 
 	if (!redirections)
-	{
-		debug_log(DEBUG_INFO, "redir", "No redirections to process");
 		return (0);
-	}
-	debug_log(DEBUG_INFO, "redir", "Setting up redirections");
 	result = process_redirection_list(redirections);
 	if (result != 0)
 		return (result);
-	debug_log(DEBUG_INFO, "redir", "All redirections processed successfully");
 	return (0);
 }

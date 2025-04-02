@@ -3,24 +3,57 @@
 /*                                                        :::      ::::::::   */
 /*   error_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 10:35:19 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/19 10:35:22 by maximart         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:21:16 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
 
 /**
+ * @brief Displays an error message to STDERR
+ *
+ * @param proof (optional) Proof that the error occured
+ * @param module (optional) Module where the error occured
+ * @param msg Error message
+ */
+void	error_print(const char *proof, const char *module, const char *msg)
+{
+	if (module && proof)
+		ft_printf_fd(STDERR_FILENO, RED "minishell: %s: `%s' %s\n" RESET,
+			module, proof, msg);
+	else if (module)
+		ft_printf_fd(STDERR_FILENO, RED "minishell: %s: %s\n" RESET, module,
+			msg);
+	else if (proof)
+		ft_printf_fd(STDERR_FILENO, RED "minishell: `%s' %s\n" RESET, proof,
+			msg);
+	else
+		ft_printf_fd(STDERR_FILENO, RED "minishell: %s\n" RESET, msg);
+}
+
+/**
  * @brief Displays an error and gets an exit code
  *
+ * @param proof (optional) Proof that the error occured
+ * @param module (optional) Module where the error occured
  * @param err Error type
  * @return int Exit code
  */
-int	ctx_error(t_error_type err)
+int	error(const char *proof, const char *module, t_error_type err)
 {
-	return (ctx_error_level(err, ERROR));
+	t_error_info	*error_table;
+	t_error_info	*info;
+	int				code;
+
+	error_table = get_error_table();
+	info = &error_table[err];
+	error_print(proof, module, info->message);
+	code = info->code;
+	free(error_table);
+	return (code);
 }
 
 /**
@@ -33,81 +66,39 @@ t_error_info	*get_error_table(void)
 	t_error_info	*error_table;
 
 	error_table = malloc(32 * sizeof(t_error_info));
-	error_table[ERR_NONE] = (t_error_info){0, "Success", false};
-	error_table[ERR_CMD_NOT_FOUND] = (t_error_info){127, "Command not found",
-		false};
-	error_table[ERR_NO_PERMISSION] = (t_error_info){EACCES, "Permission denied",
-		true};
-	error_table[ERR_IO_ERROR] = (t_error_info){EIO, "Input/output error", true};
-	error_table[ERR_UNIMPLEMENTED] = (t_error_info){ENOSYS,
-		"Not implemented yet", true};
-	error_table[ERR_ALLOC] = (t_error_info){ENOMEM,
-		"Allocation failed. Your RAM might be full", true};
-	error_table[ERR_PIPE] = (t_error_info){EPIPE, "Pipe error", false};
-	error_table[ERR_CHILD] = (t_error_info){ECHILD, "Fork error", false};
-	error_table[ERR_NO_SUCH_FILE] = (t_error_info){ENOENT,
-		"No such file or directory", false};
+	error_table[ERR_CMD_NOT_FOUND] = (t_error_info){127, "command not found"};
+	error_table[ERR_NO_PERMS] = (t_error_info){126, "permission denied"};
+	error_table[ERR_NO_FILE] = (t_error_info){ENOENT,
+		"no such file or directory"};
+	error_table[ERR_IS_DIR] = (t_error_info){EPIPE, "is a directory"};
+	error_table[ERR_NO_PWD] = (t_error_info){1,
+		"failed to get current directory"};
+	error_table[ERR_NO_OLDPWD] = (t_error_info){1, "OLDPWD not set"};
+	error_table[ERR_NO_HOME] = (t_error_info){1, "HOME not set"};
+	error_table[ERR_VLD_INPUT_LENGTH] = (t_error_info){1,
+		"input exceeds maximum length"};
+	error_table[ERR_VLD_ENV_VAR_EMPTY] = (t_error_info){1,
+		"empty variable name"};
+	error_table[ERR_VLD_ENV_VAR_START] = (t_error_info){1,
+		"variable name must start with letter or _"};
+	error_table[ERR_VLD_ENV_VAR_BAD_CHAR] = (t_error_info){1,
+		"invalid character in variable name"};
+	error_table[ERR_VLD_ENV_VAR_TOO_LONG] = (t_error_info){1,
+		"variable name too long"};
+	error_table[ERR_VLD_REDIR_FILENAME_EMPTY] = (t_error_info){1,
+		"empty filename"};
+	error_table[ERR_VLD_REDIR_FILENAME_TOO_LONG] = (t_error_info){1,
+		"filename too long"};
+	error_table[ERR_IO] = (t_error_info){EIO, "i/o error"};
+	error_table[ERR_FD] = (t_error_info){1, "bad file descriptor"};
+	error_table[ERR_ALLOC] = (t_error_info){ENOMEM, "allocation failed"};
+	error_table[ERR_CHILD] = (t_error_info){ECHILD, "child/fork/execve error"};
+	error_table[ERR_PIPE] = (t_error_info){EPIPE, "pipe processing failed"};
+	error_table[ERR_IDENTIFIER] = (t_error_info){1, "not a valid identifier"};
+	error_table[ERR_NUMERIC] = (t_error_info){255, "numeric argument required"};
+	error_table[ERR_TOO_MANY_ARGS] = (t_error_info){1, "too many arguments"};
+	error_table[ERR_UNCLOSED_QUOTE] = (t_error_info){1, "unclosed quote"};
+	error_table[ERR_TOKEN_LIST] = (t_error_info){1,
+		"failed to build token list"};
 	return (error_table);
-}
-
-/**
- * @brief Displays an error and gets an exit code
- *
- * @param err Error type
- * @param level Error level
- * @return int Exit code
- */
-int	ctx_error_level(t_error_type err, t_error_level level)
-{
-	t_error_info	*error_table;
-	t_error_info	*info;
-	char			*msg;
-	int				code;
-
-	error_table = get_error_table();
-	info = &error_table[err];
-	msg = (char *)info->message;
-	if (info->use_perror)
-		msg = strerror(info->code);
-	error_print(level, "minishell", msg);
-	code = info->code;
-	free(error_table);
-	return (code);
-}
-
-/**
- * @brief Print a system error message using errno
- *
- * @param level Error severity level
- * @param module Name of the module where error occurred
- */
-static void	error_print_sys(t_error_level level, const char *module)
-{
-	error_print(level, module, strerror(errno));
-}
-
-/**
- * @brief Exit the program with an error message
- *
- * @param ctx Context to clean up
- * @param err Error type to report
- * @param module Name of the module where error occurred
- */
-void	error_exit(t_ctx *ctx, t_error_type err, const char *module)
-{
-	t_error_info	*info;
-	t_error_info	*error_table;
-	int				code;
-
-	if (ctx)
-		ctx_clear(ctx);
-	error_table = get_error_table();
-	info = &error_table[err];
-	if (info->use_perror)
-		error_print_sys(FATAL, module);
-	else
-		error_print(FATAL, module, info->message);
-	code = info->code;
-	free(error_table);
-	exit(code);
 }

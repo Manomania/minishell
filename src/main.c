@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 13:11:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 10:52:02 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ static void	command_loop(t_ctx *ctx)
 		input = get_user_input(ctx, ctx->exit_status);
 		if (!input)
 			ctx_exit(ctx);
-		debug_log(DEBUG_INFO, "main", "Processing user input");
 		handle_command_in_main_loop(ctx, input);
 		if (ctx->exit_requested)
 			running = 0;
@@ -43,10 +42,11 @@ static void	command_loop(t_ctx *ctx)
 /**
  * @brief Checks command line args for debug flags
  *
+ * @param ctx Context
  * @param argc Argument count
  * @param argv Argument values
  */
-static void	check_debug_args(int argc, char **argv)
+static void	check_debug_args(t_ctx *ctx, int argc, char **argv)
 {
 	int	i;
 
@@ -54,9 +54,7 @@ static void	check_debug_args(int argc, char **argv)
 	while (i < argc)
 	{
 		if (ft_strncmp(argv[i], "--debug", ft_strlen("--debug")) == 0)
-			debug_init(DEBUG_INFO);
-		else if (ft_strncmp(argv[i], "--verbose", ft_strlen("--verbose")) == 0)
-			debug_init(DEBUG_VERBOSE);
+			ctx->debug = true;
 		i++;
 	}
 }
@@ -73,13 +71,11 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_ctx	*ctx;
 
-	check_debug_args(argc, argv);
-	debug_log(DEBUG_INFO, "main", "Initializing minishell");
 	ctx = init_ctx(argc, argv, envp);
+	check_debug_args(ctx, argc, argv);
 	if (!ctx)
-		error_exit(NULL, ERR_ALLOC, "context initialization");
+		ctx_error_exit(ctx, NULL, "main", ERR_ALLOC);
 	setup_signals();
-	debug_log(DEBUG_INFO, "main", "Starting command loop");
 	command_loop(ctx);
 	ctx_clear(ctx);
 	return (EXIT_SUCCESS);

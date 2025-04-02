@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:33:08 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 15:08:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/30 15:18:45 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,28 @@
 #include "minishell.h"
 
 /**
- * @brief Creates a pipe for the next command
+ * @brief Handles the last process's status
  *
- * @param pipe_fds Array to store pipe file descriptors
- * @return int 0 on success, -1 on error
+ * @param pids Array of process IDs
+ * @param status Status of the process
+ * @param i Current process index
+ * @return int Exit status code
  */
-int	setup_pipe(int pipe_fds[2])
+static int	handle_last_process_status(pid_t *pids, int status, int i)
 {
-	if (pipe(pipe_fds) == -1)
+	int	last_status;
+
+	last_status = 0;
+	if (pids[i] > 0)
 	{
-		perror("pipe");
-		return (-1);
+		if (WIFEXITED(status))
+			last_status = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+			last_status = 128 + WTERMSIG(status);
 	}
-	fcntl(pipe_fds[0], F_SETFD, FD_CLOEXEC);
-	fcntl(pipe_fds[1], F_SETFD, FD_CLOEXEC);
-	return (0);
+	else if (pids[i] == -2)
+		last_status = 0;
+	return (last_status);
 }
 
 /**
@@ -43,27 +50,25 @@ int	wait_for_pids(pid_t *pids, int count)
 	int	i;
 	int	status;
 	int	last_status;
+	int	was_signaled;
 
+	was_signaled = 0;
 	i = 0;
 	last_status = 0;
 	while (i < count)
 	{
 		if (pids[i] > 0)
-			waitpid(pids[i], &status, 0);
-		if (i == count - 1)
 		{
-			if (pids[i] > 0)
-			{
-				if (WIFEXITED(status))
-					last_status = WEXITSTATUS(status);
-				else if (WIFSIGNALED(status))
-					last_status = 128 + WTERMSIG(status);
-			}
-			else if (pids[i] == -2)
-				last_status = 0;
+			waitpid(pids[i], &status, 0);
+			if (WIFSIGNALED(status))
+				was_signaled = 1;
 		}
+		if (i == count - 1)
+			last_status = handle_last_process_status(pids, status, i);
 		i++;
 	}
+	if (was_signaled && isatty(STDOUT_FILENO))
+		write(STDOUT_FILENO, "\n", 1);
 	return (last_status);
 }
 
@@ -87,6 +92,24 @@ t_bool	init_pipe_data(t_pipe_data *data, t_ctx *ctx)
 }
 
 /**
+ * @brief Processes a child's wait status
+ *
+ * @param pid Process ID
+ * @param status Pointer to status variable
+ * @return int 1 if process was signaled, 0 otherwise
+ */
+static int	process_child_wait(pid_t pid, int *status)
+{
+	if (pid > 0)
+	{
+		waitpid(pid, status, 0);
+		if (WIFSIGNALED(*status))
+			return (1);
+	}
+	return (0);
+}
+
+/**
  * @brief Handle waiting for pipeline processes
  *
  * @param pids Array of process IDs
@@ -98,13 +121,14 @@ int	wait_for_pipeline_processes(pid_t *pids, int count)
 	int	i;
 	int	status;
 	int	last_status;
+	int	was_signaled;
 
+	was_signaled = 0;
 	i = 0;
 	last_status = 0;
 	while (i < count)
 	{
-		if (pids[i] > 0)
-			waitpid(pids[i], &status, 0);
+		was_signaled |= process_child_wait(pids[i], &status);
 		if (i == count - 1 && pids[i] > 0)
 		{
 			if (WIFEXITED(status))
@@ -114,5 +138,7 @@ int	wait_for_pipeline_processes(pid_t *pids, int count)
 		}
 		i++;
 	}
+	if (was_signaled && isatty(STDOUT_FILENO))
+		write(STDOUT_FILENO, "\n", 1);
 	return (last_status);
 }

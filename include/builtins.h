@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:51:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 16:38:57 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/30 17:53:44 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -271,5 +271,29 @@ t_bool	is_builtin_command(char *cmd_name);
  */
 pid_t	execute_pipeline_command(t_ctx *ctx, t_command *cmd, int *input_fd,
 			int *output_fd);
+
+/**
+ * @brief Handles cd . when current directory doesn't exist
+ *
+ * @param ctx Context for shell environment
+ * @return char* Directory path or NULL if not found
+ */
+char	*handle_dot_directory(t_ctx *ctx);
+
+/**
+ * @brief Gets the old PWD directory from environment
+ *
+ * @param ctx Context for shell environment
+ * @return char* Old PWD or NULL if not found
+ */
+char	*get_old_pwd(t_ctx *ctx);
+
+/**
+ * @brief Gets the home directory from environment
+ *
+ * @param ctx Context for shell environment
+ * @return char* Home directory or NULL if not found
+ */
+char	*get_home_dir(t_ctx *ctx);
 
 #endif

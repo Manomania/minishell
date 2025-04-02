@@ -6,12 +6,31 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 11:20:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/30 15:18:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "debug.h"
+#include "error.h"
 #include "minishell.h"
+
+/**
+ * @brief Creates a pipe for the next command
+ *
+ * @param pipe_fds Array to store pipe file descriptors
+ * @return int 0 on success, -1 on error
+ */
+int	setup_pipe(int pipe_fds[2])
+{
+	if (pipe(pipe_fds) == -1)
+	{
+		perror("pipe");
+		return (-1);
+	}
+	fcntl(pipe_fds[0], F_SETFD, FD_CLOEXEC);
+	fcntl(pipe_fds[1], F_SETFD, FD_CLOEXEC);
+	return (0);
+}
 
 /**
  * @brief Counts the number of commands in a pipeline
@@ -51,17 +70,11 @@ static void	execute_command(t_ctx *ctx, t_command *cmd)
 		exit(EXIT_FAILURE);
 	bin_path = bin_find(ctx, cmd->args[0]);
 	if (!bin_path)
-	{
-		ft_printf("Command not found: %s\n", cmd->args[0]);
-		exit(EXIT_FAILURE);
-	}
+		ctx_error_exit(ctx, cmd->args[0], "exec", ERR_CMD_NOT_FOUND);
 	free(cmd->args[0]);
 	cmd->args[0] = bin_path;
 	if (execve(cmd->args[0], cmd->args, ctx->envp) == -1)
-	{
-		perror("execve");
-		exit(EXIT_FAILURE);
-	}
+		ctx_error_exit(ctx, cmd->args[0], "exec", ERR_CHILD);
 }
 
 /**
@@ -89,21 +102,4 @@ void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
 	if (handle_redirections(cmd->redirection) != 0)
 		exit(EXIT_FAILURE);
 	execute_command(ctx, cmd);
-}
-
-/**
- * @brief Debug stff
- *
- * @param exit_status Exit status
- */
-void	debug_exit_status_cmdas(int exit_status)
-{
-	char	*a;
-	char	error_buf[64];
-
-	ft_strlcpy(error_buf, "Pipeline exit status: ", sizeof(error_buf));
-	a = ft_itoa(exit_status);
-	ft_strlcat(error_buf, a, sizeof(error_buf));
-	free(a);
-	debug_log(DEBUG_INFO, "pipeline", error_buf);
 }

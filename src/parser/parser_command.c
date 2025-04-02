@@ -6,10 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:37:01 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/26 12:51:34 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:23:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "error.h"
 #include "minishell.h"
 
 /**
@@ -53,7 +54,7 @@ int	parse_redirection(t_parse *parse, t_command *cmd, t_ctx *ctx)
 	advance_parse(parse);
 	if (!parse->current || parse->current->type != TOK_WORD)
 	{
-		ft_printf(RED "Error: Expected filename after redirection\n" RESET);
+		(void)error(NULL, "redir", ERR_VLD_REDIR_FILENAME_EMPTY);
 		return (0);
 	}
 	if (type == TOK_HERE_DOC_FROM)

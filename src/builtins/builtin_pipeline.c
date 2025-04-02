@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:20:14 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 16:40:47 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/30 14:38:40 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ static int	setup_pipeline_fds(int *saved_in, int *saved_out, int *input_fd,
 	*saved_in = dup(STDIN_FILENO);
 	*saved_out = dup(STDOUT_FILENO);
 	if (*saved_in == -1 || *saved_out == -1)
-		return (ERR_IO_ERROR);
+		return (ERR_IO);
 	if (*input_fd != STDIN_FILENO)
 	{
 		dup2(*input_fd, STDIN_FILENO);
@@ -76,19 +76,15 @@ static int	setup_pipeline_fds(int *saved_in, int *saved_out, int *input_fd,
 	return (0);
 }
 
-/**
- * @brief Determines which built-in command to execute
- *
- * @param ctx Context for shell environment
- * @param cmd Command to execute
- * @return int Exit status of the built-in
- */
 static int	execute_builtin_command(t_ctx *ctx, t_command *cmd)
 {
 	int	exit_status;
 
 	if (ft_strncmp(cmd->args[0], "exit", __INT_MAX__) == 0)
+	{
 		exit_status = builtin_exit(ctx, cmd);
+		ctx->exit_requested = false;
+	}
 	else if (ft_strncmp(cmd->args[0], "echo", __INT_MAX__) == 0)
 		exit_status = builtin_echo(ctx, cmd);
 	else if (ft_strncmp(cmd->args[0], "cd", __INT_MAX__) == 0)
@@ -128,7 +124,7 @@ static int	execute_pipeline_builtin(t_ctx *ctx, t_command *cmd, int *input_fd,
 
 	fd_status = setup_pipeline_fds(&saved_in, &saved_out, input_fd, output_fd);
 	if (fd_status != 0)
-		return (ctx_error(fd_status));
+		return (error(NULL, "pipeline", fd_status));
 	exit_status = execute_builtin_command(ctx, cmd);
 	restore_pipeline_fds(saved_in, saved_out);
 	return (exit_status);

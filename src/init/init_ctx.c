@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 14:46:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/27 17:55:57 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ t_ctx	*init_ctx(int argc, char **argv, char **envp)
 	ctx->envp = envp;
 	ctx->fd_file_in = -1;
 	ctx->fd_file_out = -1;
+	ctx->debug = false;
 	return (ctx);
 }
 

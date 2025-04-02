@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:55:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/25 14:16:38 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:12:26 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,9 +75,7 @@ static int	process_export_arg(t_ctx *ctx, char *arg)
 		return (1);
 	if (!validate_env_key(key))
 	{
-		ft_putstr_fd((char *)"minishell: export: `", STDERR_FILENO);
-		ft_putstr_fd(arg, STDERR_FILENO);
-		ft_putstr_fd((char *)"': not a valid identifier\n", STDERR_FILENO);
+		(void)error(arg, "export", ERR_IDENTIFIER);
 		free(key);
 		return (1);
 	}
@@ -109,7 +107,6 @@ int	builtin_export(t_ctx *ctx, t_command *cmd)
 	int	i;
 	int	status;
 
-	debug_log(DEBUG_INFO, "builtin", "Executing export builtin");
 	if (cmd->arg_count == 0)
 	{
 		print_export_env(ctx);

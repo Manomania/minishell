@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:32:19 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 11:25:21 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 10:13:39 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,33 +16,20 @@
 # include "minishell.h"
 
 // *************************************************************************** #
-//                                 Structures                                  #
-// *************************************************************************** #
-
-typedef enum e_error_level
-{
-	INFO,
-	WARNING,
-	ERROR,
-	FATAL
-}				t_error_level;
-
-// *************************************************************************** #
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
 // ctx_error_exit.c
-void			ctx_error_exit(t_ctx *ctx, t_error_type err);
+void			ctx_error_exit(t_ctx *ctx, const char *proof,
+					const char *module, t_error_type err);
 
 // error.c
 int				error_code(t_error_type err);
-void			error_print(t_error_level level, const char *module,
-					const char *msg);
 
 // error_utils.c
 t_error_info	*get_error_table(void);
-int				ctx_error(t_error_type err);
-int				ctx_error_level(t_error_type err, t_error_level level);
-void			error_exit(t_ctx *ctx, t_error_type err, const char *module);
+int				error(const char *proof, const char *module, t_error_type err);
+void			error_print(const char *proof, const char *module,
+					const char *msg);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:28:06 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/18 12:29:21 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:21:19 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,12 +69,8 @@ t_token	*tokenize(t_ctx *ctx, char *input)
 	t_token	*head;
 
 	head = NULL;
-	debug_log(DEBUG_INFO, "lexer", "Tokenizing input");
 	if (!input)
-	{
-		error_print(ERROR, "lexer", "NULL input string");
 		return (NULL);
-	}
 	lexer = safe_malloc(ctx, sizeof(t_lexer), "lexer");
 	lexer->input = input;
 	lexer->position = 0;
@@ -84,12 +80,11 @@ t_token	*tokenize(t_ctx *ctx, char *input)
 	lexer->quote.in_single_quote = 0;
 	if (!build_token_list(lexer, &head))
 	{
-		error_print(ERROR, "lexer", "Failed to build token list");
+		(void)error(NULL, "lexer", ERR_TOKEN_LIST);
 		free(lexer);
 		return (NULL);
 	}
 	sync_quote_state(ctx, lexer);
 	free(lexer);
-	debug_log(DEBUG_INFO, "lexer", "Tokenization complete");
 	return (head);
 }

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:59:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 14:30:36 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 10:22:51 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,14 +46,14 @@ char	*bin_find_path(const char *dir, char *bin)
 	tmp = ft_strjoin(dir, "/");
 	if (!tmp)
 	{
-		ctx_error(ERR_ALLOC);
+		(void)error(NULL, "bin_find_path", ERR_ALLOC);
 		return (NULL);
 	}
 	full_path = ft_strjoin(tmp, bin);
 	free(tmp);
 	if (!full_path)
 	{
-		ctx_error(ERR_ALLOC);
+		(void)error(NULL, "bin_find_path", ERR_ALLOC);
 		return (NULL);
 	}
 	if (is_executable(full_path))

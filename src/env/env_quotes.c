@@ -26,6 +26,7 @@ static char	*handle_var_expansion(t_ctx *ctx, char *str, int *i, char *result)
 	char	*var_value;
 	char	dollar[2];
 
+
 	dollar[0] = '$';
 	dollar[1] = '\0';
 	if (ctx->quote.in_single_quote == 1 && ctx->quote.in_double_quote == 0)
@@ -68,6 +69,7 @@ static char	*append_text_part(int start, int i, char *result, char *str)
 static char	*process_string(t_ctx *ctx, char *str, char *result)
 {
 	int		i;
+	int		j;
 	int		start;
 
 	i = 0;

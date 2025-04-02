@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:54:32 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 10:02:23 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 11:13:59 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,12 @@ int	builtin_pwd(t_ctx *ctx, t_command *cmd)
 	char	*pwd;
 
 	(void)cmd;
-	debug_log(DEBUG_INFO, "builtin", "Executing pwd builtin");
 	pwd = getcwd(NULL, 0);
 	if (!pwd)
 	{
 		pwd = env_find(ctx, (char *)"PWD=");
 		if (!pwd)
-		{
-			error_print(ERROR, "pwd", "Failed to get current directory");
-			return (1);
-		}
+			return (error(NULL, "pwd", ERR_NO_PWD));
 	}
 	ft_printf("%s\n", pwd);
 	free(pwd);

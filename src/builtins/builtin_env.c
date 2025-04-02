@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:56:54 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 09:56:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/27 17:49:21 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ int	builtin_env(t_ctx *ctx, t_command *cmd)
 	t_env	*env;
 
 	(void)cmd;
-	debug_log(DEBUG_INFO, "builtin", "Executing env builtin");
 	env = ctx->env_list;
 	while (env)
 	{

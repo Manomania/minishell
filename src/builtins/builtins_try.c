@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:19:14 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 11:45:35 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/03/28 09:55:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static t_bool	execute_builtin(t_ctx *ctx, t_command *cmd, int *exit_status)
 	saved_fds[1] = dup(STDOUT_FILENO);
 	if (saved_fds[0] == -1 || saved_fds[1] == -1)
 	{
-		ctx_error(ERR_IO_ERROR);
+		(void)error(NULL, "execute_builtin", ERR_IO);
 		return (false);
 	}
 	if (setup_builtin_redirections(cmd, saved_fds) == -1)
@@ -68,10 +68,7 @@ static t_bool	is_recognized_builtin(char *cmd_name)
 static t_bool	validate_command(t_ctx *ctx, t_command *cmd)
 {
 	if (!ctx || !cmd || !cmd->args || !cmd->args[0])
-	{
-		error_print(ERROR, "builtin", "Invalid command");
 		return (false);
-	}
 	return (true);
 }
 
@@ -84,23 +81,17 @@ static t_bool	validate_command(t_ctx *ctx, t_command *cmd)
  */
 t_bool	builtins_try(t_ctx *ctx, t_command *cmd)
 {
-	char	cmd_name[64];
-	int		exit_status;
+	int	exit_status;
 
 	if (!validate_command(ctx, cmd))
 		return (false);
-	ft_strlcpy(cmd_name, "Checking builtin: ", sizeof(cmd_name));
-	ft_strlcat(cmd_name, cmd->args[0], sizeof(cmd_name));
-	debug_log(DEBUG_INFO, "builtin", cmd_name);
 	if (is_recognized_builtin(cmd->args[0]))
 	{
-		debug_log(DEBUG_INFO, "builtin", "Found builtin command");
 		if (execute_builtin(ctx, cmd, &exit_status))
 		{
 			ctx->exit_status = exit_status;
 			return (true);
 		}
 	}
-	debug_log(DEBUG_INFO, "builtin", "No matching builtin found");
 	return (false);
 }
