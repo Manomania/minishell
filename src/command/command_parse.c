@@ -44,6 +44,26 @@ static int	handle_redirection_token(t_command *cmd, t_token *token,
 }
 
 /**
+ * @brief Manages empty command when first arg is empty string
+ *
+ * @param cmd Command being processed
+ * @param current Token list being processed
+ * @param ctx Context containing environment information
+ * @return t_bool true if successfully updated command
+ */
+static t_bool	handle_empty_first_arg(t_command *cmd, t_token **current,
+		t_ctx *ctx)
+{
+	if (*current && (*current)->type == TOK_WORD)
+	{
+		if (!process_word_token(cmd, *current, ctx))
+			return (false);
+		*current = (*current)->next;
+	}
+	return (true);
+}
+
+/**
  * @brief Processes tokens until end of command or pipeline marker
  *
  * @param current Current token pointer reference
@@ -54,12 +74,30 @@ static int	handle_redirection_token(t_command *cmd, t_token *token,
 static t_bool	process_command_tokens(t_token **current, t_command *cmd,
 		t_ctx *ctx)
 {
+	char	*expanded_value;
+	t_bool	first_arg_processed;
+
+	first_arg_processed = false;
 	while (*current && (*current)->type != TOK_PIPE)
 	{
 		if ((*current)->type == TOK_WORD)
 		{
+			expanded_value = handle_quotes_and_vars(ctx, (*current)->value);
+			if (!expanded_value)
+				return (false);
+			if (!first_arg_processed && expanded_value[0] == '\0')
+			{
+				free(expanded_value);
+				*current = (*current)->next;
+				first_arg_processed = true;
+				if (!handle_empty_first_arg(cmd, current, ctx))
+					return (false);
+				continue;
+			}
+			free(expanded_value);
 			if (!process_word_token(cmd, *current, ctx))
 				return (false);
+			first_arg_processed = true;
 		}
 		else if (token_is_redirection((*current)->type))
 		{

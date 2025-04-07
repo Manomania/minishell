@@ -32,10 +32,14 @@ static int	execute_single_command(t_ctx *ctx)
 	was_signaled = 0;
 	if (!command_bin(ctx))
 	{
-		if (ctx->cmd->args && ctx->cmd->args[0] && ctx->cmd->args[0][0] == '.' && !ft_strchr(ctx->cmd->args[0], '/'))
-			return (error_code(ERR_NO_FILE));
-		if (ctx->cmd->args && ctx->cmd->args[0] && ft_strchr(ctx->cmd->args[0], '/'))
-			return (error_code(ERR_IS_DIR));
+		if (ctx->cmd->args && ctx->cmd->args[0])
+		{
+			if (ctx->cmd->args[0][0] == '.' && !ft_strchr(ctx->cmd->args[0], '/'))
+				return (error_code(ERR_NO_FILE));
+			if (ft_strchr(ctx->cmd->args[0], '/'))
+				return (error_code(ERR_IS_DIR));
+			return (error(ctx->cmd->args[0], "exec", ERR_CMD_NOT_FOUND));
+		}
 		return (error_code(ERR_CMD_NOT_FOUND));
 	}
 	setup_parent_signals();
