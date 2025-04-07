@@ -29,6 +29,8 @@ t_bool	command_bin(t_ctx *ctx)
 	bin = bin_find(ctx, bin_og);
 	if (!bin)
 	{
+		if (is_directory(ctx->cmd->args[0]))
+			return (false);
 		free(bin_og);
 		ctx->cmd->args[0] = NULL;
 		return (false);
