@@ -82,8 +82,8 @@ static int	validate_command_context(t_ctx *ctx, int *status)
 	}
 	if (!ctx->cmd->args || !ctx->cmd->args[0])
 	{
-		ctx->exit_status = -1;
-		*status = -1;
+		ctx->exit_status = 0;
+		*status = 0;
 		return (0);
 	}
 	return (1);
