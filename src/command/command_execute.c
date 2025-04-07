@@ -34,8 +34,8 @@ static int	execute_single_command(t_ctx *ctx)
 	{
 		if (ctx->cmd->args && ctx->cmd->args[0] && (ft_strchr(ctx->cmd->args[0],
 					'/') || ctx->cmd->args[0][0] == '.'))
-			return (2);
-		return (127);
+			return (error_code(ERR_NO_FILE));
+		return (error_code(ERR_CMD_NOT_FOUND));
 	}
 	setup_parent_signals();
 	pid = fork();
