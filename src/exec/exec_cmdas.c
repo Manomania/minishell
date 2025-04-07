@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:17:00 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 17:27:23 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static int	handle_pipe_setup(int pipe_fds[2], int i, int cmd_count)
 {
 	if (i < cmd_count - 1)
 	{
-		if (setup_pipe(pipe_fds) == -1)
+		if (pipe(pipe_fds) == -1)
 			return (-1);
 	}
 	else
@@ -37,10 +37,10 @@ static int	handle_pipe_setup(int pipe_fds[2], int i, int cmd_count)
 }
 
 /**
- * @brief Handles descriptor management after fork, avoiding double-close errors
+ * @brief Handles descriptor management for pipeline execution
  *
- * This function safely manages file descriptors during pipeline execution,
- * ensuring we don't close the same descriptor twice.
+ * This function safely closes file descriptors that are no longer needed
+ * and prepares the file descriptors for the next command.
  *
  * @param prev_pipe Previous pipe's read end
  * @param pipe_fds Current pipe file descriptors
@@ -50,19 +50,18 @@ static int	handle_pipe_setup(int pipe_fds[2], int i, int cmd_count)
  */
 int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i, int cmd_count)
 {
-	if (prev_pipe != STDIN_FILENO && prev_pipe > 0)
-	{
+	int	next_pipe;
+
+	next_pipe = STDIN_FILENO;
+	if (prev_pipe != STDIN_FILENO && prev_pipe != -1)
 		close(prev_pipe);
-		prev_pipe = -1;
-	}
-	if (pipe_fds[1] != STDOUT_FILENO && pipe_fds[1] > 0)
-	{
-		close(pipe_fds[1]);
-		pipe_fds[1] = -1;
-	}
 	if (i < cmd_count - 1)
-		return (pipe_fds[0]);
-	return (STDIN_FILENO);
+	{
+		next_pipe = pipe_fds[0];
+		if (pipe_fds[1] != -1)
+			close(pipe_fds[1]);
+	}
+	return (next_pipe);
 }
 
 /**
@@ -76,6 +75,7 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 {
 	pid_t	pid;
 	int		result;
+	int		next_pipe;
 
 	if (handle_pipe_setup(data->pipe_fds, data->i, data->cmd_count) == -1)
 		return (-1);
@@ -85,13 +85,26 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 		return (-1);
 	else if (result > 0)
 		return (result);
-	pid = execute_pipeline_command(ctx, data->current, &data->prev_pipe,
-			&data->pipe_fds[1]);
+	if (data->i < data->cmd_count - 1)
+		pid = execute_pipeline_command(ctx, data->current, &data->prev_pipe,
+				&data->pipe_fds[1]);
+	else
+		pid = execute_pipeline_command(ctx, data->current, &data->prev_pipe,
+				&data->pipe_fds[1]);
 	data->pids[data->i] = pid;
-	return (handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
-			data->cmd_count));
+	next_pipe = handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
+			data->cmd_count);
+	return (next_pipe);
 }
 
+/**
+ * @brief Executes all commands in the pipeline
+ *
+ * @param ctx Context information
+ * @param data Pipeline data structure
+ * @param cmd_head Pointer to store original command head
+ * @return t_bool true if successful, false on error
+ */
 static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
 		t_command **cmd_head)
 {
