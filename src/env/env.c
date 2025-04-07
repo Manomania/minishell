@@ -141,6 +141,8 @@ char	*expand_variable(t_ctx *ctx, char *str, int *i)
 	if (str[*i] && str[*i] == '0')
 	{
 		(*i)++;
+		if (ctx->argv && ctx->argv[0])
+			return (ft_strdup(ctx->argv[0]));
 		return (ft_strdup("minishell"));
 	}
 	if (str[*i] && (str[*i] == '@' || str[*i] == '!' || str[*i] == '&' || (str[*i] >= '1'
