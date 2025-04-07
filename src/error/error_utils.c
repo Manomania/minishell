@@ -70,7 +70,7 @@ t_error_info	*get_error_table(void)
 	error_table[ERR_NO_PERMS] = (t_error_info){126, "permission denied"};
 	error_table[ERR_NO_FILE] = (t_error_info){ENOENT,
 		"no such file or directory"};
-	error_table[ERR_IS_DIR] = (t_error_info){EPIPE, "is a directory"};
+	error_table[ERR_IS_DIR] = (t_error_info){126, "is a directory"};
 	error_table[ERR_NO_PWD] = (t_error_info){1,
 		"failed to get current directory"};
 	error_table[ERR_NO_OLDPWD] = (t_error_info){1, "OLDPWD not set"};
