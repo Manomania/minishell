@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/30 15:18:48 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 17:17:07 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@ int	setup_pipe(int pipe_fds[2])
 		perror("pipe");
 		return (-1);
 	}
-	fcntl(pipe_fds[0], F_SETFD, FD_CLOEXEC);
-	fcntl(pipe_fds[1], F_SETFD, FD_CLOEXEC);
 	return (0);
 }
 
