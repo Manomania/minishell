@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 12:43:06 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:14:42 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,8 +76,10 @@ static t_bool	process_command_tokens(t_token **current, t_command *cmd,
 {
 	char	*expanded_value;
 	t_bool	first_arg_processed;
+	t_bool	has_redirections;
 
 	first_arg_processed = false;
+	has_redirections = false;
 	while (*current && (*current)->type != TOK_PIPE)
 	{
 		if ((*current)->type == TOK_WORD)
@@ -92,7 +94,7 @@ static t_bool	process_command_tokens(t_token **current, t_command *cmd,
 				first_arg_processed = true;
 				if (!handle_empty_first_arg(cmd, current, ctx))
 					return (false);
-				continue;
+				continue ;
 			}
 			free(expanded_value);
 			if (!process_word_token(cmd, *current, ctx))
@@ -104,13 +106,14 @@ static t_bool	process_command_tokens(t_token **current, t_command *cmd,
 			if ((*current)->next && handle_redirection_token(cmd, *current,
 					(*current)->next, ctx) == -1)
 				return (false);
+			has_redirections = true;
 			if ((*current)->next)
 				*current = (*current)->next;
 		}
 		if (*current)
 			*current = (*current)->next;
 	}
-	return (true);
+	return (first_arg_processed || has_redirections);
 }
 
 /**

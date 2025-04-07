@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 15:58:25 by maximart         ###   ########.fr       */
+/*   Updated: 2025/04/07 18:48:08 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@ static int	execute_single_command(t_ctx *ctx)
 	{
 		if (ctx->cmd->args && ctx->cmd->args[0])
 		{
-			if (ctx->cmd->args[0][0] == '.' && !ft_strchr(ctx->cmd->args[0], '/'))
+			if (ctx->cmd->args[0][0] == '.' && !ft_strchr(ctx->cmd->args[0],
+					'/'))
 				return (error_code(ERR_NO_FILE));
 			if (ft_strchr(ctx->cmd->args[0], '/'))
 				return (error_code(ERR_IS_DIR));
@@ -85,7 +86,7 @@ static int	validate_command_context(t_ctx *ctx, int *status)
 		ctx->exit_status = *status;
 		return (0);
 	}
-	if (!ctx->cmd->args || !ctx->cmd->args[0])
+	if (!ctx->cmd->args && !ctx->cmd->redirection)
 	{
 		ctx->exit_status = 0;
 		*status = 0;
@@ -104,6 +105,8 @@ static int	process_command(t_ctx *ctx)
 {
 	int	status;
 
+	if (has_only_redirections(ctx->cmd))
+		return (execute_redirections_only(ctx));
 	if (is_pipeline(ctx->cmd))
 		status = exec_cmdas(ctx);
 	else

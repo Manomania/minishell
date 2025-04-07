@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/28 11:20:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:31:04 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,6 +232,10 @@ int							command_execute(t_ctx *ctx);
 int							get_exit_status(int status);
 void						execute_child(t_ctx *ctx);
 
+// command_execute_utils2.c
+t_bool						has_only_redirections(t_command *cmd);
+int							execute_redirections_only(t_ctx *ctx);
+
 // command_new.c
 t_command					*command_new(void);
 
@@ -290,11 +294,14 @@ int							wait_for_pipeline_processes(pid_t *pids, int count);
 int							count_commands(t_command *cmd);
 void						setup_child_process(t_ctx *ctx, t_command *cmd,
 								int input_fd, int output_fd);
+pid_t						execute_redirections_only_pipeline(t_ctx *ctx,
+								t_pipe_data *data);
 
 // exec_cmdas_utils3.c
 t_bool						check_command_binary(t_ctx *ctx, t_pipe_data *data);
 t_bool						validate_pipeline_command(t_pipe_data *data);
 int							handle_non_builtin(t_ctx *ctx, t_pipe_data *data);
+t_bool						has_only_redirections_pipeline(t_command *command);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);
@@ -308,6 +315,7 @@ void						free_all_commands(t_command *cmd);
 
 // free_ctx.c
 void						ctx_clear(t_ctx *ctx);
+void						final_cleanup(t_ctx *ctx);
 
 // free_env.c
 void						free_env_list(t_env *env_list);
@@ -394,6 +402,9 @@ char						*expand_variables_in_line(t_ctx *ctx, char *line);
 // heredoc_expand_utils.c
 char						*init_expansion(char *line);
 char						*extract_var_name(char *str, int start, int end);
+
+// redir_cleanup.c
+void						cleanup_heredoc_resources(t_ctx *ctx);
 
 // redirections.c
 int							setup_redirections(t_redirection *redirections);

@@ -17,6 +17,7 @@ SRC_F				= \
 						checker/token_checker \
 						command/command_execute \
 						command/command_execute_utils \
+						command/command_execute_utils2 \
 						command/command_parse \
 						command/command_parse_utils \
 						command/command_add \

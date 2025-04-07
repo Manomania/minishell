@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:54:30 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/27 18:09:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:18:21 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,29 @@ static int	setup_child_redirections(t_ctx *ctx, t_command *cmd)
  */
 static int	check_command_executable(t_command *cmd)
 {
-	if (!cmd->args[0] || access(cmd->args[0], X_OK) != 0)
+	if (!cmd->args || !cmd->args[0])
+		return (0);
+	if (access(cmd->args[0], X_OK) != 0)
 	{
 		ft_printf("command not found or not executable: %s\n", cmd->args[0]);
 		return (1);
 	}
 	return (0);
+}
+
+/**
+ * @brief Executes command or processes redirections if no command
+ *
+ * @param ctx Context with environment
+ * @param cmd Command to execute
+ */
+static void	execute_command_or_redir(t_ctx *ctx, t_command *cmd)
+{
+	if (!cmd->args || !cmd->args[0])
+		exit(EXIT_SUCCESS);
+	execve(cmd->args[0], cmd->args, ctx->envp);
+	perror("execve");
+	exit(EXIT_FAILURE);
 }
 
 /**
@@ -71,9 +88,7 @@ void	execute_child(t_ctx *ctx)
 	cmd_check = check_command_executable(ctx->cmd);
 	if (cmd_check != 0)
 		exit(EXIT_FAILURE);
-	execve(ctx->cmd->args[0], ctx->cmd->args, ctx->envp);
-	perror("execve");
-	exit(EXIT_FAILURE);
+	execute_command_or_redir(ctx, ctx->cmd);
 }
 
 /**

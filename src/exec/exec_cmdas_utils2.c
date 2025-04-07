@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 17:17:07 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 18:55:15 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ static void	execute_command(t_ctx *ctx, t_command *cmd)
 	if (builtins_try(ctx, cmd))
 		exit(EXIT_SUCCESS);
 	if (!cmd->args || !cmd->args[0])
-		exit(EXIT_FAILURE);
+		exit(EXIT_SUCCESS);
 	bin_path = bin_find(ctx, cmd->args[0]);
 	if (!bin_path)
 		ctx_error_exit(ctx, cmd->args[0], "exec", ERR_CMD_NOT_FOUND);
@@ -99,5 +99,11 @@ void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
 	}
 	if (handle_redirections(cmd->redirection) != 0)
 		exit(EXIT_FAILURE);
+	if (!cmd->args || !cmd->args[0])
+	{
+		if (setup_heredocs(ctx, cmd) != 0)
+			exit(EXIT_FAILURE);
+		exit(EXIT_SUCCESS);
+	}
 	execute_command(ctx, cmd);
 }

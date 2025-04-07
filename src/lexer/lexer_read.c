@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:27:07 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/28 11:22:50 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:17:37 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,14 @@ char	*read_word_lexer(t_lexer *lexer)
 	return (word);
 }
 
+/**
+ * @brief Extract a quoted string from lexer input
+ *
+ * @param lexer Pointer to lexer structure
+ * @param quote_char Quote character (' or ")
+ * @return Newly allocated string containing the quoted content or NULL on error
+ * @note Caller must free the returned string
+ */
 char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 {
 	int		start;
@@ -52,7 +60,8 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 
 	start = lexer->position + 1;
 	advance_lexer(lexer);
-	while (get_lexer(lexer) != '\0' && get_lexer(lexer) != quote_char && lexer->position < lexer->length)
+	while (get_lexer(lexer) != '\0' && get_lexer(lexer) != quote_char
+		&& lexer->position < lexer->length)
 		advance_lexer(lexer);
 	if (lexer->position >= lexer->length)
 	{
@@ -66,13 +75,7 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 		lexer->quote.in_single_quote = 1;
 	advance_lexer(lexer);
 	if (start == end)
-	{
-		content = malloc(1);
-		if (!content)
-			return (NULL);
-		content[0] = '\0';
-		return (content);
-	}
+		return (ft_strdup(""));
 	content = malloc((end - start + 1));
 	if (!content)
 		return (NULL);
@@ -81,6 +84,12 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 	return (content);
 }
 
+/**
+ * @brief Checks if the current character is part of a complex word
+ *
+ * @param lexer Current lexer state
+ * @return int 1 if character is part of a complex word, 0 otherwise
+ */
 static int	peek_lexer(t_lexer *lexer)
 {
 	char	current;
@@ -89,6 +98,26 @@ static int	peek_lexer(t_lexer *lexer)
 	return (current != '\0' && current != ' ' && current != '\t'
 		&& current != '\n' && current != '|' && current != '<' && current != '>'
 		&& current != '&');
+}
+
+/**
+ * @brief Handles a single part of a complex word
+ *
+ * @param lexer Current lexer state
+ * @param result Current result string
+ * @param quote_char Quote character if in quoted mode, 0 otherwise
+ * @return char* Updated result string or NULL on error
+ */
+static char	*handle_word_part_by_type(t_lexer *lexer, char *result,
+		char quote_char)
+{
+	char	*new_result;
+
+	if (quote_char != 0)
+		new_result = handle_quoted_part(lexer, result, quote_char);
+	else
+		new_result = handle_word_part(lexer, result);
+	return (new_result);
 }
 
 /**
@@ -105,15 +134,12 @@ char	*read_complex_word(t_lexer *lexer)
 	result = NULL;
 	while (peek_lexer(lexer))
 	{
+		quote_char = 0;
 		if (get_lexer(lexer) == '"' || get_lexer(lexer) == '\'')
-		{
 			quote_char = get_lexer(lexer);
-			result = handle_quoted_part(lexer, result, quote_char);
-			if (!result)
-				return (NULL);
-		}
-		else
-			result = handle_word_part(lexer, result);
+		result = handle_word_part_by_type(lexer, result, quote_char);
+		if (!result)
+			return (NULL);
 	}
 	if (!result)
 		return (ft_strdup(""));

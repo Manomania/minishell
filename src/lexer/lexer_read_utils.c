@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_read_utils.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 10:43:47 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/19 10:43:50 by maximart         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:17:14 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ char	*handle_dollar_sign(char *result)
 char	*handle_word_part(t_lexer *lexer, char *result)
 {
 	char	*part;
+	char	*new_result;
 
 	part = read_word_lexer(lexer);
 	if (!part)
@@ -60,9 +61,9 @@ char	*handle_word_part(t_lexer *lexer, char *result)
 		free(result);
 		return (ft_strdup(""));
 	}
-	result = join_and_free(result, part);
+	new_result = join_and_free(result, part);
 	free(part);
-	return (result);
+	return (new_result);
 }
 
 /**
@@ -76,11 +77,15 @@ char	*handle_word_part(t_lexer *lexer, char *result)
 char	*handle_quoted_part(t_lexer *lexer, char *result, char quote_char)
 {
 	char	*part;
+	char	*new_result;
 
 	part = read_quoted_string_lexer(lexer, quote_char);
 	if (!part)
+	{
+		free(result);
 		return (NULL);
-	result = join_and_free(result, part);
+	}
+	new_result = join_and_free(result, part);
 	free(part);
-	return (result);
+	return (new_result);
 }
