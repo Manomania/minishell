@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/30 15:13:39 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 15:58:25 by maximart         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,10 @@ static int	execute_single_command(t_ctx *ctx)
 	was_signaled = 0;
 	if (!command_bin(ctx))
 	{
-		if (ctx->cmd->args && ctx->cmd->args[0] && (ft_strchr(ctx->cmd->args[0],
-					'/') || ctx->cmd->args[0][0] == '.'))
+		if (ctx->cmd->args && ctx->cmd->args[0] && ctx->cmd->args[0][0] == '.' && !ft_strchr(ctx->cmd->args[0], '/'))
 			return (error_code(ERR_NO_FILE));
+		if (ctx->cmd->args && ctx->cmd->args[0] && ft_strchr(ctx->cmd->args[0], '/'))
+			return (error_code(ERR_IS_DIR));
 		return (error_code(ERR_CMD_NOT_FOUND));
 	}
 	setup_parent_signals();
