@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:54:30 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 19:18:21 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 20:01:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,27 @@ static int	check_command_executable(t_command *cmd)
 }
 
 /**
+ * @brief Clean up all resources before child process exit
+ *
+ * @param ctx Context to clean up
+ */
+static void	child_process_cleanup(t_ctx *ctx)
+{
+	cleanup_heredoc_resources(ctx);
+	if (ctx->tokens)
+	{
+		free_all_token(ctx->tokens);
+		ctx->tokens = NULL;
+	}
+	ctx_clear(ctx);
+}
+
+t_bool	has_only_redirections(t_command *cmd)
+{
+	return (cmd && cmd->redirection && (!cmd->args || !cmd->args[0]));
+}
+
+/**
  * @brief Executes command or processes redirections if no command
  *
  * @param ctx Context with environment
@@ -63,9 +84,13 @@ static int	check_command_executable(t_command *cmd)
 static void	execute_command_or_redir(t_ctx *ctx, t_command *cmd)
 {
 	if (!cmd->args || !cmd->args[0])
+	{
+		child_process_cleanup(ctx);
 		exit(EXIT_SUCCESS);
+	}
 	execve(cmd->args[0], cmd->args, ctx->envp);
 	perror("execve");
+	child_process_cleanup(ctx);
 	exit(EXIT_FAILURE);
 }
 
@@ -84,10 +109,16 @@ void	execute_child(t_ctx *ctx)
 	reset_signals();
 	redirect_result = setup_child_redirections(ctx, ctx->cmd);
 	if (redirect_result != 0)
+	{
+		child_process_cleanup(ctx);
 		exit(EXIT_FAILURE);
+	}
 	cmd_check = check_command_executable(ctx->cmd);
 	if (cmd_check != 0)
+	{
+		child_process_cleanup(ctx);
 		exit(EXIT_FAILURE);
+	}
 	execute_command_or_redir(ctx, ctx->cmd);
 }
 

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 18:56:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:51:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,17 +38,20 @@ static int	process_heredoc_line(char *line, t_ctx *ctx, int pipe_fd)
 	return (0);
 }
 
-// Bruh
-static void	yap_long_aah_line(void)
+/**
+ * @brief Displays warning message for EOF in heredoc
+ */
+static void	display_heredoc_eof_warning(void)
 {
-	char	*_1;
-	char	*_2;
-	char	*_3;
+	char	*warning_part1;
+	char	*warning_part2;
+	char	*warning_part3;
 
-	_1 = "minishell: warning: heredoc: ";
-	_2 = "here-document delimited by end-of-file ";
-	_3 = "(`eof')\n";
-	ft_printf_fd(STDERR_FILENO, YELLOW "%s%s%s" RESET, _1, _2, _3);
+	warning_part1 = "minishell: warning: heredoc: ";
+	warning_part2 = "here-document delimited by end-of-file ";
+	warning_part3 = "(`eof')\n";
+	ft_printf_fd(STDERR_FILENO, YELLOW "%s%s%s" RESET, warning_part1,
+		warning_part2, warning_part3);
 }
 
 /**
@@ -63,19 +66,24 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
 {
 	char	*line;
 	int		delimiter_len;
+	int		result;
 
 	delimiter_len = ft_strlen(delimiter);
 	while (1)
 	{
 		line = readline("> ");
 		if (!line)
-			return (yap_long_aah_line(), 1);
+		{
+			display_heredoc_eof_warning();
+			return (1);
+		}
 		if (ft_strncmp(line, delimiter, delimiter_len + 1) == 0)
 		{
 			free(line);
 			break ;
 		}
-		if (process_heredoc_line(line, ctx, pipe_fd) == -1)
+		result = process_heredoc_line(line, ctx, pipe_fd);
+		if (result == -1)
 			return (-1);
 	}
 	return (0);
@@ -92,6 +100,7 @@ static int	create_heredoc(t_ctx *ctx, char *delimiter)
 {
 	int	pipe_fds[2];
 	int	result;
+	int	read_fd;
 
 	if (pipe(pipe_fds) == -1)
 	{
@@ -105,7 +114,8 @@ static int	create_heredoc(t_ctx *ctx, char *delimiter)
 		close(pipe_fds[0]);
 		return (-1);
 	}
-	return (pipe_fds[0]);
+	read_fd = pipe_fds[0];
+	return (read_fd);
 }
 
 /**

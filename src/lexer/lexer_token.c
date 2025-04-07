@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:31:33 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/07 19:16:10 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:52:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,18 @@
 static t_token	*handle_word_token(t_lexer *lexer)
 {
 	char	*word;
+	t_token	*token;
 
 	word = read_complex_word(lexer);
 	if (!word)
 		return (NULL);
-	return (create_token(TOK_WORD, word));
+	token = create_token(TOK_WORD, word);
+	if (!token)
+	{
+		free(word);
+		return (NULL);
+	}
+	return (token);
 }
 
 /**
@@ -62,12 +69,14 @@ t_token	*next_token_lexer(t_lexer *lexer)
  */
 static void	free_token(t_token *token)
 {
-	if (token)
+	if (!token)
+		return ;
+	if (token->value)
 	{
-		if (token->value)
-			free(token->value);
-		free(token);
+		free(token->value);
+		token->value = NULL;
 	}
+	free(token);
 }
 
 /**

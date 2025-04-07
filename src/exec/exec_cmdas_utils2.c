@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 18:55:15 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:59:55 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,21 +58,31 @@ int	count_commands(t_command *cmd)
  * @param cmd Command to execute
  * @return void
  */
-static void	execute_command(t_ctx *ctx, t_command *cmd)
+void	execute_command(t_ctx *ctx, t_command *cmd)
 {
 	char	*bin_path;
 
 	if (builtins_try(ctx, cmd))
+	{
+		cleanup_child_process(ctx);
 		exit(EXIT_SUCCESS);
+	}
 	if (!cmd->args || !cmd->args[0])
+	{
+		cleanup_child_process(ctx);
 		exit(EXIT_SUCCESS);
+	}
 	bin_path = bin_find(ctx, cmd->args[0]);
 	if (!bin_path)
+	{
 		ctx_error_exit(ctx, cmd->args[0], "exec", ERR_CMD_NOT_FOUND);
+	}
 	free(cmd->args[0]);
 	cmd->args[0] = bin_path;
 	if (execve(cmd->args[0], cmd->args, ctx->envp) == -1)
+	{
 		ctx_error_exit(ctx, cmd->args[0], "exec", ERR_CHILD);
+	}
 }
 
 /**
@@ -98,11 +108,18 @@ void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
 		close(output_fd);
 	}
 	if (handle_redirections(cmd->redirection) != 0)
+	{
+		cleanup_child_process(ctx);
 		exit(EXIT_FAILURE);
+	}
 	if (!cmd->args || !cmd->args[0])
 	{
 		if (setup_heredocs(ctx, cmd) != 0)
+		{
+			cleanup_child_process(ctx);
 			exit(EXIT_FAILURE);
+		}
+		cleanup_child_process(ctx);
 		exit(EXIT_SUCCESS);
 	}
 	execute_command(ctx, cmd);

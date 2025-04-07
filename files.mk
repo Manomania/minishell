@@ -68,6 +68,7 @@ SRC_F				= \
 						redir/heredoc_expand \
 						redir/heredoc_expand_utils \
 						redir/redirections \
+						redir/redir_cleanup \
 						signals/signals \
 						validation/validation \
 						main_utils \

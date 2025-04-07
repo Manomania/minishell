@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/07 19:31:04 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:59:12 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,6 +235,7 @@ void						execute_child(t_ctx *ctx);
 // command_execute_utils2.c
 t_bool						has_only_redirections(t_command *cmd);
 int							execute_redirections_only(t_ctx *ctx);
+void						cleanup_child_process(t_ctx *ctx);
 
 // command_new.c
 t_command					*command_new(void);
@@ -296,6 +297,7 @@ void						setup_child_process(t_ctx *ctx, t_command *cmd,
 								int input_fd, int output_fd);
 pid_t						execute_redirections_only_pipeline(t_ctx *ctx,
 								t_pipe_data *data);
+void						execute_command(t_ctx *ctx, t_command *cmd);
 
 // exec_cmdas_utils3.c
 t_bool						check_command_binary(t_ctx *ctx, t_pipe_data *data);
