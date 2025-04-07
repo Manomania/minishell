@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:25:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 18:33:39 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,19 @@ static int	process_heredoc_line(char *line, t_ctx *ctx, int pipe_fd)
 	return (0);
 }
 
+// Bruh
+static void	yap_long_aah_line(void)
+{
+	char	*_1;
+	char	*_2;
+	char	*_3;
+
+	_1 = "minishell: warning: heredoc: ";
+	_2 = "here-document delimited by end-of-file ";
+	_3 = "(`eof')\n";
+	ft_printf_fd(STDERR_FILENO, YELLOW "%s%s%s" RESET, _1, _2, _3);
+}
+
 /**
  * @brief Reads content for heredoc until delimiter is found
  *
@@ -56,11 +69,7 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
 	{
 		line = readline("> ");
 		if (!line)
-		{
-			ft_printf_fd(STDERR_FILENO, YELLOW "minishell: warning: heredoc: \
-				here-document delimited by end-of-file" RESET);
-			return (1);
-		}
+			return (yap_long_aah_line(), 1);
 		if (ft_strncmp(line, delimiter, delimiter_len + 1) == 0)
 		{
 			free(line);
