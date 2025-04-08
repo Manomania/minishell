@@ -65,7 +65,7 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 		advance_lexer(lexer);
 	if (lexer->position >= lexer->length)
 	{
-		ft_printf(RED "syntax error near unexpected unclosed quote\n" RESET);
+		ft_printf("\001" RED "\002syntax error near unexpected unclosed quote\n" RESET);
 		return (NULL);
 	}
 	end = lexer->position;
