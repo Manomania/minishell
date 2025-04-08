@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 19:51:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 13:43:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
  * @param delimiter String marking end of heredoc
  * @return File descriptor to read from, or -1 on error
  */
-static int	create_heredoc(t_ctx *ctx, char *delimiter)
+int	create_heredoc(t_ctx *ctx, char *delimiter)
 {
 	int	pipe_fds[2];
 	int	result;
@@ -128,19 +128,17 @@ static int	create_heredoc(t_ctx *ctx, char *delimiter)
 int	setup_heredocs(t_ctx *ctx, t_command *cmd)
 {
 	t_redirection	*redir;
-	int				heredoc_fd;
 	int				dup_result;
 
+	(void)ctx;
 	redir = cmd->redirection;
 	while (redir)
 	{
-		if (redir->type == TOK_HERE_DOC_FROM)
+		if (redir->type == TOK_HERE_DOC_FROM && redir->fd >= 0)
 		{
-			heredoc_fd = create_heredoc(ctx, redir->filename);
-			if (heredoc_fd == -1)
-				return (-1);
-			dup_result = dup2(heredoc_fd, STDIN_FILENO);
-			close(heredoc_fd);
+			dup_result = dup2(redir->fd, STDIN_FILENO);
+			close(redir->fd);
+			redir->fd = -1;
 			if (dup_result == -1)
 			{
 				perror("dup2");

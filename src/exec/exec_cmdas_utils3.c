@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:32:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 19:00:02 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 13:29:05 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,17 +120,13 @@ int	handle_non_builtin(t_ctx *ctx, t_pipe_data *data)
 	if (has_only_redirections_pipeline(data->current))
 	{
 		data->pids[data->i] = -1;
-		return (handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
-				data->cmd_count));
+		return (data->prev_pipe);
 	}
 	if (!is_builtin_command(data->current->args[0]))
 	{
 		bin_found = check_command_binary(ctx, data);
 		if (bin_found == false)
-		{
-			return (handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
-					data->cmd_count));
-		}
+			return (data->prev_pipe);
 	}
 	return (0);
 }

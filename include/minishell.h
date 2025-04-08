@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/07 19:59:12 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 13:44:04 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,7 +220,7 @@ t_bool						validate_token_sequence(t_token *tokens);
 // command_add.c
 int							command_add_argument(t_command *cmd, char *arg);
 int							command_add_redirection(t_command *cmd,
-								t_token_type type, int fd, char *filename);
+								t_token_type type, char *filename);
 
 // command_bin.c
 t_bool						command_bin(t_ctx *ctx);
@@ -236,6 +236,7 @@ void						execute_child(t_ctx *ctx);
 t_bool						has_only_redirections(t_command *cmd);
 int							execute_redirections_only(t_ctx *ctx);
 void						cleanup_child_process(t_ctx *ctx);
+int							read_all_heredocs(t_ctx *ctx);
 
 // command_new.c
 t_command					*command_new(void);
@@ -393,6 +394,7 @@ char						*bin_find_path(const char *dir, char *bin);
 
 // heredoc.c
 int							setup_heredocs(t_ctx *ctx, t_command *cmd);
+int							create_heredoc(t_ctx *ctx, char *delimiter);
 
 // heredoc_utils.c
 char						*replace_substring(char *str, int start, int end,

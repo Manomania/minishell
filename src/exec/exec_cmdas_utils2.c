@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 19:59:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 13:28:33 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,11 @@ void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
 		dup2(output_fd, STDOUT_FILENO);
 		close(output_fd);
 	}
+	if (setup_heredocs(ctx, cmd) != 0)
+	{
+		cleanup_child_process(ctx);
+		exit(EXIT_FAILURE);
+	}
 	if (handle_redirections(cmd->redirection) != 0)
 	{
 		cleanup_child_process(ctx);
@@ -114,11 +119,6 @@ void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
 	}
 	if (!cmd->args || !cmd->args[0])
 	{
-		if (setup_heredocs(ctx, cmd) != 0)
-		{
-			cleanup_child_process(ctx);
-			exit(EXIT_FAILURE);
-		}
 		cleanup_child_process(ctx);
 		exit(EXIT_SUCCESS);
 	}

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 20:24:07 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 13:41:28 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,8 @@ int	command_execute(t_ctx *ctx)
 	is_valid = validate_command_context(ctx, &status);
 	if (!is_valid)
 		return (status);
+	if (read_all_heredocs(ctx) != 0)
+		return (error(NULL, "heredoc", ERR_PIPE));
 	status = process_command(ctx);
 	ctx->exit_status = status;
 	return (status);
