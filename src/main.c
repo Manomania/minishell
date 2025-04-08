@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:52:02 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:30:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,6 @@ int	main(int argc, char **argv, char **envp)
 		ctx_error_exit(ctx, NULL, "main", ERR_ALLOC);
 	setup_signals();
 	command_loop(ctx);
-	ctx_clear(ctx);
+	final_cleanup(ctx);
 	return (EXIT_SUCCESS);
 }

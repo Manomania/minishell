@@ -10,3 +10,4 @@ output.txt\\nHeredoc
 actual_output.txt
 .vscode
 libft.a
+*_outfiles

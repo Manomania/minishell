@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 17:27:23 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 18:59:56 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,13 +85,23 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 		return (-1);
 	else if (result > 0)
 		return (result);
-	if (data->i < data->cmd_count - 1)
+	if (has_only_redirections_pipeline(data->current))
+	{
+		pid = execute_redirections_only_pipeline(ctx, data);
+		data->pids[data->i] = pid;
+	}
+	else if (data->i < data->cmd_count - 1)
+	{
 		pid = execute_pipeline_command(ctx, data->current, &data->prev_pipe,
 				&data->pipe_fds[1]);
+		data->pids[data->i] = pid;
+	}
 	else
+	{
 		pid = execute_pipeline_command(ctx, data->current, &data->prev_pipe,
 				&data->pipe_fds[1]);
-	data->pids[data->i] = pid;
+		data->pids[data->i] = pid;
+	}
 	next_pipe = handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
 			data->cmd_count);
 	return (next_pipe);

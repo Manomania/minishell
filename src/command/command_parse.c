@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/26 12:43:06 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 13:44:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static int	handle_redirection_token(t_command *cmd, t_token *token,
 	expanded_filename = handle_quotes_and_vars(ctx, next_token->value);
 	if (!expanded_filename)
 		return (-1);
-	result = command_add_redirection(cmd, token->type, fd, expanded_filename);
+	result = command_add_redirection(cmd, token->type, expanded_filename);
 	free(expanded_filename);
 	return (result);
 }
@@ -76,8 +76,10 @@ static t_bool	process_command_tokens(t_token **current, t_command *cmd,
 {
 	char	*expanded_value;
 	t_bool	first_arg_processed;
+	t_bool	has_redirections;
 
 	first_arg_processed = false;
+	has_redirections = false;
 	while (*current && (*current)->type != TOK_PIPE)
 	{
 		if ((*current)->type == TOK_WORD)
@@ -92,7 +94,7 @@ static t_bool	process_command_tokens(t_token **current, t_command *cmd,
 				first_arg_processed = true;
 				if (!handle_empty_first_arg(cmd, current, ctx))
 					return (false);
-				continue;
+				continue ;
 			}
 			free(expanded_value);
 			if (!process_word_token(cmd, *current, ctx))
@@ -104,13 +106,14 @@ static t_bool	process_command_tokens(t_token **current, t_command *cmd,
 			if ((*current)->next && handle_redirection_token(cmd, *current,
 					(*current)->next, ctx) == -1)
 				return (false);
+			has_redirections = true;
 			if ((*current)->next)
 				*current = (*current)->next;
 		}
 		if (*current)
 			*current = (*current)->next;
 	}
-	return (true);
+	return (first_arg_processed || has_redirections);
 }
 
 /**
@@ -131,7 +134,7 @@ static t_bool	create_pipeline(t_command **cmd, t_token **current, t_ctx *ctx)
 	if (!new_cmd)
 		return (false);
 	prev_cmd->next = new_cmd;
-	prev_cmd->operator = TOK_PIPE;
+	prev_cmd->operator= TOK_PIPE;
 	*cmd = new_cmd;
 	*current = (*current)->next;
 	if (!process_command_tokens(current, *cmd, ctx))

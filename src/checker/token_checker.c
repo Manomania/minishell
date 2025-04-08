@@ -29,64 +29,64 @@ static t_bool	check_invalid_tokens(t_token *tokens)
 	{
 		if (current->type == TOK_ESP)
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token '&'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token '&'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if (current->type == TOK_OR)
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token '||'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token '||'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if (current->type == TOK_AND)
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token '&&'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token '&&'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if (current->type == TOK_REDIR_FROM && current->next->type == TOK_REDIR_TO)
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token 'newline'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token 'newline'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if (token_is_redirection(current->type) && current->next->type == TOK_REDIR_TO)
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token '>'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token '>'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if (token_is_redirection(current->type) && current->next->type == TOK_REDIR_FROM)
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token '<'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token '<'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if ((current->type == TOK_PIPE && token_is_redirection(current->next->type))
 			|| (token_is_redirection(current->type) && current->next->type == TOK_PIPE))
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token '|'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token '|'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if (current->type == TOK_PIPE && (current->next->type == TOK_PIPE
 			|| current->next->type == TOK_EOF))
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token '|'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token '|'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if (current->type == TOK_REDIR_FROM && current->next->type == TOK_REDIR_FROM)
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token '<'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token '<'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if (current->type == TOK_REDIR_TO && current->next->type == TOK_REDIR_TO)
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token '>'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token '>'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if (current->type == TOK_HERE_DOC_TO && current->next->type == TOK_HERE_DOC_TO)
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token '>>'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token '>>'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if (current->type == TOK_HERE_DOC_FROM && current->next->type == TOK_HERE_DOC_FROM)
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token '<<'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token '<<'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		if (token_is_redirection(current->type)
@@ -95,7 +95,7 @@ static t_bool	check_invalid_tokens(t_token *tokens)
 				|| current->next->type == TOK_EOF
 				|| current->next->type == TOK_NEW_LINE))
 		{
-			ft_putendl_fd(RED"syntax error near unexpected token 'newline'"RESET, STDERR_FILENO);
+			ft_putendl_fd("\001" RED "\002syntax error near unexpected token 'newline'"RESET, STDERR_FILENO);
 			return (false);
 		}
 		current = current->next;

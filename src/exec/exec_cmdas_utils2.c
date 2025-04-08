@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 17:17:07 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:57:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,31 +52,62 @@ int	count_commands(t_command *cmd)
 }
 
 /**
+ * @brief Reports command not found error with proper formatting
+ *
+ * @param cmd_name Name of the command that was not found
+ */
+static void	report_cmd_not_found_pipe(char *cmd_name)
+{
+	ft_putstr_fd(cmd_name, STDERR_FILENO);
+	ft_putstr_fd(": command not found\n", STDERR_FILENO);
+}
+
+/**
  * @brief Handles command execution after redirection setup
  *
  * @param ctx Context with environment
  * @param cmd Command to execute
  * @return void
  */
-static void	execute_command(t_ctx *ctx, t_command *cmd)
+void	execute_command(t_ctx *ctx, t_command *cmd)
 {
 	char	*bin_path;
 
 	if (builtins_try(ctx, cmd))
+	{
+		cleanup_child_process(ctx);
 		exit(EXIT_SUCCESS);
+	}
 	if (!cmd->args || !cmd->args[0])
-		exit(EXIT_FAILURE);
+	{
+		cleanup_child_process(ctx);
+		exit(EXIT_SUCCESS);
+	}
 	bin_path = bin_find(ctx, cmd->args[0]);
 	if (!bin_path)
-		ctx_error_exit(ctx, cmd->args[0], "exec", ERR_CMD_NOT_FOUND);
+	{
+		if (cmd->args[0][0] == '.' && !ft_strchr(cmd->args[0], '/'))
+			ctx_error_exit(ctx, NULL, "exec", ERR_NO_FILE);
+		if (ft_strchr(cmd->args[0], '/'))
+			ctx_error_exit(ctx, cmd->args[0], "exec", ERR_IS_DIR);
+		report_cmd_not_found_pipe(cmd->args[0]);
+		cleanup_child_process(ctx);
+		exit(127);
+	}
 	free(cmd->args[0]);
 	cmd->args[0] = bin_path;
 	if (execve(cmd->args[0], cmd->args, ctx->envp) == -1)
+	{
 		ctx_error_exit(ctx, cmd->args[0], "exec", ERR_CHILD);
+	}
 }
 
 /**
  * @brief Sets up the child process for command execution
+ *
+ * This function first handles all redirections before checking
+ * if the command exists, ensuring that files are created even for
+ * non-existent commands.
  *
  * @param ctx Context with environment
  * @param cmd Command to execute
@@ -97,7 +128,20 @@ void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
 		dup2(output_fd, STDOUT_FILENO);
 		close(output_fd);
 	}
-	if (handle_redirections(cmd->redirection) != 0)
+	if (setup_heredocs(ctx, cmd) != 0)
+	{
+		cleanup_child_process(ctx);
 		exit(EXIT_FAILURE);
+	}
+	if (handle_redirections(cmd->redirection) != 0)
+	{
+		cleanup_child_process(ctx);
+		exit(EXIT_FAILURE);
+	}
+	if (!cmd->args || !cmd->args[0])
+	{
+		cleanup_child_process(ctx);
+		exit(EXIT_SUCCESS);
+	}
 	execute_command(ctx, cmd);
 }

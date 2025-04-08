@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:54:30 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/27 18:09:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 16:59:17 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,21 +35,43 @@ static int	setup_child_redirections(t_ctx *ctx, t_command *cmd)
 }
 
 /**
- * @brief Checks if command exists and is executable
+ * @brief Clean up all resources before child process exit
  *
- * This function verifies the command path and permissions.
- *
- * @param cmd Command to check
- * @return 0 on success, non-zero on error
+ * @param ctx Context to clean up
  */
-static int	check_command_executable(t_command *cmd)
+static void	child_process_cleanup(t_ctx *ctx)
 {
-	if (!cmd->args[0] || access(cmd->args[0], X_OK) != 0)
+	cleanup_heredoc_resources(ctx);
+	if (ctx->tokens)
 	{
-		ft_printf("command not found or not executable: %s\n", cmd->args[0]);
-		return (1);
+		free_all_token(ctx->tokens);
+		ctx->tokens = NULL;
 	}
-	return (0);
+	ctx_clear(ctx);
+}
+
+t_bool	has_only_redirections(t_command *cmd)
+{
+	return (cmd && cmd->redirection && (!cmd->args || !cmd->args[0]));
+}
+
+/**
+ * @brief Executes command or processes redirections if no command
+ *
+ * @param ctx Context with environment
+ * @param cmd Command to execute
+ */
+static void	execute_command_or_redir(t_ctx *ctx, t_command *cmd)
+{
+	if (!cmd->args || !cmd->args[0])
+	{
+		child_process_cleanup(ctx);
+		exit(EXIT_SUCCESS);
+	}
+	execve(cmd->args[0], cmd->args, ctx->envp);
+	perror("execve");
+	child_process_cleanup(ctx);
+	exit(EXIT_FAILURE);
 }
 
 /**
@@ -108,16 +130,34 @@ static char	**create_env_array(t_env *env_list)
 void	execute_child(t_ctx *ctx)
 {
 	int		redirect_result;
-	int		cmd_check;
 	char	**env_array;
 
 	reset_signals();
 	redirect_result = setup_child_redirections(ctx, ctx->cmd);
 	if (redirect_result != 0)
+	{
+		child_process_cleanup(ctx);
 		exit(EXIT_FAILURE);
-	cmd_check = check_command_executable(ctx->cmd);
-	if (cmd_check != 0)
-		exit(EXIT_FAILURE);
+	}
+	if (!ctx->cmd->args || !ctx->cmd->args[0])
+	{
+		child_process_cleanup(ctx);
+		exit(EXIT_SUCCESS);
+	}
+	if (!command_bin(ctx))
+	{
+		if (ctx->cmd->args && ctx->cmd->args[0])
+		{
+			if (ctx->cmd->args[0][0] == '.' && !ft_strchr(ctx->cmd->args[0],
+					'/'))
+				exit(error_code(ERR_NO_FILE));
+			if (ft_strchr(ctx->cmd->args[0], '/'))
+				exit(error_code(ERR_IS_DIR));
+			exit(error(ctx->cmd->args[0], "exec", ERR_CMD_NOT_FOUND));
+		}
+		exit(error_code(ERR_CMD_NOT_FOUND));
+	}
+	execute_command_or_redir(ctx, ctx->cmd);
 	env_array = create_env_array(ctx->env_list);
 	if (!env_array)
 		exit(EXIT_FAILURE);

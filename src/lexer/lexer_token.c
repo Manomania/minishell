@@ -6,20 +6,33 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:31:33 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/18 11:40:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:52:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/**
+ * @brief Handles a word token in the lexer
+ *
+ * @param lexer Current lexer state
+ * @return t_token* Created word token or NULL on error
+ */
 static t_token	*handle_word_token(t_lexer *lexer)
 {
 	char	*word;
+	t_token	*token;
 
 	word = read_complex_word(lexer);
 	if (!word)
 		return (NULL);
-	return (create_token(TOK_WORD, word));
+	token = create_token(TOK_WORD, word);
+	if (!token)
+	{
+		free(word);
+		return (NULL);
+	}
+	return (token);
 }
 
 /**
@@ -49,13 +62,21 @@ t_token	*next_token_lexer(t_lexer *lexer)
 	return (NULL);
 }
 
+/**
+ * @brief Frees a single token
+ *
+ * @param token Token to free
+ */
 static void	free_token(t_token *token)
 {
-	if (token)
+	if (!token)
+		return ;
+	if (token->value)
 	{
 		free(token->value);
-		free(token);
+		token->value = NULL;
 	}
+	free(token);
 }
 
 /**

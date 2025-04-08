@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:48:41 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:24:40 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 13:44:05 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,12 +74,10 @@ int	command_add_argument(t_command *cmd, char *arg)
  *
  * @param cmd Command to add redirection to
  * @param type Redirection type (< > << >>)
- * @param fd File descriptor (0 for input, 1 for output)
  * @param filename Target filename
  * @return int 0 on success, -1 on failure
  */
-int	command_add_redirection(t_command *cmd, t_token_type type, int fd,
-		char *filename)
+int	command_add_redirection(t_command *cmd, t_token_type type, char *filename)
 {
 	t_redirection	*redir;
 	t_redirection	*current;
@@ -90,7 +88,7 @@ int	command_add_redirection(t_command *cmd, t_token_type type, int fd,
 	if (!redir)
 		return (-1);
 	redir->type = type;
-	redir->fd = fd;
+	redir->fd = -1;
 	redir->filename = ft_strdup(filename);
 	if (!redir->filename)
 		return (free(redir), -1);

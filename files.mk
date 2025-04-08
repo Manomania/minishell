@@ -17,6 +17,7 @@ SRC_F				= \
 						checker/token_checker \
 						command/command_execute \
 						command/command_execute_utils \
+						command/command_execute_utils2 \
 						command/command_parse \
 						command/command_parse_utils \
 						command/command_add \
@@ -64,9 +65,11 @@ SRC_F				= \
 						path/bin_find_path \
 						redir/heredoc \
 						redir/heredoc_utils \
+						redir/heredoc_utils2 \
 						redir/heredoc_expand \
 						redir/heredoc_expand_utils \
 						redir/redirections \
+						redir/redir_cleanup \
 						signals/signals \
 						validation/validation \
 						main_utils \

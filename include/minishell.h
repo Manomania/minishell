@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/28 11:20:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,7 +220,7 @@ t_bool						validate_token_sequence(t_token *tokens);
 // command_add.c
 int							command_add_argument(t_command *cmd, char *arg);
 int							command_add_redirection(t_command *cmd,
-								t_token_type type, int fd, char *filename);
+								t_token_type type, char *filename);
 
 // command_bin.c
 t_bool						command_bin(t_ctx *ctx);
@@ -231,6 +231,12 @@ int							command_execute(t_ctx *ctx);
 // command_execute_utils.c
 int							get_exit_status(int status);
 void						execute_child(t_ctx *ctx);
+
+// command_execute_utils2.c
+t_bool						has_only_redirections(t_command *cmd);
+int							execute_redirections_only(t_ctx *ctx);
+void						cleanup_child_process(t_ctx *ctx);
+int							read_all_heredocs(t_ctx *ctx);
 
 // command_new.c
 t_command					*command_new(void);
@@ -290,11 +296,15 @@ int							wait_for_pipeline_processes(pid_t *pids, int count);
 int							count_commands(t_command *cmd);
 void						setup_child_process(t_ctx *ctx, t_command *cmd,
 								int input_fd, int output_fd);
+pid_t						execute_redirections_only_pipeline(t_ctx *ctx,
+								t_pipe_data *data);
+void						execute_command(t_ctx *ctx, t_command *cmd);
 
 // exec_cmdas_utils3.c
 t_bool						check_command_binary(t_ctx *ctx, t_pipe_data *data);
 t_bool						validate_pipeline_command(t_pipe_data *data);
 int							handle_non_builtin(t_ctx *ctx, t_pipe_data *data);
+t_bool						has_only_redirections_pipeline(t_command *command);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);
@@ -308,6 +318,7 @@ void						free_all_commands(t_command *cmd);
 
 // free_ctx.c
 void						ctx_clear(t_ctx *ctx);
+void						final_cleanup(t_ctx *ctx);
 
 // free_env.c
 void						free_env_list(t_env *env_list);
@@ -383,10 +394,14 @@ char						*bin_find_path(const char *dir, char *bin);
 
 // heredoc.c
 int							setup_heredocs(t_ctx *ctx, t_command *cmd);
+int							create_heredoc(t_ctx *ctx, char *delimiter);
 
 // heredoc_utils.c
 char						*replace_substring(char *str, int start, int end,
 								char *replacement);
+
+// heredoc_utils2.c
+void						close_heredoc_fds(t_command *cmd);
 
 // heredoc_expand.c
 char						*expand_variables_in_line(t_ctx *ctx, char *line);
@@ -394,6 +409,9 @@ char						*expand_variables_in_line(t_ctx *ctx, char *line);
 // heredoc_expand_utils.c
 char						*init_expansion(char *line);
 char						*extract_var_name(char *str, int start, int end);
+
+// redir_cleanup.c
+void						cleanup_heredoc_resources(t_ctx *ctx);
 
 // redirections.c
 int							setup_redirections(t_redirection *redirections);

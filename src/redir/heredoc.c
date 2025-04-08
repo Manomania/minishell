@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:25:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:01:23 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,22 @@ static int	process_heredoc_line(char *line, t_ctx *ctx, int pipe_fd)
 }
 
 /**
+ * @brief Displays warning message for EOF in heredoc
+ */
+static void	display_heredoc_eof_warning(void)
+{
+	char	*warning_part1;
+	char	*warning_part2;
+	char	*warning_part3;
+
+	warning_part1 = "minishell: warning: heredoc: ";
+	warning_part2 = "here-document delimited by end-of-file ";
+	warning_part3 = "(`eof')\n";
+	ft_printf_fd(STDERR_FILENO, YELLOW "%s%s%s" RESET, warning_part1,
+		warning_part2, warning_part3);
+}
+
+/**
  * @brief Reads content for heredoc until delimiter is found
  *
  * @param pipe_fd File descriptor to write heredoc content to
@@ -50,6 +66,7 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
 {
 	char	*line;
 	int		delimiter_len;
+	int		result;
 
 	delimiter_len = ft_strlen(delimiter);
 	while (1)
@@ -57,8 +74,7 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
 		line = readline("> ");
 		if (!line)
 		{
-			ft_printf_fd(STDERR_FILENO, YELLOW "minishell: warning: heredoc: \
-				here-document delimited by end-of-file" RESET);
+			display_heredoc_eof_warning();
 			return (1);
 		}
 		if (ft_strncmp(line, delimiter, delimiter_len + 1) == 0)
@@ -66,7 +82,8 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
 			free(line);
 			break ;
 		}
-		if (process_heredoc_line(line, ctx, pipe_fd) == -1)
+		result = process_heredoc_line(line, ctx, pipe_fd);
+		if (result == -1)
 			return (-1);
 	}
 	return (0);
@@ -79,10 +96,11 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
  * @param delimiter String marking end of heredoc
  * @return File descriptor to read from, or -1 on error
  */
-static int	create_heredoc(t_ctx *ctx, char *delimiter)
+int	create_heredoc(t_ctx *ctx, char *delimiter)
 {
 	int	pipe_fds[2];
 	int	result;
+	int	read_fd;
 
 	if (pipe(pipe_fds) == -1)
 	{
@@ -96,7 +114,8 @@ static int	create_heredoc(t_ctx *ctx, char *delimiter)
 		close(pipe_fds[0]);
 		return (-1);
 	}
-	return (pipe_fds[0]);
+	read_fd = pipe_fds[0];
+	return (read_fd);
 }
 
 /**
@@ -109,19 +128,17 @@ static int	create_heredoc(t_ctx *ctx, char *delimiter)
 int	setup_heredocs(t_ctx *ctx, t_command *cmd)
 {
 	t_redirection	*redir;
-	int				heredoc_fd;
 	int				dup_result;
 
+	(void)ctx;
 	redir = cmd->redirection;
 	while (redir)
 	{
-		if (redir->type == TOK_HERE_DOC_FROM)
+		if (redir->type == TOK_HERE_DOC_FROM && redir->fd >= 0)
 		{
-			heredoc_fd = create_heredoc(ctx, redir->filename);
-			if (heredoc_fd == -1)
-				return (-1);
-			dup_result = dup2(heredoc_fd, STDIN_FILENO);
-			close(heredoc_fd);
+			dup_result = dup2(redir->fd, STDIN_FILENO);
+			close(redir->fd);
+			redir->fd = -1;
 			if (dup_result == -1)
 			{
 				perror("dup2");

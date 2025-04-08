@@ -6,28 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:49:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/21 15:16:31 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:32:03 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-/**
- * @brief Frees memory allocated for a redirection structure
- *
- * This function releases all memory associated with a redirection structure
- * including the filename.
- *
- * @param redirection Redirection structure to free
- */
-static void	free_redirection(t_redirection *redirection)
-{
-	if (!redirection)
-		return ;
-	if (redirection->filename)
-		free(redirection->filename);
-	free(redirection);
-}
 
 /**
  * @brief Frees memory allocated for all redirections in a linked list
@@ -45,7 +28,9 @@ static void	free_all_redirections(t_redirection *redirection)
 	while (current)
 	{
 		next = current->next;
-		free_redirection(current);
+		if (current->filename)
+			free(current->filename);
+		free(current);
 		current = next;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:47:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 11:29:39 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 20:22:43 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
  * @brief Processes a command after parsing
  *
  * @param ctx Shell context
- * @return Exit status of the command
  */
 static void	process_command(t_ctx *ctx)
 {
@@ -28,11 +27,15 @@ static void	process_command(t_ctx *ctx)
 		ft_putstr("exit\n");
 	ctx->exit_status = command_execute(ctx);
 	if (ctx->cmd)
+	{
 		free_all_commands(ctx->cmd);
-	ctx->cmd = NULL;
+		ctx->cmd = NULL;
+	}
 	if (ctx->tokens)
+	{
 		free_all_token(ctx->tokens);
-	ctx->tokens = NULL;
+		ctx->tokens = NULL;
+	}
 }
 
 /**
@@ -50,6 +53,7 @@ static t_bool	parse_user_input(t_ctx *ctx, char *input)
 		free_all_token(ctx->tokens);
 		ctx->tokens = NULL;
 		ctx->exit_status = 2;
+		free(input);
 		return (false);
 	}
 	free(input);
@@ -98,12 +102,12 @@ char	*create_prompt(int prev_status)
 		free(rdl_str1);
 		if (!rdl_str2)
 			return (NULL);
-		rdl_str3 = ft_strjoin(rdl_str2, " $ \001" RESET "\002");
+		rdl_str3 = ft_strjoin(rdl_str2, " $\001" RESET "\002 ");
 		free(rdl_str2);
 		prompt = rdl_str3;
 	}
 	else
-		prompt = ft_strdup("\001" GREEN "\002$ \001" RESET "\002");
+		prompt = ft_strdup("\001" GREEN "\002$\001" RESET "\002 ");
 	return (prompt);
 }
 

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:28:06 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 11:21:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/07 19:15:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ static int	build_token_list(t_lexer *lexer, t_token **head)
 		if (!token)
 		{
 			free_all_token(*head);
+			*head = NULL;
 			return (0);
 		}
 		add_token_to_list(head, &current, token);
