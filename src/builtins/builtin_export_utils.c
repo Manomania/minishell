@@ -83,8 +83,6 @@ t_bool	update_env_var(t_env **env_list, char *key, char *value,
 {
 	t_env	*current;
 
-	if (has_equals && (!value || value[0] == '\0'))
-		return (remove_env_var(env_list, key));
 	current = *env_list;
 	while (current)
 	{
@@ -97,8 +95,6 @@ t_bool	update_env_var(t_env **env_list, char *key, char *value,
 				current->value = NULL;
 				if (value)
 					current->value = ft_strdup(value);
-				if (value && !current->value)
-					return (false);
 			}
 			return (true);
 		}
