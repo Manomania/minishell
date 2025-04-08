@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 10:35:19 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/28 11:21:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:58:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,28 +32,6 @@ void	error_print(const char *proof, const char *module, const char *msg)
 			msg);
 	else
 		ft_printf_fd(STDERR_FILENO, RED "minishell: %s\n" RESET, msg);
-}
-
-/**
- * @brief Displays an error and gets an exit code
- *
- * @param proof (optional) Proof that the error occured
- * @param module (optional) Module where the error occured
- * @param err Error type
- * @return int Exit code
- */
-int	error(const char *proof, const char *module, t_error_type err)
-{
-	t_error_info	*error_table;
-	t_error_info	*info;
-	int				code;
-
-	error_table = get_error_table();
-	info = &error_table[err];
-	error_print(proof, module, info->message);
-	code = info->code;
-	free(error_table);
-	return (code);
 }
 
 /**

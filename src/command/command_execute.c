@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 14:00:32 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:57:20 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,20 +16,46 @@
 #include "minishell.h"
 
 /**
- * @brief Executes a single command without a pipeline
+ * @brief Sets up redirections for a command
  *
- * This function executes a single command by forking a child process.
+ * This function applies all redirections including those associated with
+ * an unknown command.
  *
- * @param ctx Context containing environment and command info
- * @return Exit status of the command
+ * @param cmd Command containing redirections to set up
+ * @return int 0 on success, -1 on error
  */
-static int	execute_single_command(t_ctx *ctx)
+static int	setup_command_redirections(t_command *cmd)
 {
-	pid_t	pid;
-	int		status;
-	int		was_signaled;
+	if (setup_heredocs(NULL, cmd) != 0)
+		return (-1);
+	if (setup_redirections(cmd->redirection) != 0)
+		return (-1);
+	return (0);
+}
 
-	was_signaled = 0;
+/**
+ * @brief Reports command not found error with proper formatting
+ *
+ * @param cmd_name Name of the command that was not found
+ * @return int Error code for command not found
+ */
+static int	report_cmd_not_found(char *cmd_name)
+{
+	ft_putstr_fd(cmd_name, STDERR_FILENO);
+	ft_putstr_fd(": command not found\n", STDERR_FILENO);
+	return (127);
+}
+
+/**
+ * @brief Handles command validation and error reporting in child process
+ *
+ * @param ctx Context containing environment info
+ * @return int Exit code for the child process
+ */
+static int	validate_cmd_in_child(t_ctx *ctx)
+{
+	if (!ctx->cmd->args || !ctx->cmd->args[0])
+		return (EXIT_SUCCESS);
 	if (!command_bin(ctx))
 	{
 		if (ctx->cmd->args && ctx->cmd->args[0])
@@ -39,23 +65,62 @@ static int	execute_single_command(t_ctx *ctx)
 				return (error_code(ERR_NO_FILE));
 			if (ft_strchr(ctx->cmd->args[0], '/'))
 				return (error_code(ERR_IS_DIR));
-			return (error(ctx->cmd->args[0], "exec", ERR_CMD_NOT_FOUND));
+			return (report_cmd_not_found(ctx->cmd->args[0]));
 		}
 		return (error_code(ERR_CMD_NOT_FOUND));
 	}
-	setup_parent_signals();
-	pid = fork();
-	if (pid == -1)
-		return (error(NULL, "execute_single_command", ERR_CHILD));
-	if (pid == 0)
-		execute_child(ctx);
-	waitpid(pid, &status, 0);
-	if (WIFSIGNALED(status))
-		was_signaled = 1;
-	setup_signals();
-	if (was_signaled && isatty(STDOUT_FILENO))
-		write(STDOUT_FILENO, "\n", 1);
-	return (get_exit_status(status));
+	return (0);
+}
+
+/**
+ * @brief Executes a single command without a pipeline
+ *
+ * This function executes a single command by forking a child process.
+ * Redirections are set up before checking if the command exists.
+ *
+ * @param ctx Context containing environment and command info
+ * @return Exit status of the command
+ */
+static int	execute_single_command(t_ctx *ctx)
+{
+	pid_t	pid;
+	int		status;
+	int		was_signaled;
+	int		cmd_status;
+
+	was_signaled = 0;
+	if (!builtins_try(ctx, ctx->cmd))
+	{
+		setup_parent_signals();
+		pid = fork();
+		if (pid == -1)
+			return (error(NULL, "execute_single_command", ERR_CHILD));
+		if (pid == 0)
+		{
+			reset_signals();
+			if (setup_command_redirections(ctx->cmd) != 0)
+			{
+				cleanup_child_process(ctx);
+				exit(EXIT_FAILURE);
+			}
+			cmd_status = validate_cmd_in_child(ctx);
+			if (cmd_status != 0)
+			{
+				cleanup_child_process(ctx);
+				exit(cmd_status);
+			}
+			execve(ctx->cmd->args[0], ctx->cmd->args, ctx->envp);
+			ctx_error_exit(ctx, ctx->cmd->args[0], "exec", ERR_CHILD);
+		}
+		waitpid(pid, &status, 0);
+		if (WIFSIGNALED(status))
+			was_signaled = 1;
+		setup_signals();
+		if (was_signaled && isatty(STDOUT_FILENO))
+			write(STDOUT_FILENO, "\n", 1);
+		return (get_exit_status(status));
+	}
+	return (ctx->exit_status);
 }
 
 /**
@@ -110,11 +175,7 @@ static int	process_command(t_ctx *ctx)
 	if (is_pipeline(ctx->cmd))
 		status = exec_cmdas(ctx);
 	else
-	{
-		if (builtins_try(ctx, ctx->cmd))
-			return (ctx->exit_status);
 		status = execute_single_command(ctx);
-	}
 	return (status);
 }
 

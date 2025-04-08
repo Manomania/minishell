@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:54:30 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 20:01:34 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:48:05 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,26 +32,6 @@ static int	setup_child_redirections(t_ctx *ctx, t_command *cmd)
 		return (result);
 	result = setup_redirections(cmd->redirection);
 	return (result);
-}
-
-/**
- * @brief Checks if command exists and is executable
- *
- * This function verifies the command path and permissions.
- *
- * @param cmd Command to check
- * @return 0 on success, non-zero on error
- */
-static int	check_command_executable(t_command *cmd)
-{
-	if (!cmd->args || !cmd->args[0])
-		return (0);
-	if (access(cmd->args[0], X_OK) != 0)
-	{
-		ft_printf("command not found or not executable: %s\n", cmd->args[0]);
-		return (1);
-	}
-	return (0);
 }
 
 /**
@@ -97,14 +77,15 @@ static void	execute_command_or_redir(t_ctx *ctx, t_command *cmd)
 /**
  * @brief Executes the child process portion of a single command
  *
- * This function handles the execution of a command in a child process.
+ * This function sets up redirections first, then checks if the command
+ * exists,
+	ensuring that redirections are applied even for non-existent commands.
  *
  * @param ctx Context containing environment and command info
  */
 void	execute_child(t_ctx *ctx)
 {
 	int	redirect_result;
-	int	cmd_check;
 
 	reset_signals();
 	redirect_result = setup_child_redirections(ctx, ctx->cmd);
@@ -113,11 +94,23 @@ void	execute_child(t_ctx *ctx)
 		child_process_cleanup(ctx);
 		exit(EXIT_FAILURE);
 	}
-	cmd_check = check_command_executable(ctx->cmd);
-	if (cmd_check != 0)
+	if (!ctx->cmd->args || !ctx->cmd->args[0])
 	{
 		child_process_cleanup(ctx);
-		exit(EXIT_FAILURE);
+		exit(EXIT_SUCCESS);
+	}
+	if (!command_bin(ctx))
+	{
+		if (ctx->cmd->args && ctx->cmd->args[0])
+		{
+			if (ctx->cmd->args[0][0] == '.' && !ft_strchr(ctx->cmd->args[0],
+					'/'))
+				exit(error_code(ERR_NO_FILE));
+			if (ft_strchr(ctx->cmd->args[0], '/'))
+				exit(error_code(ERR_IS_DIR));
+			exit(error(ctx->cmd->args[0], "exec", ERR_CMD_NOT_FOUND));
+		}
+		exit(error_code(ERR_CMD_NOT_FOUND));
 	}
 	execute_command_or_redir(ctx, ctx->cmd);
 }

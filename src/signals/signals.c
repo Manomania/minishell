@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:58:55 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/30 14:59:56 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:39:32 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
  * @brief Global variable to track if we're in a child process
  * This will help us determine how to handle signals.
  */
-static volatile sig_atomic_t	g_in_child = 0;
+static sig_atomic_t	g_in_child = 0;
 
 /**
  * @brief Signal handler for interactive mode (shell prompt)

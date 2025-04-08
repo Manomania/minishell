@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 13:41:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:50:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,12 @@ int	read_all_heredocs(t_ctx *ctx)
 	return (0);
 }
 
+/**
+ * @brief Sets up redirections in child process for command with only
+ * redirections
+ *
+ * @param ctx Context containing environment information
+ */
 static void	setup_stuff(t_ctx *ctx)
 {
 	reset_signals();
