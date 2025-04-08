@@ -14,6 +14,40 @@
 #include "minishell.h"
 
 /**
+ * @brief Increments SHLVL in the environment list
+ *
+ * @param env_list Environment variable list
+ * @return t_bool true if successful, false otherwise
+ */
+static t_bool	increment_shlvl(t_env **env_list)
+{
+	t_env	*current;
+	int		level;
+	char	*new_value;
+
+	current = *env_list;
+	while (current)
+	{
+		if (ft_strncmp(current->key, "SHLVL", 6) == 0)
+		{
+			level = 1;
+			if (current->value)
+			{
+				level = ft_atoi(current->value) + 1;
+				free(current->value);
+			}
+			new_value = ft_itoa(level);
+			if (!new_value)
+				return (false);
+			current->value = new_value;
+			return (true);
+		}
+		current = current->next;
+	}
+	return (add_env_var(env_list, "SHLVL", "1"));
+}
+
+/**
  * @brief Initializes the environment in the context
  *
  * @param ctx Context
@@ -32,6 +66,11 @@ static void	init_ctx_envp(t_ctx *ctx, char **envp)
 			return ;
 		}
 		i++;
+	}
+	if (!increment_shlvl(&ctx->env_list))
+	{
+		ctx_clear(ctx);
+		return ;
 	}
 }
 
