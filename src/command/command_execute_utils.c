@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:54:30 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 14:48:05 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 15:17:07 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,8 +78,8 @@ static void	execute_command_or_redir(t_ctx *ctx, t_command *cmd)
  * @brief Executes the child process portion of a single command
  *
  * This function sets up redirections first, then checks if the command
- * exists,
-	ensuring that redirections are applied even for non-existent commands.
+ * exists, ensuring that redirections are applied even for non-existent
+ * commands.
  *
  * @param ctx Context containing environment and command info
  */
