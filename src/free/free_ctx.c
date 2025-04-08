@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 18:24:28 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 19:32:44 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:00:58 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,8 @@ void	ctx_clear(t_ctx *ctx)
  */
 void	final_cleanup(t_ctx *ctx)
 {
+	if (ctx->cmd)
+		close_heredoc_fds(ctx->cmd);
 	if (ctx->tokens)
 	{
 		free_all_token(ctx->tokens);

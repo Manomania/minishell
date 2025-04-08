@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/08 13:44:04 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -399,6 +399,9 @@ int							create_heredoc(t_ctx *ctx, char *delimiter);
 // heredoc_utils.c
 char						*replace_substring(char *str, int start, int end,
 								char *replacement);
+
+// heredoc_utils2.c
+void						close_heredoc_fds(t_command *cmd);
 
 // heredoc_expand.c
 char						*expand_variables_in_line(t_ctx *ctx, char *line);

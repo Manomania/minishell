@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 13:41:28 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 14:00:32 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,6 +136,7 @@ int	command_execute(t_ctx *ctx)
 	if (read_all_heredocs(ctx) != 0)
 		return (error(NULL, "heredoc", ERR_PIPE));
 	status = process_command(ctx);
+	close_heredoc_fds(ctx->cmd);
 	ctx->exit_status = status;
 	return (status);
 }
