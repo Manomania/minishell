@@ -107,6 +107,11 @@ int	builtin_cd(t_ctx *ctx, t_command *cmd)
 	int		result;
 	t_env	*old_pwd_node;
 
+	if (cmd->arg_count > 1)
+	{
+		error(NULL, "cd", ERR_TOO_MANY_ARGS);
+		return (1);
+	}
 	old_pwd = get_current_pwd(ctx);
 	target_dir = get_target_directory(ctx, cmd);
 	if (!target_dir)
