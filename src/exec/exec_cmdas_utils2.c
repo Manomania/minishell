@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 14:57:34 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 18:42:16 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,9 +103,8 @@ void	execute_command(t_ctx *ctx, t_command *cmd)
 /**
  * @brief Sets up the child process for command execution
  *
- * This function first handles all redirections before checking
- * if the command exists, ensuring that files are created even for
- * non-existent commands.
+ * This function handles all redirections before checking if the command exists,
+ * ensuring proper error handling for redirection failures in pipelines.
  *
  * @param ctx Context with environment
  * @param cmd Command to execute
@@ -118,20 +117,26 @@ void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
 	reset_signals();
 	if (input_fd != STDIN_FILENO)
 	{
-		dup2(input_fd, STDIN_FILENO);
+		if (dup2(input_fd, STDIN_FILENO) == -1)
+		{
+			perror("dup2");
+			cleanup_child_process(ctx);
+			exit(EXIT_FAILURE);
+		}
 		close(input_fd);
 	}
 	if (output_fd != STDOUT_FILENO)
 	{
-		dup2(output_fd, STDOUT_FILENO);
+		if (dup2(output_fd, STDOUT_FILENO) == -1)
+		{
+			perror("dup2");
+			cleanup_child_process(ctx);
+			exit(EXIT_FAILURE);
+		}
 		close(output_fd);
 	}
-	if (setup_heredocs(ctx, cmd) != 0)
-	{
-		cleanup_child_process(ctx);
-		exit(EXIT_FAILURE);
-	}
-	if (handle_redirections(cmd->redirection) != 0)
+	if (setup_heredocs(ctx, cmd) != 0
+		|| setup_redirections(cmd->redirection) != 0)
 	{
 		cleanup_child_process(ctx);
 		exit(EXIT_FAILURE);

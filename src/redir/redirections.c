@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:45:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/27 18:13:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 18:43:30 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,10 @@ static int	open_redirect_file(t_token_type type, char *filename)
 	else if (type == TOK_HERE_DOC_TO)
 		fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd == -1)
+	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror(filename);
+	}
 	return (fd);
 }
 
@@ -59,6 +62,7 @@ static int	redirect_std_fd(int fd, t_token_type type)
 	close(fd);
 	if (dup_result == -1)
 	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		perror("dup2");
 		return (-1);
 	}
@@ -88,10 +92,13 @@ static int	process_redirection(t_redirection *redir)
 /**
  * @brief Process each redirection in a linked list
  *
+ * When a redirection fails, the function returns immediately
+ * to ensure proper error handling in pipeline contexts.
+ *
  * @param redirections Redirection list to process
  * @return 0 on success, error code on failure
  */
-int	process_redirection_list(t_redirection *redirections)
+static int	process_redirection_list(t_redirection *redirections)
 {
 	t_redirection	*redir;
 	int				result;
@@ -115,12 +122,7 @@ int	process_redirection_list(t_redirection *redirections)
  */
 int	setup_redirections(t_redirection *redirections)
 {
-	int	result;
-
 	if (!redirections)
 		return (0);
-	result = process_redirection_list(redirections);
-	if (result != 0)
-		return (result);
-	return (0);
+	return (process_redirection_list(redirections));
 }

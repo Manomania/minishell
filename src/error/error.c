@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:20:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 14:58:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 18:13:51 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
  */
 static int	handle_cmd_not_found(const char *proof, const char *msg)
 {
+	ft_putstr_fd("minishell: ", STDERR_FILENO);
 	ft_putstr_fd((char *)proof, STDERR_FILENO);
 	ft_putstr_fd(": ", STDERR_FILENO);
 	ft_putstr_fd((char *)msg, STDERR_FILENO);

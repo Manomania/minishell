@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 10:35:19 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/08 17:02:50 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 18:14:32 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,30 +21,18 @@
  */
 void	error_print(const char *proof, const char *module, const char *msg)
 {
+	ft_printf_fd(STDERR_FILENO,
+		"\001" RED "\002"
+		"minishell: ",
+		RESET);
 	if (module && proof)
-		ft_printf_fd(STDERR_FILENO,
-			"\001" RED "\002"
-			"minishell: %s: `%s' %s\n" RESET,
-			module,
-			proof,
-			msg);
+		ft_printf_fd(STDERR_FILENO, "%s: `%s' %s\n", module, proof, msg);
 	else if (module)
-		ft_printf_fd(STDERR_FILENO,
-			"\001" RED "\002"
-			"minishell: %s: %s\n" RESET,
-			module,
-			msg);
+		ft_printf_fd(STDERR_FILENO, "%s: %s\n", module, msg);
 	else if (proof)
-		ft_printf_fd(STDERR_FILENO,
-			"\001" RED "\002"
-			"minishell: `%s' %s\n" RESET,
-			proof,
-			msg);
+		ft_printf_fd(STDERR_FILENO, "%s: %s\n", proof, msg);
 	else
-		ft_printf_fd(STDERR_FILENO,
-			"\001" RED "\002"
-			"minishell: %s\n" RESET,
-			msg);
+		ft_printf_fd(STDERR_FILENO, "%s\n", msg);
 }
 
 /**
