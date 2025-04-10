@@ -116,8 +116,13 @@ static int	execute_single_command(t_ctx *ctx)
 		if (WIFSIGNALED(status))
 			was_signaled = 1;
 		setup_signals();
-		if (was_signaled && isatty(STDOUT_FILENO))
-			write(STDOUT_FILENO, "\n", 1);
+		if (was_signaled)
+		{
+			if (WTERMSIG(status) == SIGQUIT)
+				ft_putstr_fd("Quit (core dumped)\n", STDERR_FILENO);
+			else if (isatty(STDOUT_FILENO))
+				write(STDOUT_FILENO, "\n", 1);
+		}
 		return (get_exit_status(status));
 	}
 	return (ctx->exit_status);
