@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:32:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 13:29:05 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 18:43:56 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 
 /**
  * @brief Executes a command that only has redirections in a pipeline
+ *
+ * This function ensures redirection failures are properly handled in pipeline
+ * contexts, terminating the child process if redirection fails.
  *
  * @param ctx Context containing environment information
  * @param data Pipeline data structure
@@ -40,10 +43,13 @@ pid_t	execute_redirections_only_pipeline(t_ctx *ctx, t_pipe_data *data)
 			dup2(data->pipe_fds[1], STDOUT_FILENO);
 			close(data->pipe_fds[1]);
 		}
-		if (setup_heredocs(ctx, data->current) != 0)
+		if (setup_heredocs(ctx, data->current) != 0
+			|| setup_redirections(data->current->redirection) != 0)
+		{
+			cleanup_child_process(ctx);
 			exit(EXIT_FAILURE);
-		if (setup_redirections(data->current->redirection) != 0)
-			exit(EXIT_FAILURE);
+		}
+		cleanup_child_process(ctx);
 		exit(EXIT_SUCCESS);
 	}
 	return (pid);
