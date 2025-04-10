@@ -30,6 +30,8 @@ static t_bool	is_valid_number(char *str)
 		return (false);
 	if (str[i] == '+' || str[i] == '-')
 		i++;
+	if (!str[i])
+		return (false);
 	while (str[i])
 	{
 		if (!ft_isdigit(str[i]))
@@ -69,16 +71,18 @@ int	builtin_exit(t_ctx *ctx, t_command *cmd)
 	int	exit_code;
 
 	exit_code = ctx->exit_status;
-	if (cmd->arg_count > 0 && cmd->args[1])
+	if (cmd->arg_count == 0 || !cmd->args[1])
 	{
-		if (!validate_exit_arg(cmd->args[1], &exit_code))
-		{
-			ctx->exit_requested = true;
-			return (exit_code);
-		}
-		if (cmd->arg_count > 1)
-			return (error(NULL, "exit", ERR_TOO_MANY_ARGS));
+		ctx->exit_requested = true;
+		return (exit_code);
 	}
+	if (!validate_exit_arg(cmd->args[1], &exit_code))
+	{
+		ctx->exit_requested = true;
+		return (exit_code);
+	}
+	if (cmd->arg_count > 1)
+		return (error(NULL, "exit", ERR_TOO_MANY_ARGS));
 	ctx->exit_status = exit_code;
 	ctx->exit_requested = true;
 	return (exit_code);
