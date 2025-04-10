@@ -20,8 +20,9 @@
  *
  * @param ctx Shell context
  * @param prev_status Previous command exit status
+ * @return int Final exit status
  */
-static void	command_loop(t_ctx *ctx)
+static int	command_loop(t_ctx *ctx)
 {
 	char	*input;
 	int		running;
@@ -32,11 +33,12 @@ static void	command_loop(t_ctx *ctx)
 	{
 		input = get_user_input(ctx, ctx->exit_status);
 		if (!input)
-			ctx_exit(ctx);
+			return (ctx->exit_status);
 		handle_command_in_main_loop(ctx, input);
 		if (ctx->exit_requested)
 			running = 0;
 	}
+	return (ctx->exit_status);
 }
 
 /**
@@ -70,13 +72,14 @@ static void	check_debug_args(t_ctx *ctx, int argc, char **argv)
 int	main(int argc, char **argv, char **envp)
 {
 	t_ctx	*ctx;
+	int	final_status;
 
 	ctx = init_ctx(argc, argv, envp);
 	check_debug_args(ctx, argc, argv);
 	if (!ctx)
 		ctx_error_exit(ctx, NULL, "main", ERR_ALLOC);
 	setup_signals();
-	command_loop(ctx);
+	final_status = command_loop(ctx);
 	final_cleanup(ctx);
-	return (EXIT_SUCCESS);
+	return (final_status);
 }

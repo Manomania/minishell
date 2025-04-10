@@ -19,6 +19,9 @@
  */
 void	ctx_exit(t_ctx *ctx)
 {
+	int exit_code;
+
+	exit_code = ctx->exit_status;
 	ctx_clear(ctx);
-	exit(EXIT_SUCCESS);
+	exit(exit_code);
 }

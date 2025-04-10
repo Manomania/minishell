@@ -86,7 +86,7 @@ t_error_info	*get_error_table(void)
 	error_table[ERR_CHILD] = (t_error_info){ECHILD, "child/fork/execve error"};
 	error_table[ERR_PIPE] = (t_error_info){EPIPE, "pipe processing failed"};
 	error_table[ERR_IDENTIFIER] = (t_error_info){1, "not a valid identifier"};
-	error_table[ERR_NUMERIC] = (t_error_info){255, "numeric argument required"};
+	error_table[ERR_NUMERIC] = (t_error_info){2, "numeric argument required"};
 	error_table[ERR_TOO_MANY_ARGS] = (t_error_info){1, "too many arguments"};
 	error_table[ERR_UNCLOSED_QUOTE] = (t_error_info){1, "unclosed quote"};
 	error_table[ERR_TOKEN_LIST] = (t_error_info){1,
