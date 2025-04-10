@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:54:30 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 18:15:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/08 16:59:17 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ void	execute_child(t_ctx *ctx)
 				exit(error_code(ERR_NO_FILE));
 			if (ft_strchr(ctx->cmd->args[0], '/'))
 				exit(error_code(ERR_IS_DIR));
-			exit(error(ctx->cmd->args[0], "minishell", ERR_CMD_NOT_FOUND));
+			exit(error(ctx->cmd->args[0], "exec", ERR_CMD_NOT_FOUND));
 		}
 		exit(error_code(ERR_CMD_NOT_FOUND));
 	}
