@@ -97,9 +97,7 @@ void	execute_command(t_ctx *ctx, t_command *cmd)
 	free(cmd->args[0]);
 	cmd->args[0] = bin_path;
 	if (execve(cmd->args[0], cmd->args, ctx->envp) == -1)
-	{
 		ctx_error_exit(ctx, cmd->args[0], "exec", ERR_CHILD);
-	}
 }
 
 /**
