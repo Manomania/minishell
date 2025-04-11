@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:01:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/30 17:52:37 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/10 17:11:07 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,38 +39,6 @@ char	*get_target_directory(t_ctx *ctx, t_command *cmd)
 	else
 		target_dir = ft_strdup(cmd->args[1]);
 	return (target_dir);
-}
-
-/**
- * @brief Changes directory to the target path
- *
- * @param target_dir Target directory path
- * @param old_pwd Old PWD value (will be freed on error)
- * @return int Exit status (0 for success, 1 for error)
- */
-int	change_directory(char *target_dir, char *old_pwd)
-{
-	int	result;
-
-	if (!target_dir)
-		return (free(old_pwd), 1);
-	result = chdir(target_dir);
-	if (result != 0)
-	{
-		if (errno == ENOENT)
-			(void)error(target_dir, "cd", ERR_NO_FILE);
-		else if (errno == EACCES)
-			(void)error(target_dir, "cd", ERR_NO_PERMS);
-		else if (errno == ENOTDIR)
-			(void)error(target_dir, "cd", ERR_IS_DIR);
-		else
-			(void)error(target_dir, "cd", ERR_NO_FILE);
-		free(target_dir);
-		free(old_pwd);
-		return (1);
-	}
-	free(target_dir);
-	return (0);
 }
 
 /**

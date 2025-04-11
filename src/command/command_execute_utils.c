@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:54:30 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 18:15:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/10 15:33:41 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,25 +53,6 @@ static void	child_process_cleanup(t_ctx *ctx)
 t_bool	has_only_redirections(t_command *cmd)
 {
 	return (cmd && cmd->redirection && (!cmd->args || !cmd->args[0]));
-}
-
-/**
- * @brief Executes command or processes redirections if no command
- *
- * @param ctx Context with environment
- * @param cmd Command to execute
- */
-static void	execute_command_or_redir(t_ctx *ctx, t_command *cmd)
-{
-	if (!cmd->args || !cmd->args[0])
-	{
-		child_process_cleanup(ctx);
-		exit(EXIT_SUCCESS);
-	}
-	execve(cmd->args[0], cmd->args, ctx->envp);
-	perror("execve");
-	child_process_cleanup(ctx);
-	exit(EXIT_FAILURE);
 }
 
 /**
@@ -123,47 +104,80 @@ static char	**create_env_array(t_env *env_list)
 }
 
 /**
- * @brief Executes the child process portion of a command
+ * Sets up and manages child process redirection
  *
- * @param ctx Context containing environment and command info
+ * @param ctx Context containing shell state
+ * @return int Status code, 0 for success or error code
  */
-void	execute_child(t_ctx *ctx)
+static int	handle_child_redirections(t_ctx *ctx)
 {
-	int		redirect_result;
-	char	**env_array;
+	int	redirect_result;
 
-	reset_signals();
 	redirect_result = setup_child_redirections(ctx, ctx->cmd);
 	if (redirect_result != 0)
-	{
-		child_process_cleanup(ctx);
-		exit(EXIT_FAILURE);
-	}
+		return (EXIT_FAILURE);
 	if (!ctx->cmd->args || !ctx->cmd->args[0])
-	{
-		child_process_cleanup(ctx);
-		exit(EXIT_SUCCESS);
-	}
+		return (EXIT_SUCCESS);
+	return (0);
+}
+
+/**
+ * Validates command binary and handles error reporting
+ *
+ * @param ctx Context containing shell state
+ * @return int 0 if valid, error code otherwise
+ */
+static int	validate_child_command(t_ctx *ctx)
+{
 	if (!command_bin(ctx))
 	{
 		if (ctx->cmd->args && ctx->cmd->args[0])
 		{
 			if (ctx->cmd->args[0][0] == '.' && !ft_strchr(ctx->cmd->args[0],
 					'/'))
-				exit(error_code(ERR_NO_FILE));
+				return (error_code(ERR_NO_FILE));
 			if (ft_strchr(ctx->cmd->args[0], '/'))
-				exit(error_code(ERR_IS_DIR));
-			exit(error(ctx->cmd->args[0], "minishell", ERR_CMD_NOT_FOUND));
+				return (error_code(ERR_IS_DIR));
+			return (error(ctx->cmd->args[0], "minishell", ERR_CMD_NOT_FOUND));
 		}
-		exit(error_code(ERR_CMD_NOT_FOUND));
+		return (error_code(ERR_CMD_NOT_FOUND));
 	}
-	execute_command_or_redir(ctx, ctx->cmd);
+	return (0);
+}
+
+/**
+ * Main child process execution function
+ *
+ * @param ctx Context containing shell state
+ */
+void	execute_child(t_ctx *ctx)
+{
+	int		status;
+	char	**env_array;
+
+	reset_signals();
+	status = handle_child_redirections(ctx);
+	if (status != 0)
+	{
+		child_process_cleanup(ctx);
+		exit(status);
+	}
+	status = validate_child_command(ctx);
+	if (status != 0)
+	{
+		child_process_cleanup(ctx);
+		exit(status);
+	}
 	env_array = create_env_array(ctx->env_list);
 	if (!env_array)
+	{
+		child_process_cleanup(ctx);
 		exit(EXIT_FAILURE);
+	}
 	execve(ctx->cmd->args[0], ctx->cmd->args, env_array);
 	free_2d_array((void **)env_array);
 	perror("execve");
+	child_process_cleanup(ctx);
 	exit(EXIT_FAILURE);
 }
 
