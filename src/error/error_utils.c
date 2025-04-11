@@ -71,8 +71,7 @@ t_error_info	*get_error_table(void)
 	error_table[ERR_IO] = (t_error_info){EIO, "i/o error"};
 	error_table[ERR_FD] = (t_error_info){1, "bad file descriptor"};
 	error_table[ERR_ALLOC] = (t_error_info){ENOMEM, "allocation failed"};
-	// error_table[ERR_CHILD] = (t_error_info){126, "No such file or directory"};
-	error_table[ERR_CHILD] = (t_error_info){127, "child/fork/execve error"};
+	error_table[ERR_CHILD] = (t_error_info){127, "No such file or directory"};
 	error_table[ERR_PIPE] = (t_error_info){EPIPE, "pipe processing failed"};
 	error_table[ERR_IDENTIFIER] = (t_error_info){1, "not a valid identifier"};
 	error_table[ERR_NUMERIC] = (t_error_info){2, "numeric argument required"};
