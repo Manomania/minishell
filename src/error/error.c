@@ -21,7 +21,7 @@
  */
 static int	handle_cmd_not_found(const char *proof, const char *msg)
 {
-	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	ft_putstr_fd("minishell: ", STDOUT_FILENO);
 	ft_putstr_fd((char *)proof, STDERR_FILENO);
 	ft_putstr_fd(": ", STDERR_FILENO);
 	ft_putstr_fd((char *)msg, STDERR_FILENO);

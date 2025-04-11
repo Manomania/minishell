@@ -26,7 +26,7 @@ void	error_print(const char *proof, const char *module, const char *msg)
 		"minishell: ",
 		RESET);
 	if (module && proof)
-		ft_printf_fd(STDERR_FILENO, "%s: `%s' %s\n", module, proof, msg);
+		ft_printf_fd(STDERR_FILENO, "%s: %s: %s", module, proof, msg);
 	else if (module)
 		ft_printf_fd(STDERR_FILENO, "%s: %s\n", module, msg);
 	else if (proof)
@@ -46,10 +46,10 @@ t_error_info	*get_error_table(void)
 
 	error_table = malloc(32 * sizeof(t_error_info));
 	error_table[ERR_CMD_NOT_FOUND] = (t_error_info){127, "command not found"};
-	error_table[ERR_NO_PERMS] = (t_error_info){126, "permission denied"};
+	error_table[ERR_NO_PERMS] = (t_error_info){126, "Permission denied"};
 	error_table[ERR_NO_FILE] = (t_error_info){127,
-		"no such file or directory"};
-	error_table[ERR_IS_DIR] = (t_error_info){126, "is a directory"};
+		"No such file or directory"};
+	error_table[ERR_IS_DIR] = (t_error_info){126, "Is a directory"};
 	error_table[ERR_NO_PWD] = (t_error_info){1,
 		"failed to get current directory"};
 	error_table[ERR_NO_OLDPWD] = (t_error_info){1, "OLDPWD not set"};
@@ -71,8 +71,8 @@ t_error_info	*get_error_table(void)
 	error_table[ERR_IO] = (t_error_info){EIO, "i/o error"};
 	error_table[ERR_FD] = (t_error_info){1, "bad file descriptor"};
 	error_table[ERR_ALLOC] = (t_error_info){ENOMEM, "allocation failed"};
-	error_table[ERR_CHILD] = (t_error_info){127, "No such file or directory"};
-	// error_table[ERR_CHILD] = (t_error_info){127, "child/fork/execve error"};
+	// error_table[ERR_CHILD] = (t_error_info){126, "No such file or directory"};
+	error_table[ERR_CHILD] = (t_error_info){127, "child/fork/execve error"};
 	error_table[ERR_PIPE] = (t_error_info){EPIPE, "pipe processing failed"};
 	error_table[ERR_IDENTIFIER] = (t_error_info){1, "not a valid identifier"};
 	error_table[ERR_NUMERIC] = (t_error_info){2, "numeric argument required"};
