@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 12:35:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 14:11:25 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 14:18:11 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,13 +68,13 @@ int	apply_output_redirection(int fd)
  */
 static int	report_redir_error(char *filename)
 {
-	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
 	ft_putstr_fd(filename, STDERR_FILENO);
 	ft_putstr_fd(": ", STDERR_FILENO);
 	if (errno == ENOENT)
-		ft_putstr_fd("No such file or directory", STDERR_FILENO);
+		ft_putstr_fd("No such file or directory" RESET, STDERR_FILENO);
 	else if (errno == EACCES)
-		ft_putstr_fd("Permission denied", STDERR_FILENO);
+		ft_putstr_fd("Permission denied" RESET, STDERR_FILENO);
 	else
 		ft_putstr_fd(strerror(errno), STDERR_FILENO);
 	ft_putstr_fd("\n", STDERR_FILENO);

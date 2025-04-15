@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 13:57:47 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 14:19:04 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,9 @@ int	count_commands(t_command *cmd)
  */
 static void	report_cmd_not_found_pipe(char *cmd_name)
 {
-	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
 	ft_putstr_fd(cmd_name, STDERR_FILENO);
-	ft_putstr_fd(": command not found\n", STDERR_FILENO);
+	ft_putstr_fd(": command not found" RESET "\n", STDERR_FILENO);
 }
 
 /**
