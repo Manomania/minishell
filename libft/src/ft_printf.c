@@ -48,7 +48,7 @@ int	ft_printf_fd(int fd, const char *format, ...)
 			count += ft_check_args(fd, fmt, args);
 		}
 		else
-			count += ft_putchar(*format);
+			count += ft_putchar_fd(*format, fd);
 		format++;
 	}
 	va_end(args);
