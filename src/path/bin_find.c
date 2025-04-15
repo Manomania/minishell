@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 11:10:18 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/10 17:36:16 by maximart         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,8 @@ static char	*handle_bin_as_path(char *bin, t_path_error *error_state)
 	if (path)
 		return (path);
 	if (*error_state == PATH_ERR_IS_DIR)
+		return (display_path_error(bin, *error_state), NULL);
+	if (*error_state == PATH_ERR_NO_PERMISSION)
 		return (display_path_error(bin, *error_state), NULL);
 	path = check_relative_path(bin, error_state);
 	if (path)

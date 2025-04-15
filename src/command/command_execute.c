@@ -34,19 +34,6 @@ static int	setup_command_redirections(t_command *cmd)
 }
 
 /**
- * @brief Reports command not found error with proper formatting
- *
- * @param cmd_name Name of the command that was not found
- * @return int Error code for command not found
- */
-static int	report_cmd_not_found(char *cmd_name)
-{
-	ft_putstr_fd(cmd_name, STDERR_FILENO);
-	ft_putstr_fd(": command not found\n", STDERR_FILENO);
-	return (127);
-}
-
-/**
  * @brief Handles command validation and error reporting in child process
  *
  * @param ctx Context containing environment info
@@ -65,7 +52,7 @@ static int	validate_cmd_in_child(t_ctx *ctx)
 				return (error_code(ERR_NO_FILE));
 			if (ft_strchr(ctx->cmd->args[0], '/'))
 				return (error_code(ERR_IS_DIR));
-			return (report_cmd_not_found(ctx->cmd->args[0]));
+			exit(127);
 		}
 		return (error_code(ERR_CMD_NOT_FOUND));
 	}

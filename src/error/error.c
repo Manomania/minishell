@@ -21,12 +21,19 @@
  */
 static int	handle_cmd_not_found(const char *proof, const char *msg)
 {
-	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	ft_putstr_fd(RED"minishell: ", STDOUT_FILENO);
 	ft_putstr_fd((char *)proof, STDERR_FILENO);
 	ft_putstr_fd(": ", STDERR_FILENO);
 	ft_putstr_fd((char *)msg, STDERR_FILENO);
 	ft_putstr_fd("\n", STDERR_FILENO);
-	return (127);
+
+	if (ft_strncmp(msg, "No such file or directory", 25) == 0)
+		return (127);
+	else if (ft_strncmp(msg, "Permission denied", 17) == 0)
+		return (126);
+	else if (ft_strncmp(msg, "Is a directory", 14) == 0)
+		return (126);
+	return (1);
 }
 
 /**

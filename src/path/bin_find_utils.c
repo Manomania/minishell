@@ -66,9 +66,9 @@ char	*check_relative_path(char *bin, t_path_error *error_state)
 void	display_path_error(char *bin, t_path_error error_state)
 {
 	if (error_state == PATH_ERR_NOT_FOUND)
-		(void)error(bin, NULL, ERR_NO_FILE);
-	else if (error_state == PATH_ERR_NO_PERMISSION)
-		(void)error(bin, NULL, ERR_NO_PERMS);
-	else if (error_state == PATH_ERR_IS_DIR)
-		(void)error(bin, NULL, ERR_IS_DIR);
+		exit(error(bin, NULL, ERR_NO_FILE));
+	if (error_state == PATH_ERR_NO_PERMISSION)
+		exit(error(bin, NULL, ERR_NO_PERMS));
+	if (error_state == PATH_ERR_IS_DIR)
+		exit(error(bin, NULL, ERR_IS_DIR));
 }
