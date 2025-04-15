@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:52:58 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 15:49:47 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 17:59:44 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,6 @@
 #include "debug.h"
 #include "error.h"
 #include "minishell.h"
-
-// Forward declaration from builtins_redirect_utils.c if needed,
-// or include header
-int		apply_redirection(t_redirection *redir);
 
 /**
  * @brief Opens a file for redirection (shared logic)
@@ -47,12 +43,6 @@ int	open_redirection_file(t_redirection *redir)
 	else
 		return (-1);
 	fd = open(redir->filename, flags, 0644);
-	if (fd == -1)
-	{
-		ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
-		perror(redir->filename);
-		ft_putstr_fd(RESET, STDERR_FILENO);
-	}
 	return (fd);
 }
 
@@ -101,14 +91,14 @@ int	builtin_setup_redirections(t_command *cmd, int saved_fds[2])
  */
 void	builtin_restore_redirections(int saved_fds[2])
 {
-	if (saved_fds[0] != -1)
+	if (saved_fds[0] >= 0)
 	{
 		if (dup2(saved_fds[0], STDIN_FILENO) == -1)
 			perror("minishell: dup2 failed restoring stdin");
 		close(saved_fds[0]);
 		saved_fds[0] = -1;
 	}
-	if (saved_fds[1] != -1)
+	if (saved_fds[1] >= 0)
 	{
 		if (dup2(saved_fds[1], STDOUT_FILENO) == -1)
 			perror("minishell: dup2 failed restoring stdout");

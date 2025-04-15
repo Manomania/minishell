@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 11:43:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 15:55:50 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 18:09:00 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,16 @@ int	setup_builtin_redirections(t_command *cmd, int *saved_fds)
 	result = builtin_setup_redirections(cmd, saved_fds);
 	if (result == -1)
 	{
-		close(saved_fds[0]);
-		saved_fds[0] = -1;
-		close(saved_fds[1]);
-		saved_fds[1] = -1;
+		if (saved_fds[0] >= 2)
+		{
+			close(saved_fds[0]);
+			saved_fds[0] = -1;
+		}
+		if (saved_fds[1] >= 2)
+		{
+			close(saved_fds[1]);
+			saved_fds[1] = -1;
+		}
 		return (-1);
 	}
 	return (0);

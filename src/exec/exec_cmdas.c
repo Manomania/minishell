@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 15:45:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 18:14:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ static int	handle_pre_fork_redirections(t_command *cmd)
 			fd = open_redirection_file(redir);
 			if (fd != -1)
 			{
-				write(fd, "", 0); /* Ensure file is created and truncated */
+				write(fd, "", 0);
 				close(fd);
 			}
 		}
@@ -83,13 +83,18 @@ int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i, int cmd_count)
 	int	next_pipe;
 
 	next_pipe = STDIN_FILENO;
-	if (prev_pipe != STDIN_FILENO && prev_pipe != -1)
+	if (prev_pipe > 2)
 		close(prev_pipe);
 	if (i < cmd_count - 1)
 	{
 		next_pipe = pipe_fds[0];
-		if (pipe_fds[1] != -1 && pipe_fds[1] != STDOUT_FILENO)
+		if (pipe_fds[1] > 2)
 			close(pipe_fds[1]);
+	}
+	else
+	{
+		if (pipe_fds[0] > 2)
+			close(pipe_fds[0]);
 	}
 	return (next_pipe);
 }

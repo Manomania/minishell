@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:20:14 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 14:11:12 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 18:03:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,6 @@ static int	preprocess_redirections(t_command *cmd)
 			fd = open_redirection_file(redir);
 			if (fd != -1)
 			{
-				/* For regular redirections, truncate the file */
 				if (redir->type == TOK_REDIR_TO)
 					write(fd, "", 0);
 				close(fd);
@@ -89,7 +88,13 @@ static int	setup_pipeline_fds(int *saved_in, int *saved_out, int *input_fd,
 	}
 	if (*input_fd != STDIN_FILENO)
 	{
-		dup2(*input_fd, STDIN_FILENO);
+		if (dup2(*input_fd, STDIN_FILENO) == -1)
+		{
+			if (*input_fd > 2)
+				close(*input_fd);
+			restore_pipeline_fds(*saved_in, *saved_out);
+			return (ERR_FD);
+		}
 		if (*input_fd > 2)
 		{
 			close(*input_fd);
@@ -98,7 +103,13 @@ static int	setup_pipeline_fds(int *saved_in, int *saved_out, int *input_fd,
 	}
 	if (*output_fd != STDOUT_FILENO)
 	{
-		dup2(*output_fd, STDOUT_FILENO);
+		if (dup2(*output_fd, STDOUT_FILENO) == -1)
+		{
+			if (*output_fd > 2)
+				close(*output_fd);
+			restore_pipeline_fds(*saved_in, *saved_out);
+			return (ERR_FD);
+		}
 		if (*output_fd > 2)
 		{
 			close(*output_fd);
@@ -157,20 +168,23 @@ static int	execute_pipeline_builtin(t_ctx *ctx, t_command *cmd, int *input_fd,
 	int	saved_out;
 	int	fd_status;
 	int	exit_status;
+	int	builtin_saved_fds[2];
 
-	/* Pre-process any redirections */
-	preprocess_redirections(cmd);
+	builtin_saved_fds[0] = -1;
+	builtin_saved_fds[1] = -1;
 	fd_status = setup_pipeline_fds(&saved_in, &saved_out, input_fd, output_fd);
 	if (fd_status != 0)
 		return (error(NULL, "pipeline", fd_status));
-	/* Apply command redirections */
-	if (setup_builtin_redirections(cmd, (int[2]){-1, -1}) != 0)
+	if (setup_builtin_redirections(cmd, builtin_saved_fds) != 0)
 	{
-		restore_pipeline_fds(saved_in, saved_out);
-		return (1);
+		exit_status = 1;
 	}
-	exit_status = execute_builtin_command(ctx, cmd);
+	else
+	{
+		exit_status = execute_builtin_command(ctx, cmd);
+	}
 	restore_pipeline_fds(saved_in, saved_out);
+	builtin_restore_redirections(builtin_saved_fds);
 	return (exit_status);
 }
 
@@ -191,7 +205,6 @@ pid_t	execute_pipeline_command(t_ctx *ctx, t_command *cmd, int *input_fd,
 
 	if (!cmd->args || !cmd->args[0])
 		return (-1);
-	/* Pre-process files for this command */
 	preprocess_redirections(cmd);
 	if (is_builtin_command(cmd->args[0]))
 	{

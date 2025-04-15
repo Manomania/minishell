@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 15:55:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 15:58:11 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 18:01:11 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,11 +33,11 @@ static t_bool	process_builtin(t_ctx *ctx, t_command *cmd, int *exit_status,
 	{
 		*exit_status = 1;
 		builtin_restore_redirections(saved_fds);
-		return (1);
+		return (true);
 	}
 	run_builtin_command(ctx, cmd, exit_status);
 	builtin_restore_redirections(saved_fds);
-	return (1);
+	return (true);
 }
 
 /**
@@ -87,10 +87,12 @@ static t_bool	save_original_fds(int saved_fds[2])
 			close(saved_fds[0]);
 		if (saved_fds[1] != -1)
 			close(saved_fds[1]);
+		saved_fds[0] = -1;
+		saved_fds[1] = -1;
 		(void)error(NULL, "save_original_fds", ERR_IO);
-		return (0);
+		return (false);
 	}
-	return (1);
+	return (true);
 }
 
 /**
@@ -105,12 +107,17 @@ t_bool	execute_builtin(t_ctx *ctx, t_command *cmd, int *exit_status)
 {
 	int	saved_fds[2];
 
+	saved_fds[0] = -1;
+	saved_fds[1] = -1;
 	if (prepare_builtin_files(cmd) == -1)
 	{
 		*exit_status = 1;
-		return (1);
+		return (true);
 	}
 	if (!save_original_fds(saved_fds))
-		return (0);
+	{
+		*exit_status = 1;
+		return (true);
+	}
 	return (process_builtin(ctx, cmd, exit_status, saved_fds));
 }
