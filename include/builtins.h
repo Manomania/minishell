@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:51:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/30 17:53:44 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 15:57:08 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,5 +295,15 @@ char	*get_old_pwd(t_ctx *ctx);
  * @return char* Home directory or NULL if not found
  */
 char	*get_home_dir(t_ctx *ctx);
+
+/**
+ * Executes a built-in command with proper redirection handling
+ *
+ * @param ctx Context for shell environment
+ * @param cmd Command to execute
+ * @param exit_status Pointer to store exit status
+ * @return t_bool true if a built-in was executed, false otherwise
+ */
+t_bool	execute_builtin(t_ctx *ctx, t_command *cmd, int *exit_status);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 14:10:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 15:45:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,6 @@ static pid_t	execute_pipeline_cmd_with_redir(t_ctx *ctx, t_pipe_data *data,
 {
 	pid_t	pid;
 
-	/* Apply output redirections before forking */
 	handle_pre_fork_redirections(data->current);
 	if (has_only_redirections_pipeline(data->current))
 	{

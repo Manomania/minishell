@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/15 11:29:31 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 16:31:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,13 +230,19 @@ int							command_execute(t_ctx *ctx);
 
 // command_execute_utils.c
 int							get_exit_status(int status);
-void						execute_child(t_ctx *ctx);
+int							handle_child_redirections(t_ctx *ctx);
 
 // command_execute_utils2.c
 t_bool						has_only_redirections(t_command *cmd);
 int							execute_redirections_only(t_ctx *ctx);
 void						cleanup_child_process(t_ctx *ctx);
 int							read_all_heredocs(t_ctx *ctx);
+
+// command_execute_utils3.c
+void						execute_child(t_ctx *ctx);
+
+// command_execute_utils4.c
+char						**create_env_array(t_env *env_list);
 
 // command_new.c
 t_command					*command_new(void);

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:45:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 14:43:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 15:48:01 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,27 +24,26 @@
 static int	open_redirect_file(t_token_type type, char *filename)
 {
 	int	fd;
+	int	flags;
 
-	int flags; // Added flags variable for clarity
 	fd = -1;
-	// Use flags for open modes
 	if (type == TOK_REDIR_FROM)
 		flags = O_RDONLY;
 	else if (type == TOK_REDIR_TO)
 		flags = O_WRONLY | O_CREAT | O_TRUNC;
 	else if (type == TOK_HERE_DOC_TO)
 		flags = O_WRONLY | O_CREAT | O_APPEND;
-	else // Should not happen for file opening, but good practice
+	else
 		return (-1);
-	fd = open(filename, flags, 0644); // Use flags here
+	fd = open(filename, flags, 0644);
 	if (fd == -1)
 	{
-		// Print error only once here, using the error module if available
-		error(filename, "redir",
-			(errno == EACCES) ? ERR_NO_PERMS : ERR_NO_FILE);
-		// Using perror is simpler for now to match bash output closely
+		if (errno == EACCES)
+			error(filename, "redir", ERR_NO_PERMS);
+		else
+			error(filename, "redir", ERR_NO_FILE);
 		ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
-		perror(filename); // perror prints the filename and the system error
+		perror(filename);
 		ft_putstr_fd(RESET, STDERR_FILENO);
 	}
 	return (fd);
@@ -63,27 +62,20 @@ static int	redirect_std_fd(int fd, t_token_type type, char *filename)
 	int	target_fd;
 	int	dup_result;
 
-	if (fd < 0) // Should be checked before calling
+	if (fd < 0)
 		return (-1);
 	if (type == TOK_REDIR_FROM || type == TOK_HERE_DOC_FROM)
-		// Include HERE_DOC_FROM for consistency
 		target_fd = STDIN_FILENO;
-	else // TOK_REDIR_TO or TOK_HERE_DOC_TO
+	else
 		target_fd = STDOUT_FILENO;
 	dup_result = dup2(fd, target_fd);
-	// Close the original fd AFTER dup2, regardless of success or failure
-	// If dup2 fails, fd might still be open.
 	close(fd);
 	if (dup_result == -1)
 	{
-		// Use perror for consistency with open_redirect_file error reporting
 		ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
-		// dup2 errors are less common, but could be EBADF, EINTR etc.
-		// We can use the filename for context,
-		// though dup2 itself doesn't use it.
 		ft_putstr_fd(filename, STDERR_FILENO);
 		ft_putstr_fd(": ", STDERR_FILENO);
-		perror("dup2 failed"); // perror will print the specific dup2 error
+		perror("dup2 failed");
 		ft_putstr_fd(RESET, STDERR_FILENO);
 		return (-1);
 	}
@@ -101,27 +93,22 @@ static int	process_redirection(t_redirection *redir)
 	int	fd;
 	int	redirect_result;
 
-	// Skip heredoc processing here, it's handled separately
 	if (redir->type == TOK_HERE_DOC_FROM)
 	{
-		// If heredoc fd is already set (from pre-reading), dup it
 		if (redir->fd >= 0)
 		{
 			redirect_result = redirect_std_fd(redir->fd, redir->type,
 					"heredoc");
-			redir->fd = -1; // Mark as used/closed
+			redir->fd = -1;
 			return (redirect_result);
 		}
-		return (0); // No file to open for heredoc here
+		return (0);
 	}
-	// Open the file for other redirection types
 	fd = open_redirect_file(redir->type, redir->filename);
 	if (fd == -1)
-		return (-1); // Error already printed by open_redirect_file
-	// Redirect stdin/stdout
+		return (-1);
 	redirect_result = redirect_std_fd(fd, redir->type, redir->filename);
-	// fd is closed inside redirect_std_fd
-	return (redirect_result); // Return status of dup2
+	return (redirect_result);
 }
 
 /**
@@ -140,13 +127,13 @@ static int	process_redirection_list(t_redirection *redirections)
 	while (redir)
 	{
 		result = process_redirection(redir);
-		if (result != 0) // If process_redirection failed
+		if (result != 0)
 		{
-			return (-1); // Stop processing and return error
+			return (-1);
 		}
 		redir = redir->next;
 	}
-	return (0); // All redirections succeeded
+	return (0);
 }
 
 /**
@@ -159,6 +146,5 @@ int	setup_redirections(t_redirection *redirections)
 {
 	if (!redirections)
 		return (0);
-	// Process the list; it will stop and return -1 on the first error
 	return (process_redirection_list(redirections));
 }

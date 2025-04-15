@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:32:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 13:58:02 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 15:36:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,6 @@ int	handle_non_builtin(t_ctx *ctx, t_pipe_data *data)
 	if (!is_builtin_command(data->current->args[0]))
 	{
 		bin_found = check_command_binary(ctx, data);
-		/* Continue the pipeline even if binary not found */
 		if (bin_found == false)
 			return (data->prev_pipe);
 	}
