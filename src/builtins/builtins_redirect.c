@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:52:58 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 11:43:41 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 13:57:55 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "minishell.h"
 
 /**
- * @brief Opens a file for redirection
+ * Opens a file for redirection
  *
  * @param redir Redirection information
  * @return int File descriptor or -1 on error
@@ -43,7 +43,7 @@ int	open_redirection_file(t_redirection *redir)
 }
 
 /**
- * @brief Sets up redirections for a built-in command
+ * Sets up redirections for a built-in command
  *
  * @param cmd Command with redirections
  * @param saved_fds Array to store original file descriptors
@@ -72,7 +72,7 @@ int	builtin_setup_redirections(t_command *cmd, int saved_fds[2])
 }
 
 /**
- * @brief Restores original file descriptors after built-in execution
+ * Restores original file descriptors after built-in execution
  *
  * @param saved_fds Array containing saved file descriptors
  * @return void

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:32:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 10:53:47 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 13:58:02 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "minishell.h"
 
 /**
- * @brief Executes a command that only has redirections in a pipeline
+ * Executes a command that only has redirections in a pipeline
  *
  * This function ensures redirection failures are properly handled in pipeline
  * contexts, terminating the child process if redirection fails.
@@ -58,7 +58,7 @@ pid_t	execute_redirections_only_pipeline(t_ctx *ctx, t_pipe_data *data)
 }
 
 /**
- * @brief Checks if command binary exists and is executable
+ * Checks if command binary exists and is executable
  *
  * @param ctx Context information
  * @param data Structure with pipe information
@@ -82,7 +82,7 @@ t_bool	check_command_binary(t_ctx *ctx, t_pipe_data *data)
 }
 
 /**
- * @brief Checks if the command has only redirections without an actual command
+ * Checks if the command has only redirections without an actual command
  *
  * @param command The command to check
  * @return t_bool true if command has only redirections, false otherwise
@@ -94,7 +94,7 @@ t_bool	has_only_redirections_pipeline(t_command *command)
 }
 
 /**
- * @brief Validates if command is valid and setup for execution
+ * Validates if command is valid and setup for execution
  *
  * @param data Structure with pipe information
  * @return t_bool true if valid command, false otherwise
@@ -113,7 +113,7 @@ t_bool	validate_pipeline_command(t_pipe_data *data)
 }
 
 /**
- * @brief Handles non-builtin commands in pipeline
+ * Handles non-builtin commands in pipeline
  *
  * @param ctx Context information
  * @param data Structure with pipe information
@@ -133,6 +133,7 @@ int	handle_non_builtin(t_ctx *ctx, t_pipe_data *data)
 	if (!is_builtin_command(data->current->args[0]))
 	{
 		bin_found = check_command_binary(ctx, data);
+		/* Continue the pipeline even if binary not found */
 		if (bin_found == false)
 			return (data->prev_pipe);
 	}

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 11:40:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 13:57:39 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include "minishell.h"
 
 /**
- * @brief Handles pipe setup for commands
+ * Handles pipe setup for commands
  *
  * @param pipe_fds Pipe file descriptors
  * @param i Index of current command
@@ -40,7 +40,7 @@ static int	handle_pipe_setup(int pipe_fds[2], int i, int cmd_count)
 }
 
 /**
- * @brief Handles descriptor management for pipeline execution
+ * Handles descriptor management for pipeline execution
  *
  * This function safely closes file descriptors that are no longer needed
  * and prepares the file descriptors for the next command.
@@ -68,7 +68,7 @@ int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i, int cmd_count)
 }
 
 /**
- * @brief Cleanup pipe file descriptors in error cases
+ * Cleanup pipe file descriptors in error cases
  *
  * @param pipe_fds Pipe file descriptors array
  */
@@ -83,7 +83,32 @@ static void	cleanup_pipe_fds(int pipe_fds[2])
 }
 
 /**
- * @brief Execute a command with redirections in the pipeline
+ * Apply redirections before executing command in pipeline
+ *
+ * @param cmd Current command with redirections
+ * @return int 0 on success, -1 on error
+ */
+static int	apply_pre_fork_redirections(t_command *cmd)
+{
+	t_redirection	*redir;
+	int				fd;
+
+	redir = cmd->redirection;
+	while (redir)
+	{
+		if (redir->type == TOK_REDIR_TO || redir->type == TOK_HERE_DOC_TO)
+		{
+			fd = open_redirection_file(redir);
+			if (fd != -1)
+				close(fd);
+		}
+		redir = redir->next;
+	}
+	return (0);
+}
+
+/**
+ * Execute a command with redirections in the pipeline
  *
  * @param ctx Context information
  * @param data Pipe data structure
@@ -97,6 +122,8 @@ static pid_t	execute_pipeline_cmd_with_redir(t_ctx *ctx, t_pipe_data *data,
 	pid_t	pid;
 
 	pid = -1;
+	/* Apply redirections before piping to match bash behavior */
+	apply_pre_fork_redirections(data->current);
 	if (has_only_redirections_pipeline(data->current))
 	{
 		pid = execute_redirections_only_pipeline(ctx, data);
@@ -112,7 +139,7 @@ static pid_t	execute_pipeline_cmd_with_redir(t_ctx *ctx, t_pipe_data *data,
 }
 
 /**
- * @brief Process one command in the pipeline
+ * Process one command in the pipeline
  *
  * @param ctx Context information
  * @param data Pipeline data structure
@@ -148,7 +175,7 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 }
 
 /**
- * @brief Handle error during pipeline execution
+ * Handle error during pipeline execution
  *
  * @param pids Process IDs array
  * @param ctx Shell context
@@ -162,7 +189,7 @@ static int	handle_pipeline_error(pid_t *pids, t_ctx *ctx)
 }
 
 /**
- * @brief Execute commands in pipeline
+ * Execute commands in pipeline
  *
  * @param ctx Context information
  * @param data Pipeline data structure
@@ -196,7 +223,7 @@ static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
 }
 
 /**
- * @brief Execute the commands in a pipeline
+ * Execute the commands in a pipeline
  *
  * @param ctx Context
  * @return Exit status of the last command

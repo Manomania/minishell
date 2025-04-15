@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 11:30:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 11:40:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 13:58:12 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "minishell.h"
 
 /**
- * @brief Opens and prepares all files for redirection before forking
+ * Opens and prepares all files for redirection before forking
  *
  * @param cmd Command containing redirections
  * @return int 0 on success, -1 on error
@@ -30,7 +30,8 @@ int	prepare_redirections_files(t_command *cmd)
 	redir = cmd->redirection;
 	while (redir)
 	{
-		if (redir->type != TOK_HERE_DOC_FROM)
+		/* Make sure to create the files before forking to match bash behavior */
+		if (redir->type == TOK_REDIR_TO || redir->type == TOK_HERE_DOC_TO)
 		{
 			fd = open_redirection_file(redir);
 			if (fd == -1)
@@ -43,7 +44,7 @@ int	prepare_redirections_files(t_command *cmd)
 }
 
 /**
- * @brief Opens all output files in pipeline to ensure they're created
+ * Opens all output files in pipeline to ensure they're created
  *
  * @param cmd First command in the pipeline
  * @return int 0 on success, -1 on error
@@ -57,15 +58,16 @@ int	prepare_all_pipeline_files(t_command *cmd)
 	while (current)
 	{
 		result = prepare_redirections_files(current);
+		/* Continue even if one command fails, to match bash behavior */
 		if (result != 0)
-			return (result);
+			return (0);
 		current = current->next;
 	}
 	return (0);
 }
 
 /**
- * @brief Handles here-doc redirection in a child process
+ * Handles here-doc redirection in a child process
  *
  * @param redir Redirection to handle
  * @return int 0 on success, -1 on error
@@ -86,7 +88,7 @@ static int	apply_heredoc_redirection(t_redirection *redir)
 }
 
 /**
- * @brief Applies redirections for a specific command in a child process
+ * Applies redirections for a specific command in a child process
  *
  * @param cmd Command containing redirections
  * @return int 0 on success, -1 on error
@@ -113,7 +115,7 @@ int	apply_child_redirections(t_command *cmd)
 }
 
 /**
- * @brief Handles redirections and pipe setup for pipeline commands
+ * Handles redirections and pipe setup for pipeline commands
  *
  * @param cmd Command to process
  * @param input_fd Input file descriptor

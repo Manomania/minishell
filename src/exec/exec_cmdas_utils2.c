@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 11:41:35 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 13:57:47 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "minishell.h"
 
 /**
- * @brief Creates a pipe for the next command
+ * Creates a pipe for the next command
  *
  * @param pipe_fds Array to store pipe file descriptors
  * @return int 0 on success, -1 on error
@@ -31,7 +31,7 @@ int	setup_pipe(int pipe_fds[2])
 }
 
 /**
- * @brief Counts the number of commands in a pipeline
+ * Counts the number of commands in a pipeline
  *
  * @param cmd The first command in the pipeline
  * @return int The number of commands
@@ -52,7 +52,7 @@ int	count_commands(t_command *cmd)
 }
 
 /**
- * @brief Reports command not found error with proper formatting
+ * Reports command not found error with proper formatting
  *
  * @param cmd_name Name of the command that was not found
  */
@@ -64,7 +64,7 @@ static void	report_cmd_not_found_pipe(char *cmd_name)
 }
 
 /**
- * @brief Handles command execution after redirection setup
+ * Handles command execution after redirection setup
  *
  * @param ctx Context with environment
  * @param cmd Command to execute
@@ -101,7 +101,7 @@ void	execute_command(t_ctx *ctx, t_command *cmd)
 }
 
 /**
- * @brief Sets up the child process for command execution
+ * Sets up the child process for command execution
  *
  * @param ctx Context with environment
  * @param cmd Command to execute

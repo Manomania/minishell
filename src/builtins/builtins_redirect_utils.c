@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 12:35:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 11:30:05 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 13:58:22 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "minishell.h"
 
 /**
- * @brief Checks if redirection is a here-doc input
+ * Checks if redirection is a here-doc input
  *
  * @param redir Redirection to check
  * @return t_bool true if here-doc input, false otherwise
@@ -27,7 +27,7 @@ t_bool	is_here_doc_input(t_redirection *redir)
 }
 
 /**
- * @brief Applies input redirection
+ * Applies input redirection
  *
  * @param fd File descriptor to redirect from
  * @return int 0 on success, -1 on error
@@ -43,7 +43,7 @@ int	apply_input_redirection(int fd)
 }
 
 /**
- * @brief Applies output redirection
+ * Applies output redirection
  *
  * @param fd File descriptor to redirect to
  * @return int 0 on success, -1 on error
@@ -59,7 +59,7 @@ int	apply_output_redirection(int fd)
 }
 
 /**
- * @brief Applies a redirection for a command
+ * Applies a redirection for a command
  *
  * This function first opens the file and then redirects the standard
  * file descriptor to it. It properly handles error cases.
