@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:32:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 18:43:56 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 10:53:47 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ pid_t	execute_redirections_only_pipeline(t_ctx *ctx, t_pipe_data *data)
 			dup2(data->pipe_fds[1], STDOUT_FILENO);
 			close(data->pipe_fds[1]);
 		}
+		if (data->pipe_fds[0] != STDIN_FILENO)
+			close(data->pipe_fds[0]);
 		if (setup_heredocs(ctx, data->current) != 0
 			|| setup_redirections(data->current->redirection) != 0)
 		{

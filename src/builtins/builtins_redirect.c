@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:52:58 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 18:17:34 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 10:54:03 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,10 @@ int	open_redirection_file(t_redirection *redir)
 	else
 		return (-1);
 	if (fd == -1)
-		return (-1);
+	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
+		perror(redir->filename);
+	}
 	return (fd);
 }
 

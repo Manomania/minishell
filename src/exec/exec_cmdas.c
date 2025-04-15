@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 18:59:56 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 10:53:51 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,10 @@ static int	handle_pipe_setup(int pipe_fds[2], int i, int cmd_count)
 			return (-1);
 	}
 	else
+	{
+		pipe_fds[0] = -1;
 		pipe_fds[1] = STDOUT_FILENO;
+	}
 	return (0);
 }
 
@@ -58,10 +61,25 @@ int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i, int cmd_count)
 	if (i < cmd_count - 1)
 	{
 		next_pipe = pipe_fds[0];
-		if (pipe_fds[1] != -1)
+		if (pipe_fds[1] != -1 && pipe_fds[1] != STDOUT_FILENO)
 			close(pipe_fds[1]);
 	}
 	return (next_pipe);
+}
+
+/**
+ * @brief Cleanup pipe file descriptors in error cases
+ *
+ * @param pipe_fds Pipe file descriptors array
+ */
+static void	cleanup_pipe_fds(int pipe_fds[2])
+{
+	if (pipe_fds[0] != -1 && pipe_fds[0] != STDIN_FILENO)
+		close(pipe_fds[0]);
+	if (pipe_fds[1] != -1 && pipe_fds[1] != STDOUT_FILENO)
+		close(pipe_fds[1]);
+	pipe_fds[0] = -1;
+	pipe_fds[1] = -1;
 }
 
 /**
@@ -69,7 +87,7 @@ int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i, int cmd_count)
  *
  * @param ctx Context information
  * @param data Structure with pipe information
- * @return int Updated previous pipe file descriptor
+ * @return int Updated previous pipe file descriptor or -1 on error
  */
 static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 {
@@ -82,7 +100,10 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 	setup_parent_signals();
 	result = handle_non_builtin(ctx, data);
 	if (result == -1)
+	{
+		cleanup_pipe_fds(data->pipe_fds);
 		return (-1);
+	}
 	else if (result > 0)
 		return (result);
 	if (has_only_redirections_pipeline(data->current))
@@ -159,7 +180,10 @@ int	exec_cmdas(t_ctx *ctx)
 	setup_parent_signals();
 	cmd_head = ctx->cmd;
 	if (!exec_all_cmdas(ctx, data, &cmd_head))
+	{
+		free(data.pids);
 		return (ctx->exit_status);
+	}
 	exit_status = wait_for_pipeline_processes(data.pids, data.cmd_count);
 	setup_signals();
 	free(data.pids);

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:19:14 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 09:55:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 10:54:26 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,16 +26,26 @@
 static t_bool	execute_builtin(t_ctx *ctx, t_command *cmd, int *exit_status)
 {
 	int	saved_fds[2];
+	int	redir_status;
 
 	saved_fds[0] = dup(STDIN_FILENO);
 	saved_fds[1] = dup(STDOUT_FILENO);
 	if (saved_fds[0] == -1 || saved_fds[1] == -1)
 	{
+		if (saved_fds[0] != -1)
+			close(saved_fds[0]);
+		if (saved_fds[1] != -1)
+			close(saved_fds[1]);
 		(void)error(NULL, "execute_builtin", ERR_IO);
 		return (false);
 	}
-	if (setup_builtin_redirections(cmd, saved_fds) == -1)
-		return (false);
+	redir_status = setup_builtin_redirections(cmd, saved_fds);
+	if (redir_status == -1)
+	{
+		*exit_status = 1;
+		builtin_restore_redirections(saved_fds);
+		return (true);
+	}
 	run_builtin_command(ctx, cmd, exit_status);
 	builtin_restore_redirections(saved_fds);
 	return (true);
