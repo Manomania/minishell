@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 12:35:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 12:36:30 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 11:30:05 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,10 @@ int	apply_output_redirection(int fd)
 }
 
 /**
- * @brief Applies a single redirection
+ * @brief Applies a redirection for a command
+ *
+ * This function first opens the file and then redirects the standard
+ * file descriptor to it. It properly handles error cases.
  *
  * @param redir Redirection to apply
  * @return int 0 on success, -1 on error
@@ -68,16 +71,21 @@ int	apply_redirection(t_redirection *redir)
 {
 	int	fd;
 	int	result;
+	int	target_fd;
 
 	fd = open_redirection_file(redir);
 	if (fd == -1)
 		return (-1);
-	if (redir->type == TOK_REDIR_FROM)
-		result = apply_input_redirection(fd);
-	else if (redir->type == TOK_REDIR_TO || redir->type == TOK_HERE_DOC_TO)
-		result = apply_output_redirection(fd);
+	if (redir->type == TOK_REDIR_FROM || redir->type == TOK_HERE_DOC_FROM)
+		target_fd = STDIN_FILENO;
 	else
-		result = 0;
+		target_fd = STDOUT_FILENO;
+	result = dup2(fd, target_fd);
+	if (result == -1)
+	{
+		close(fd);
+		return (-1);
+	}
 	close(fd);
-	return (result);
+	return (0);
 }

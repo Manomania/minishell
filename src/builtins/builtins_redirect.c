@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:52:58 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 10:54:03 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 11:43:41 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,15 @@ int	open_redirection_file(t_redirection *redir)
 {
 	int	fd;
 
+	fd = -1;
 	if (redir->type == TOK_REDIR_FROM)
 		fd = open(redir->filename, O_RDONLY);
 	else if (redir->type == TOK_REDIR_TO)
 		fd = open(redir->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	else if (redir->type == TOK_HERE_DOC_TO)
 		fd = open(redir->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
-	else
-		return (-1);
+	else if (redir->type == TOK_HERE_DOC_FROM && redir->fd >= 0)
+		return (redir->fd);
 	if (fd == -1)
 	{
 		ft_putstr_fd("minishell: ", STDERR_FILENO);

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/10 11:14:37 by maximart         ###   ########.fr       */
+/*   Updated: 2025/04/15 11:29:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -305,6 +305,11 @@ t_bool						check_command_binary(t_ctx *ctx, t_pipe_data *data);
 t_bool						validate_pipeline_command(t_pipe_data *data);
 int							handle_non_builtin(t_ctx *ctx, t_pipe_data *data);
 t_bool						has_only_redirections_pipeline(t_command *command);
+
+// exec_cmdas_utils4.c
+int							prepare_all_pipeline_files(t_command *cmd);
+int							setup_child_pipeline_redirections(t_command *cmd,
+								int input_fd, int output_fd);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);
