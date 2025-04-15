@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 16:37:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 13:57:39 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 14:10:14 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@
 /**
  * Handles pipe setup for commands
  *
- * @param pipe_fds Pipe file descriptors
- * @param i Index of current command
+ * @param pipe_fds Pipe file descriptors array to set up
+ * @param i Current command index
  * @param cmd_count Total command count
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 static int	handle_pipe_setup(int pipe_fds[2], int i, int cmd_count)
 {
@@ -40,16 +40,43 @@ static int	handle_pipe_setup(int pipe_fds[2], int i, int cmd_count)
 }
 
 /**
- * Handles descriptor management for pipeline execution
+ * Processes redirections for a command before forking
  *
- * This function safely closes file descriptors that are no longer needed
- * and prepares the file descriptors for the next command.
+ * @param cmd Command with redirections
+ * @return 0 on success, -1 on error
+ */
+static int	handle_pre_fork_redirections(t_command *cmd)
+{
+	t_redirection	*redir;
+	int				fd;
+
+	if (!cmd || !cmd->redirection)
+		return (0);
+	redir = cmd->redirection;
+	while (redir)
+	{
+		if (redir->type == TOK_REDIR_TO || redir->type == TOK_HERE_DOC_TO)
+		{
+			fd = open_redirection_file(redir);
+			if (fd != -1)
+			{
+				write(fd, "", 0); /* Ensure file is created and truncated */
+				close(fd);
+			}
+		}
+		redir = redir->next;
+	}
+	return (0);
+}
+
+/**
+ * Handles descriptor management for pipeline execution
  *
  * @param prev_pipe Previous pipe's read end
  * @param pipe_fds Current pipe file descriptors
  * @param i Current command index
  * @param cmd_count Total command count
- * @return int Updated previous pipe file descriptor
+ * @return Updated previous pipe file descriptor
  */
 int	handle_descriptors(int prev_pipe, int pipe_fds[2], int i, int cmd_count)
 {
@@ -83,47 +110,21 @@ static void	cleanup_pipe_fds(int pipe_fds[2])
 }
 
 /**
- * Apply redirections before executing command in pipeline
- *
- * @param cmd Current command with redirections
- * @return int 0 on success, -1 on error
- */
-static int	apply_pre_fork_redirections(t_command *cmd)
-{
-	t_redirection	*redir;
-	int				fd;
-
-	redir = cmd->redirection;
-	while (redir)
-	{
-		if (redir->type == TOK_REDIR_TO || redir->type == TOK_HERE_DOC_TO)
-		{
-			fd = open_redirection_file(redir);
-			if (fd != -1)
-				close(fd);
-		}
-		redir = redir->next;
-	}
-	return (0);
-}
-
-/**
  * Execute a command with redirections in the pipeline
  *
  * @param ctx Context information
  * @param data Pipe data structure
  * @param input_fd Input file descriptor
  * @param output_fd Output file descriptor
- * @return pid_t Process ID or -1 on error
+ * @return Process ID or -1 on error
  */
 static pid_t	execute_pipeline_cmd_with_redir(t_ctx *ctx, t_pipe_data *data,
 		int input_fd, int output_fd)
 {
 	pid_t	pid;
 
-	pid = -1;
-	/* Apply redirections before piping to match bash behavior */
-	apply_pre_fork_redirections(data->current);
+	/* Apply output redirections before forking */
+	handle_pre_fork_redirections(data->current);
 	if (has_only_redirections_pipeline(data->current))
 	{
 		pid = execute_redirections_only_pipeline(ctx, data);
@@ -143,7 +144,7 @@ static pid_t	execute_pipeline_cmd_with_redir(t_ctx *ctx, t_pipe_data *data,
  *
  * @param ctx Context information
  * @param data Pipeline data structure
- * @return int Updated prev_pipe descriptor or -1 on error
+ * @return Updated prev_pipe descriptor or -1 on error
  */
 static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 {
@@ -179,13 +180,13 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
  *
  * @param pids Process IDs array
  * @param ctx Shell context
- * @return int Error status
+ * @return Error status
  */
 static int	handle_pipeline_error(pid_t *pids, t_ctx *ctx)
 {
 	free(pids);
 	ctx->exit_status = error(NULL, "exec_all_cmdas", ERR_PIPE);
-	return (false);
+	return (0);
 }
 
 /**
@@ -194,20 +195,21 @@ static int	handle_pipeline_error(pid_t *pids, t_ctx *ctx)
  * @param ctx Context information
  * @param data Pipeline data structure
  * @param cmd_head Pointer to store original command head
- * @return t_bool True if successful, false on error
+ * @return True if successful, false on error
  */
 static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
 		t_command **cmd_head)
 {
-	int	i;
-	int	pipe_result;
+	int			i;
+	int			pipe_result;
+	t_command	*cmd_iter;
 
-	if (prepare_all_pipeline_files(*cmd_head) != 0)
-		return (handle_pipeline_error(data.pids, ctx));
 	i = 0;
+	cmd_iter = data.current;
 	while (i < data.cmd_count)
 	{
-		ctx->cmd = data.current;
+		/* Process each command's redirections first */
+		ctx->cmd = cmd_iter;
 		pipe_result = process_pipeline_cmd(ctx, &data);
 		if (pipe_result == -1)
 		{
@@ -215,11 +217,12 @@ static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
 			return (handle_pipeline_error(data.pids, ctx));
 		}
 		data.prev_pipe = pipe_result;
-		data.current = data.current->next;
+		cmd_iter = cmd_iter->next;
+		data.current = cmd_iter;
 		data.i++;
 		i++;
 	}
-	return (true);
+	return (1);
 }
 
 /**

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 12:35:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 13:58:22 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 14:11:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,15 @@
 t_bool	is_here_doc_input(t_redirection *redir)
 {
 	if (redir->type == TOK_HERE_DOC_FROM)
-		return (true);
-	return (false);
+		return (1);
+	return (0);
 }
 
 /**
  * Applies input redirection
  *
  * @param fd File descriptor to redirect from
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 int	apply_input_redirection(int fd)
 {
@@ -39,6 +39,7 @@ int	apply_input_redirection(int fd)
 		close(fd);
 		return (-1);
 	}
+	close(fd);
 	return (0);
 }
 
@@ -46,7 +47,7 @@ int	apply_input_redirection(int fd)
  * Applies output redirection
  *
  * @param fd File descriptor to redirect to
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 int	apply_output_redirection(int fd)
 {
@@ -55,7 +56,29 @@ int	apply_output_redirection(int fd)
 		close(fd);
 		return (-1);
 	}
+	close(fd);
 	return (0);
+}
+
+/**
+ * Reports redirection error
+ *
+ * @param filename Filename that caused the error
+ * @return -1 to indicate error
+ */
+static int	report_redir_error(char *filename)
+{
+	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	ft_putstr_fd(filename, STDERR_FILENO);
+	ft_putstr_fd(": ", STDERR_FILENO);
+	if (errno == ENOENT)
+		ft_putstr_fd("No such file or directory", STDERR_FILENO);
+	else if (errno == EACCES)
+		ft_putstr_fd("Permission denied", STDERR_FILENO);
+	else
+		ft_putstr_fd(strerror(errno), STDERR_FILENO);
+	ft_putstr_fd("\n", STDERR_FILENO);
+	return (-1);
 }
 
 /**
@@ -65,27 +88,21 @@ int	apply_output_redirection(int fd)
  * file descriptor to it. It properly handles error cases.
  *
  * @param redir Redirection to apply
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 int	apply_redirection(t_redirection *redir)
 {
 	int	fd;
 	int	result;
-	int	target_fd;
 
 	fd = open_redirection_file(redir);
 	if (fd == -1)
-		return (-1);
+		return (report_redir_error(redir->filename));
 	if (redir->type == TOK_REDIR_FROM || redir->type == TOK_HERE_DOC_FROM)
-		target_fd = STDIN_FILENO;
+		result = apply_input_redirection(fd);
 	else
-		target_fd = STDOUT_FILENO;
-	result = dup2(fd, target_fd);
+		result = apply_output_redirection(fd);
 	if (result == -1)
-	{
-		close(fd);
-		return (-1);
-	}
-	close(fd);
+		return (report_redir_error(redir->filename));
 	return (0);
 }

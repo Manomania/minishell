@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 11:30:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 13:58:12 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 14:11:18 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
  * Opens and prepares all files for redirection before forking
  *
  * @param cmd Command containing redirections
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 int	prepare_redirections_files(t_command *cmd)
 {
@@ -30,13 +30,16 @@ int	prepare_redirections_files(t_command *cmd)
 	redir = cmd->redirection;
 	while (redir)
 	{
-		/* Make sure to create the files before forking to match bash behavior */
 		if (redir->type == TOK_REDIR_TO || redir->type == TOK_HERE_DOC_TO)
 		{
 			fd = open_redirection_file(redir);
-			if (fd == -1)
-				return (-1);
-			close(fd);
+			if (fd != -1)
+			{
+				/* For > redirections, truncate the file immediately */
+				if (redir->type == TOK_REDIR_TO)
+					write(fd, "", 0);
+				close(fd);
+			}
 		}
 		redir = redir->next;
 	}
@@ -47,20 +50,16 @@ int	prepare_redirections_files(t_command *cmd)
  * Opens all output files in pipeline to ensure they're created
  *
  * @param cmd First command in the pipeline
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 int	prepare_all_pipeline_files(t_command *cmd)
 {
 	t_command	*current;
-	int			result;
 
 	current = cmd;
 	while (current)
 	{
-		result = prepare_redirections_files(current);
-		/* Continue even if one command fails, to match bash behavior */
-		if (result != 0)
-			return (0);
+		prepare_redirections_files(current);
 		current = current->next;
 	}
 	return (0);
@@ -70,7 +69,7 @@ int	prepare_all_pipeline_files(t_command *cmd)
  * Handles here-doc redirection in a child process
  *
  * @param redir Redirection to handle
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 static int	apply_heredoc_redirection(t_redirection *redir)
 {
@@ -91,7 +90,7 @@ static int	apply_heredoc_redirection(t_redirection *redir)
  * Applies redirections for a specific command in a child process
  *
  * @param cmd Command containing redirections
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 int	apply_child_redirections(t_command *cmd)
 {
@@ -120,22 +119,30 @@ int	apply_child_redirections(t_command *cmd)
  * @param cmd Command to process
  * @param input_fd Input file descriptor
  * @param output_fd Output file descriptor
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 int	setup_child_pipeline_redirections(t_command *cmd, int input_fd,
 		int output_fd)
 {
+	/* Handle pipe redirections first */
 	if (input_fd != STDIN_FILENO)
 	{
 		if (dup2(input_fd, STDIN_FILENO) == -1)
+		{
+			close(input_fd);
 			return (-1);
+		}
 		close(input_fd);
 	}
 	if (output_fd != STDOUT_FILENO)
 	{
 		if (dup2(output_fd, STDOUT_FILENO) == -1)
+		{
+			close(output_fd);
 			return (-1);
+		}
 		close(output_fd);
 	}
+	/* Then apply command's own redirections, which overrides pipes if needed */
 	return (apply_child_redirections(cmd));
 }
