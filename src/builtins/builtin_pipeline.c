@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:20:14 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 18:03:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 18:25:28 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,56 @@
 #include "minishell.h"
 
 /**
- * Checks if a command is a built-in
+ * @brief Sets up stdin/stdout for a built-in command in a pipeline.
+ *
+ * Saves original std fds and redirects stdin/stdout to input_fd/output_fd.
+ * Does NOT close the original pipe FDs (*input_fd, *output_fd); this is
+ * handled by the main pipeline loop to prevent double-closes.
+ *
+ * @param saved_in Pointer to store duplicated original stdin fd.
+ * @param saved_out Pointer to store duplicated original stdout fd.
+ * @param input_fd Pointer to the fd to use for stdin.
+ * @param output_fd Pointer to the fd to use for stdout.
+ * @return 0 on success, ERR_IO or ERR_FD on failure.
+ */
+static int	setup_pipeline_fds(int *saved_in, int *saved_out, int *input_fd,
+		int *output_fd)
+{
+	*saved_in = dup(STDIN_FILENO);
+	*saved_out = dup(STDOUT_FILENO);
+	if (*saved_in == -1 || *saved_out == -1)
+	{
+		if (*saved_in != -1)
+			close(*saved_in);
+		if (*saved_out != -1)
+			close(*saved_out);
+		return (ERR_IO);
+	}
+	if (*input_fd != STDIN_FILENO)
+	{
+		if (dup2(*input_fd, STDIN_FILENO) == -1)
+		{
+			if (*input_fd > 2)
+				close(*input_fd);
+			restore_pipeline_fds(*saved_in, *saved_out);
+			return (ERR_FD);
+		}
+	}
+	if (*output_fd != STDOUT_FILENO)
+	{
+		if (dup2(*output_fd, STDOUT_FILENO) == -1)
+		{
+			if (*output_fd > 2)
+				close(*output_fd);
+			restore_pipeline_fds(*saved_in, *saved_out);
+			return (ERR_FD);
+		}
+	}
+	return (0);
+}
+
+/**
+ * @brief Checks if a command is a built-in
  *
  * @param cmd_name Command name to check
  * @return t_bool true if built-in, false otherwise
@@ -72,59 +121,6 @@ static int	preprocess_redirections(t_command *cmd)
  * @param input_fd Input file descriptor
  * @param output_fd Output file descriptor
  * @return Status code (0 for success, error code otherwise)
- */
-static int	setup_pipeline_fds(int *saved_in, int *saved_out, int *input_fd,
-		int *output_fd)
-{
-	*saved_in = dup(STDIN_FILENO);
-	*saved_out = dup(STDOUT_FILENO);
-	if (*saved_in == -1 || *saved_out == -1)
-	{
-		if (*saved_in != -1)
-			close(*saved_in);
-		if (*saved_out != -1)
-			close(*saved_out);
-		return (ERR_IO);
-	}
-	if (*input_fd != STDIN_FILENO)
-	{
-		if (dup2(*input_fd, STDIN_FILENO) == -1)
-		{
-			if (*input_fd > 2)
-				close(*input_fd);
-			restore_pipeline_fds(*saved_in, *saved_out);
-			return (ERR_FD);
-		}
-		if (*input_fd > 2)
-		{
-			close(*input_fd);
-			*input_fd = -1;
-		}
-	}
-	if (*output_fd != STDOUT_FILENO)
-	{
-		if (dup2(*output_fd, STDOUT_FILENO) == -1)
-		{
-			if (*output_fd > 2)
-				close(*output_fd);
-			restore_pipeline_fds(*saved_in, *saved_out);
-			return (ERR_FD);
-		}
-		if (*output_fd > 2)
-		{
-			close(*output_fd);
-			*output_fd = -1;
-		}
-	}
-	return (0);
-}
-
-/**
- * Executes the appropriate built-in command
- *
- * @param ctx Context containing environment
- * @param cmd Command to execute
- * @return Exit status of the built-in
  */
 static int	execute_builtin_command(t_ctx *ctx, t_command *cmd)
 {
