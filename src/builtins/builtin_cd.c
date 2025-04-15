@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:01:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/30 17:52:37 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 11:03:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ char	*get_target_directory(t_ctx *ctx, t_command *cmd)
 		target_dir = ft_strdup(cmd->args[1]);
 	return (target_dir);
 }
-
 
 /**
  * @brief Gets the current PWD directory from environment

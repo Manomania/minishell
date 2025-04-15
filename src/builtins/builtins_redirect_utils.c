@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 12:35:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 12:36:30 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 18:03:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "minishell.h"
 
 /**
- * @brief Checks if redirection is a here-doc input
+ * Checks if redirection is a here-doc input
  *
  * @param redir Redirection to check
  * @return t_bool true if here-doc input, false otherwise
@@ -22,15 +22,15 @@
 t_bool	is_here_doc_input(t_redirection *redir)
 {
 	if (redir->type == TOK_HERE_DOC_FROM)
-		return (true);
-	return (false);
+		return (1);
+	return (0);
 }
 
 /**
- * @brief Applies input redirection
+ * Applies input redirection
  *
  * @param fd File descriptor to redirect from
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 int	apply_input_redirection(int fd)
 {
@@ -39,14 +39,15 @@ int	apply_input_redirection(int fd)
 		close(fd);
 		return (-1);
 	}
+	close(fd);
 	return (0);
 }
 
 /**
- * @brief Applies output redirection
+ * Applies output redirection
  *
  * @param fd File descriptor to redirect to
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 int	apply_output_redirection(int fd)
 {
@@ -55,14 +56,18 @@ int	apply_output_redirection(int fd)
 		close(fd);
 		return (-1);
 	}
+	close(fd);
 	return (0);
 }
 
 /**
- * @brief Applies a single redirection
+ * Applies a redirection for a command
+ *
+ * This function first opens the file and then redirects the standard
+ * file descriptor to it. It properly handles error cases.
  *
  * @param redir Redirection to apply
- * @return int 0 on success, -1 on error
+ * @return 0 on success, -1 on error
  */
 int	apply_redirection(t_redirection *redir)
 {
@@ -71,13 +76,26 @@ int	apply_redirection(t_redirection *redir)
 
 	fd = open_redirection_file(redir);
 	if (fd == -1)
+	{
+		ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
+		ft_putstr_fd(redir->filename, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putstr_fd(strerror(errno), STDERR_FILENO);
+		ft_putstr_fd(RESET "\n", STDERR_FILENO);
 		return (-1);
-	if (redir->type == TOK_REDIR_FROM)
+	}
+	if (redir->type == TOK_REDIR_FROM || redir->type == TOK_HERE_DOC_FROM)
 		result = apply_input_redirection(fd);
-	else if (redir->type == TOK_REDIR_TO || redir->type == TOK_HERE_DOC_TO)
-		result = apply_output_redirection(fd);
 	else
-		result = 0;
-	close(fd);
-	return (result);
+		result = apply_output_redirection(fd);
+	if (result == -1)
+	{
+		ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
+		ft_putstr_fd(redir->filename, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putstr_fd(strerror(errno), STDERR_FILENO);
+		ft_putstr_fd(RESET "\n", STDERR_FILENO);
+		return (-1);
+	}
+	return (0);
 }

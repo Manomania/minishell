@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:45:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 18:43:30 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 15:48:01 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,18 +24,27 @@
 static int	open_redirect_file(t_token_type type, char *filename)
 {
 	int	fd;
+	int	flags;
 
 	fd = -1;
 	if (type == TOK_REDIR_FROM)
-		fd = open(filename, O_RDONLY);
+		flags = O_RDONLY;
 	else if (type == TOK_REDIR_TO)
-		fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		flags = O_WRONLY | O_CREAT | O_TRUNC;
 	else if (type == TOK_HERE_DOC_TO)
-		fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		flags = O_WRONLY | O_CREAT | O_APPEND;
+	else
+		return (-1);
+	fd = open(filename, flags, 0644);
 	if (fd == -1)
 	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
+		if (errno == EACCES)
+			error(filename, "redir", ERR_NO_PERMS);
+		else
+			error(filename, "redir", ERR_NO_FILE);
+		ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
 		perror(filename);
+		ft_putstr_fd(RESET, STDERR_FILENO);
 	}
 	return (fd);
 }
@@ -45,16 +54,17 @@ static int	open_redirect_file(t_token_type type, char *filename)
  *
  * @param fd File descriptor to redirect to/from
  * @param type Type of redirection
+ * @param filename Filename (for error message if dup2 fails)
  * @return 0 on success, -1 on error
  */
-static int	redirect_std_fd(int fd, t_token_type type)
+static int	redirect_std_fd(int fd, t_token_type type, char *filename)
 {
 	int	target_fd;
 	int	dup_result;
 
 	if (fd < 0)
 		return (-1);
-	if (type == TOK_REDIR_FROM)
+	if (type == TOK_REDIR_FROM || type == TOK_HERE_DOC_FROM)
 		target_fd = STDIN_FILENO;
 	else
 		target_fd = STDOUT_FILENO;
@@ -62,8 +72,11 @@ static int	redirect_std_fd(int fd, t_token_type type)
 	close(fd);
 	if (dup_result == -1)
 	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
-		perror("dup2");
+		ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
+		ft_putstr_fd(filename, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		perror("dup2 failed");
+		ft_putstr_fd(RESET, STDERR_FILENO);
 		return (-1);
 	}
 	return (0);
@@ -81,22 +94,29 @@ static int	process_redirection(t_redirection *redir)
 	int	redirect_result;
 
 	if (redir->type == TOK_HERE_DOC_FROM)
+	{
+		if (redir->fd >= 0)
+		{
+			redirect_result = redirect_std_fd(redir->fd, redir->type,
+					"heredoc");
+			redir->fd = -1;
+			return (redirect_result);
+		}
 		return (0);
+	}
 	fd = open_redirect_file(redir->type, redir->filename);
 	if (fd == -1)
 		return (-1);
-	redirect_result = redirect_std_fd(fd, redir->type);
+	redirect_result = redirect_std_fd(fd, redir->type, redir->filename);
 	return (redirect_result);
 }
 
 /**
- * @brief Process each redirection in a linked list
- *
- * When a redirection fails, the function returns immediately
- * to ensure proper error handling in pipeline contexts.
+ * @brief Process each redirection in a linked list sequentially.
+ * Stops and returns immediately on the first error.
  *
  * @param redirections Redirection list to process
- * @return 0 on success, error code on failure
+ * @return 0 on success, -1 on failure (first error encountered)
  */
 static int	process_redirection_list(t_redirection *redirections)
 {
@@ -108,14 +128,16 @@ static int	process_redirection_list(t_redirection *redirections)
 	{
 		result = process_redirection(redir);
 		if (result != 0)
-			return (result);
+		{
+			return (-1);
+		}
 		redir = redir->next;
 	}
 	return (0);
 }
 
 /**
- * @brief Process all redirections in a linked list
+ * @brief Sets up all redirections for a command. Stops on first error.
  *
  * @param redirections List of redirections to process
  * @return 0 on success, -1 on error

@@ -11,7 +11,7 @@ CFLAGS 				:= 	-Wall -Wextra -Werror
 # Debug
 CFLAGS				+=	-g3
 # Compability checks
-CFLAGS				+=	-Wpedantic
+CFLAGS				+=	-pedantic
 # Dependency management
 CFLAGS				+=	-MD -MP
 # Warns when a variable declaration shadows another variable

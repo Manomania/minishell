@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 18:42:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 14:19:04 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "minishell.h"
 
 /**
- * @brief Creates a pipe for the next command
+ * Creates a pipe for the next command
  *
  * @param pipe_fds Array to store pipe file descriptors
  * @return int 0 on success, -1 on error
@@ -31,7 +31,7 @@ int	setup_pipe(int pipe_fds[2])
 }
 
 /**
- * @brief Counts the number of commands in a pipeline
+ * Counts the number of commands in a pipeline
  *
  * @param cmd The first command in the pipeline
  * @return int The number of commands
@@ -52,22 +52,22 @@ int	count_commands(t_command *cmd)
 }
 
 /**
- * @brief Reports command not found error with proper formatting
+ * Reports command not found error with proper formatting
  *
  * @param cmd_name Name of the command that was not found
  */
 static void	report_cmd_not_found_pipe(char *cmd_name)
 {
+	ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
 	ft_putstr_fd(cmd_name, STDERR_FILENO);
-	ft_putstr_fd(": command not found\n", STDERR_FILENO);
+	ft_putstr_fd(": command not found" RESET "\n", STDERR_FILENO);
 }
 
 /**
- * @brief Handles command execution after redirection setup
+ * Handles command execution after redirection setup
  *
  * @param ctx Context with environment
  * @param cmd Command to execute
- * @return void
  */
 void	execute_command(t_ctx *ctx, t_command *cmd)
 {
@@ -101,10 +101,7 @@ void	execute_command(t_ctx *ctx, t_command *cmd)
 }
 
 /**
- * @brief Sets up the child process for command execution
- *
- * This function handles all redirections before checking if the command exists,
- * ensuring proper error handling for redirection failures in pipelines.
+ * Sets up the child process for command execution
  *
  * @param ctx Context with environment
  * @param cmd Command to execute
@@ -114,29 +111,16 @@ void	execute_command(t_ctx *ctx, t_command *cmd)
 void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
 		int output_fd)
 {
+	int	result;
+
 	reset_signals();
-	if (input_fd != STDIN_FILENO)
+	result = setup_child_pipeline_redirections(cmd, input_fd, output_fd);
+	if (result != 0)
 	{
-		if (dup2(input_fd, STDIN_FILENO) == -1)
-		{
-			perror("dup2");
-			cleanup_child_process(ctx);
-			exit(EXIT_FAILURE);
-		}
-		close(input_fd);
+		cleanup_child_process(ctx);
+		exit(EXIT_FAILURE);
 	}
-	if (output_fd != STDOUT_FILENO)
-	{
-		if (dup2(output_fd, STDOUT_FILENO) == -1)
-		{
-			perror("dup2");
-			cleanup_child_process(ctx);
-			exit(EXIT_FAILURE);
-		}
-		close(output_fd);
-	}
-	if (setup_heredocs(ctx, cmd) != 0
-		|| setup_redirections(cmd->redirection) != 0)
+	if (setup_heredocs(ctx, cmd) != 0)
 	{
 		cleanup_child_process(ctx);
 		exit(EXIT_FAILURE);

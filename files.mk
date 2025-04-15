@@ -1,6 +1,7 @@
 SRC_F				= \
 						builtins/builtins_try \
-						builtins/builtins_try2 \
+						builtins/builtins_try_utils \
+						builtins/builtins_try_utils2 \
 						builtins/builtins_redirect \
 						builtins/builtins_redirect_utils \
 						builtins/builtin_echo \
@@ -18,6 +19,8 @@ SRC_F				= \
 						command/command_execute \
 						command/command_execute_utils \
 						command/command_execute_utils2 \
+						command/command_execute_utils3 \
+						command/command_execute_utils4 \
 						command/command_parse \
 						command/command_parse_utils \
 						command/command_add \
@@ -40,6 +43,7 @@ SRC_F				= \
 						exec/exec_cmdas_utils \
 						exec/exec_cmdas_utils2 \
 						exec/exec_cmdas_utils3 \
+						exec/exec_cmdas_utils4 \
 						free/free_env \
 						free/free_2d_array \
 						free/free_ctx \

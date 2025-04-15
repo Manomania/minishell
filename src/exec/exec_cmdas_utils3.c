@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:32:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 18:43:56 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/15 15:36:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "minishell.h"
 
 /**
- * @brief Executes a command that only has redirections in a pipeline
+ * Executes a command that only has redirections in a pipeline
  *
  * This function ensures redirection failures are properly handled in pipeline
  * contexts, terminating the child process if redirection fails.
@@ -43,6 +43,8 @@ pid_t	execute_redirections_only_pipeline(t_ctx *ctx, t_pipe_data *data)
 			dup2(data->pipe_fds[1], STDOUT_FILENO);
 			close(data->pipe_fds[1]);
 		}
+		if (data->pipe_fds[0] != STDIN_FILENO)
+			close(data->pipe_fds[0]);
 		if (setup_heredocs(ctx, data->current) != 0
 			|| setup_redirections(data->current->redirection) != 0)
 		{
@@ -56,7 +58,7 @@ pid_t	execute_redirections_only_pipeline(t_ctx *ctx, t_pipe_data *data)
 }
 
 /**
- * @brief Checks if command binary exists and is executable
+ * Checks if command binary exists and is executable
  *
  * @param ctx Context information
  * @param data Structure with pipe information
@@ -80,7 +82,7 @@ t_bool	check_command_binary(t_ctx *ctx, t_pipe_data *data)
 }
 
 /**
- * @brief Checks if the command has only redirections without an actual command
+ * Checks if the command has only redirections without an actual command
  *
  * @param command The command to check
  * @return t_bool true if command has only redirections, false otherwise
@@ -92,7 +94,7 @@ t_bool	has_only_redirections_pipeline(t_command *command)
 }
 
 /**
- * @brief Validates if command is valid and setup for execution
+ * Validates if command is valid and setup for execution
  *
  * @param data Structure with pipe information
  * @return t_bool true if valid command, false otherwise
@@ -111,7 +113,7 @@ t_bool	validate_pipeline_command(t_pipe_data *data)
 }
 
 /**
- * @brief Handles non-builtin commands in pipeline
+ * Handles non-builtin commands in pipeline
  *
  * @param ctx Context information
  * @param data Structure with pipe information
