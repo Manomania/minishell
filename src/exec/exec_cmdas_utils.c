@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:33:08 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/30 15:18:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/16 16:35:05 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,21 +70,14 @@ int	wait_for_pids(pid_t *pids, int count)
 	if (was_signaled)
 	{
 		if (WTERMSIG(status) == SIGQUIT)
-		{
-			// The ^\ is already printed by the terminal when Ctrl+\ is pressed
-			// Just print the "Quit (core dumped)" part without a newline first
-			ft_putstr_fd("Quit (core dumped)\n", STDERR_FILENO);
-		}
+			ft_printf_fd(STDERR_FILENO, "Quit (core dumped)\n");
 		else if (WTERMSIG(status) == SIGINT)
 		{
 			// For Ctrl+C, no additional text is needed,
 			// the newline is already handled
 		}
 		else if (isatty(STDOUT_FILENO))
-		{
-			// Handle other signals with just a newline
 			write(STDOUT_FILENO, "\n", 1);
-		}
 	}
 	return (last_status);
 }
@@ -158,7 +151,7 @@ int	wait_for_pipeline_processes(pid_t *pids, int count)
 	if (was_signaled)
 	{
 		if (WTERMSIG(status) == SIGQUIT)
-			ft_putstr_fd("Quit (core dumped)\n", STDERR_FILENO);
+			ft_printf_fd(STDERR_FILENO, "Quit (core dumped)\n");
 		else if (isatty(STDOUT_FILENO))
 			write(STDOUT_FILENO, "\n", 1);
 	}

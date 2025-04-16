@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:19:32 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/18 12:46:40 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/16 16:38:30 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ static void	main_loop_end(t_ctx *ctx, int prev_status)
 	if (ctx->cmd->args && ctx->cmd->args[0] && ft_strncmp(ctx->cmd->args[0],
 			"exit", __INT_MAX__) == 0)
 	{
-		ft_putstr("exit\n");
+		ft_printf("exit\n");
 		status = 0;
 		should_exit = true;
 	}

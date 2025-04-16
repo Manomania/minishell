@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 10:35:19 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/08 18:14:32 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/16 15:27:41 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,7 @@
  */
 void	error_print(const char *proof, const char *module, const char *msg)
 {
-	ft_printf_fd(STDERR_FILENO,
-		"\001" RED "\002"
-		"minishell: ",
-		RESET);
+	ft_printf_fd(STDERR_FILENO, "minishell: ");
 	if (module && proof)
 		ft_printf_fd(STDERR_FILENO, "%s: %s: %s", module, proof, msg);
 	else if (module)
@@ -47,8 +44,7 @@ t_error_info	*get_error_table(void)
 	error_table = malloc(32 * sizeof(t_error_info));
 	error_table[ERR_CMD_NOT_FOUND] = (t_error_info){127, "command not found"};
 	error_table[ERR_NO_PERMS] = (t_error_info){126, "Permission denied"};
-	error_table[ERR_NO_FILE] = (t_error_info){127,
-		"No such file or directory"};
+	error_table[ERR_NO_FILE] = (t_error_info){127, "No such file or directory"};
 	error_table[ERR_IS_DIR] = (t_error_info){126, "Is a directory"};
 	error_table[ERR_NO_PWD] = (t_error_info){1,
 		"failed to get current directory"};

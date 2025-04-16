@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:20:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 18:13:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/16 15:29:32 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,7 @@
  */
 static int	handle_cmd_not_found(const char *proof, const char *msg)
 {
-	ft_putstr_fd(RED"minishell: ", STDOUT_FILENO);
-	ft_putstr_fd((char *)proof, STDERR_FILENO);
-	ft_putstr_fd(": ", STDERR_FILENO);
-	ft_putstr_fd((char *)msg, STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
-
+	ft_printf_fd(STDERR_FILENO, "minishell: %s: %s\n", proof, msg);
 	if (ft_strncmp(msg, "No such file or directory", 25) == 0)
 		return (127);
 	else if (ft_strncmp(msg, "Permission denied", 17) == 0)

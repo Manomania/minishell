@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:54:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/27 17:49:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/16 15:43:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int	builtin_echo(t_ctx *ctx, t_command *cmd)
 	}
 	while (i <= cmd->arg_count)
 	{
-		ft_putstr_fd(cmd->args[i], STDOUT_FILENO);
+		ft_printf(cmd->args[i], STDOUT_FILENO);
 		if (i < cmd->arg_count)
 			ft_putchar_fd(' ', STDOUT_FILENO);
 		i++;

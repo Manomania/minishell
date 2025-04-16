@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:47:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 20:22:43 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/16 16:38:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static void	process_command(t_ctx *ctx)
 {
 	if (ctx->cmd && ctx->cmd->args && ctx->cmd->args[0]
 		&& ft_strncmp(ctx->cmd->args[0], "exit", __INT_MAX__) == 0)
-		ft_putstr("exit\n");
+		ft_printf("exit\n");
 	ctx->exit_status = command_execute(ctx);
 	if (ctx->cmd)
 	{
@@ -130,7 +130,7 @@ char	*get_user_input(t_ctx *ctx, int prev_status)
 	free(prompt);
 	if (!input)
 	{
-		ft_putstr("exit\n");
+		ft_printf("exit\n");
 		return (NULL);
 	}
 	if (input[0] != '\0')
