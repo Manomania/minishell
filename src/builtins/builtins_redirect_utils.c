@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 12:35:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 18:03:49 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/16 16:33:00 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,11 +77,8 @@ int	apply_redirection(t_redirection *redir)
 	fd = open_redirection_file(redir);
 	if (fd == -1)
 	{
-		ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
-		ft_putstr_fd(redir->filename, STDERR_FILENO);
-		ft_putstr_fd(": ", STDERR_FILENO);
-		ft_putstr_fd(strerror(errno), STDERR_FILENO);
-		ft_putstr_fd(RESET "\n", STDERR_FILENO);
+		ft_printf_fd(STDERR_FILENO, "minishell: %s: %s\n", redir->filename,
+			strerror(errno));
 		return (-1);
 	}
 	if (redir->type == TOK_REDIR_FROM || redir->type == TOK_HERE_DOC_FROM)
@@ -90,11 +87,8 @@ int	apply_redirection(t_redirection *redir)
 		result = apply_output_redirection(fd);
 	if (result == -1)
 	{
-		ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
-		ft_putstr_fd(redir->filename, STDERR_FILENO);
-		ft_putstr_fd(": ", STDERR_FILENO);
-		ft_putstr_fd(strerror(errno), STDERR_FILENO);
-		ft_putstr_fd(RESET "\n", STDERR_FILENO);
+		ft_printf_fd(STDERR_FILENO, "minishell: %s: %s\n", redir->filename,
+			strerror(errno));
 		return (-1);
 	}
 	return (0);

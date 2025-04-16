@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:45:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 15:48:01 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/16 15:35:04 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,8 @@ static int	open_redirect_file(t_token_type type, char *filename)
 			error(filename, "redir", ERR_NO_PERMS);
 		else
 			error(filename, "redir", ERR_NO_FILE);
-		ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
+		ft_printf_fd(STDERR_FILENO, "minishell: ");
 		perror(filename);
-		ft_putstr_fd(RESET, STDERR_FILENO);
 	}
 	return (fd);
 }
@@ -72,11 +71,8 @@ static int	redirect_std_fd(int fd, t_token_type type, char *filename)
 	close(fd);
 	if (dup_result == -1)
 	{
-		ft_putstr_fd(RED "minishell: ", STDERR_FILENO);
-		ft_putstr_fd(filename, STDERR_FILENO);
-		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_printf_fd(STDERR_FILENO, "minishell: %s: ", filename);
 		perror("dup2 failed");
-		ft_putstr_fd(RESET, STDERR_FILENO);
 		return (-1);
 	}
 	return (0);

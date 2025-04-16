@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 16:13:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/16 16:34:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,15 +157,12 @@ static int	execute_single_command(t_ctx *ctx)
 		{
 			was_signaled = 1;
 			if (WTERMSIG(status) == SIGQUIT)
-				ft_putstr_fd("Quit (core dumped)\n", STDERR_FILENO);
+				ft_printf_fd(STDERR_FILENO, "Quit (core dumped)\n");
 			else if (WTERMSIG(status) == SIGINT && isatty(STDOUT_FILENO))
 				write(STDOUT_FILENO, "\n", 1);
 			else if (WTERMSIG(status) == SIGPIPE)
-			{
-				ft_putstr_fd("Broken pipe: ", STDERR_FILENO);
-				ft_putnbr_fd(WTERMSIG(status), STDERR_FILENO);
-				ft_putstr_fd("\n", STDERR_FILENO);
-			}
+				ft_printf_fd(STDERR_FILENO, "Broken pipe: %d\n",
+					WTERMSIG(status));
 			else if (WTERMSIG(status) != SIGINT && isatty(STDOUT_FILENO))
 				write(STDOUT_FILENO, "\n", 1);
 			exit_code = 128 + WTERMSIG(status);
