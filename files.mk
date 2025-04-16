@@ -32,6 +32,7 @@ SRC_F				= \
 						debug/debug_utils2 \
 						debug/debug_utils3 \
 						env/env \
+						env/env_dupe \
 						env/env_find \
 						env/env_find_bin \
 						env/env_quotes \
