@@ -6,19 +6,18 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:58:55 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/17 16:53:15 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/17 17:07:51 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "signals.h"
 
 /* Global variable for signal status - required for POSIX signal handlers */
-int			g_signal_status = 0;
+static int	g_signal_status = 0;
 
 /**
  * @brief Signal handler for interactive mode (shell prompt)
- * Handles SIGINT (CTRL+C) by setting signal status and printing new prompt
+ * Handles SIGINT (CTRL+C) by setting signal status
  *
  * @param sig Signal number
  */

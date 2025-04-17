@@ -6,26 +6,28 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:47:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/17 16:53:39 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/17 17:06:12 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "debug.h"
 #include "error.h"
 #include "minishell.h"
-#include "signals.h"
 #include "validation.h"
 
 /**
  * @brief Processes a command after parsing
+ * Executes the command and frees related resources
  *
  * @param ctx Context containing shell state
  */
 static void	process_command(t_ctx *ctx)
 {
-	if (ctx->cmd && ctx->cmd->args && ctx->cmd->args[0]
-		&& ft_strncmp(ctx->cmd->args[0], "exit", __INT_MAX__) == 0)
-		ft_printf("exit\n");
+	if (ctx->cmd && ctx->cmd->args && ctx->cmd->args[0])
+	{
+		if (ft_strncmp(ctx->cmd->args[0], "exit", __INT_MAX__) == 0)
+			ft_printf("exit\n");
+	}
 	ctx->exit_status = command_execute(ctx);
 	if (ctx->cmd)
 	{
@@ -41,6 +43,7 @@ static void	process_command(t_ctx *ctx)
 
 /**
  * @brief Tokenizes and parses user input
+ * Processes input string into tokens and command structures
  *
  * @param ctx Context containing shell state
  * @param input User input string
@@ -48,7 +51,10 @@ static void	process_command(t_ctx *ctx)
  */
 static t_bool	parse_user_input(t_ctx *ctx, char *input)
 {
+	t_bool	result;
+
 	ctx->tokens = tokenize(ctx, input);
+	result = true;
 	if (!validate_token_sequence(ctx->tokens))
 	{
 		free_all_token(ctx->tokens);
@@ -75,13 +81,14 @@ static t_bool	parse_user_input(t_ctx *ctx, char *input)
 		ctx->tokens = NULL;
 		free_all_commands(ctx->cmd);
 		ctx->cmd = NULL;
-		return (false);
+		result = false;
 	}
-	return (true);
+	return (result);
 }
 
 /**
  * @brief Creates a prompt string based on previous command status
+ * Creates a colored prompt showing the exit status if non-zero
  *
  * @param prev_status Exit status of previous command
  * @return Formatted prompt string
@@ -114,6 +121,7 @@ char	*create_prompt(int prev_status)
 
 /**
  * @brief Gets user input with appropriate prompt
+ * Displays prompt and reads input, handling SIGINT if received
  *
  * @param ctx Context containing shell state
  * @param prev_status Exit status of previous command
@@ -129,6 +137,7 @@ char	*get_user_input(t_ctx *ctx, int prev_status)
 		ctx_error_exit(ctx, NULL, "prompt", ERR_ALLOC);
 	input = readline(prompt);
 	free(prompt);
+	/* Update status if SIGINT was received during readline */
 	update_signal_status(ctx);
 	if (!input)
 	{
@@ -147,6 +156,7 @@ char	*get_user_input(t_ctx *ctx, int prev_status)
 
 /**
  * @brief Process the parsed command
+ * Handles command execution and resource cleanup
  *
  * @param ctx Context containing shell state
  * @param input User input line

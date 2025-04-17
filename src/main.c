@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/17 16:51:54 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/17 17:04:52 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,6 @@
 #include "error.h"
 #include "minishell.h"
 #include "validation.h"
-
-/* Global variable for signal tracking - unavoidable with POSIX signals */
-int			g_last_signal = 0;
 
 /**
  * @brief Main command loop for the shell
@@ -33,10 +30,7 @@ static int	command_loop(t_ctx *ctx)
 	running = 1;
 	while (running)
 	{
-		g_last_signal = 0;
 		input = get_user_input(ctx, ctx->exit_status);
-		if (g_last_signal == SIGINT)
-			ctx->exit_status = 130;
 		if (!input)
 			return (ctx->exit_status);
 		handle_command_in_main_loop(ctx, input);
