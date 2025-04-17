@@ -6,19 +6,20 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:47:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/16 16:38:49 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/17 16:53:39 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "debug.h"
 #include "error.h"
 #include "minishell.h"
+#include "signals.h"
 #include "validation.h"
 
 /**
  * @brief Processes a command after parsing
  *
- * @param ctx Shell context
+ * @param ctx Context containing shell state
  */
 static void	process_command(t_ctx *ctx)
 {
@@ -41,7 +42,7 @@ static void	process_command(t_ctx *ctx)
 /**
  * @brief Tokenizes and parses user input
  *
- * @param ctx Shell context
+ * @param ctx Context containing shell state
  * @param input User input string
  * @return true if successful, false on error
  */
@@ -114,7 +115,7 @@ char	*create_prompt(int prev_status)
 /**
  * @brief Gets user input with appropriate prompt
  *
- * @param ctx Shell context
+ * @param ctx Context containing shell state
  * @param prev_status Exit status of previous command
  * @return User input string or NULL on error/EOF
  */
@@ -128,6 +129,7 @@ char	*get_user_input(t_ctx *ctx, int prev_status)
 		ctx_error_exit(ctx, NULL, "prompt", ERR_ALLOC);
 	input = readline(prompt);
 	free(prompt);
+	update_signal_status(ctx);
 	if (!input)
 	{
 		ft_printf("exit\n");
@@ -146,7 +148,7 @@ char	*get_user_input(t_ctx *ctx, int prev_status)
 /**
  * @brief Process the parsed command
  *
- * @param ctx Shell context
+ * @param ctx Context containing shell state
  * @param input User input line
  */
 void	handle_command_in_main_loop(t_ctx *ctx, char *input)

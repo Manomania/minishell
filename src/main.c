@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/10 15:10:54 by maximart         ###   ########.fr       */
+/*   Updated: 2025/04/17 16:51:54 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,13 @@
 #include "minishell.h"
 #include "validation.h"
 
+/* Global variable for signal tracking - unavoidable with POSIX signals */
+int			g_last_signal = 0;
+
 /**
  * @brief Main command loop for the shell
  *
  * @param ctx Shell context
- * @param prev_status Previous command exit status
  * @return int Final exit status
  */
 static int	command_loop(t_ctx *ctx)
@@ -31,7 +33,10 @@ static int	command_loop(t_ctx *ctx)
 	running = 1;
 	while (running)
 	{
+		g_last_signal = 0;
 		input = get_user_input(ctx, ctx->exit_status);
+		if (g_last_signal == SIGINT)
+			ctx->exit_status = 130;
 		if (!input)
 			return (ctx->exit_status);
 		handle_command_in_main_loop(ctx, input);
@@ -39,26 +44,6 @@ static int	command_loop(t_ctx *ctx)
 			running = 0;
 	}
 	return (ctx->exit_status);
-}
-
-/**
- * @brief Checks command line args for debug flags
- *
- * @param ctx Context
- * @param argc Argument count
- * @param argv Argument values
- */
-static void	check_debug_args(t_ctx *ctx, int argc, char **argv)
-{
-	int	i;
-
-	i = 1;
-	while (i < argc)
-	{
-		if (ft_strncmp(argv[i], "--debug", ft_strlen("--debug")) == 0)
-			ctx->debug = true;
-		i++;
-	}
 }
 
 /**
@@ -72,10 +57,9 @@ static void	check_debug_args(t_ctx *ctx, int argc, char **argv)
 int	main(int argc, char **argv, char **envp)
 {
 	t_ctx	*ctx;
-	int	final_status;
+	int		final_status;
 
 	ctx = init_ctx(argc, argv, envp);
-	check_debug_args(ctx, argc, argv);
 	if (!ctx)
 		ctx_error_exit(ctx, NULL, "main", ERR_ALLOC);
 	setup_signals();

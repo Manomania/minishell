@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/16 17:11:47 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/17 16:54:03 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -433,6 +433,7 @@ int							setup_redirections(t_redirection *redirections);
 void						setup_signals(void);
 void						reset_signals(void);
 void						setup_parent_signals(void);
+void						update_signal_status(t_ctx *ctx);
 
 // parser_command.c
 t_command					*parse_command(t_parse *parse, t_ctx *ctx);
