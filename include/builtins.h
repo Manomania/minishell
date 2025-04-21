@@ -306,4 +306,10 @@ char	*get_home_dir(t_ctx *ctx);
  */
 t_bool	execute_builtin(t_ctx *ctx, t_command *cmd, int *exit_status);
 
+int	extract_export_data(char *arg, char **key_ptr, char **value_ptr,
+		t_bool *has_equals_ptr);
+int	update_or_add_env_var(t_ctx *ctx, char *key, char *value, t_bool has_equals);
+t_bool	validate_env_key(char *key);
+char	*get_env_value_from_export(char *arg);
+
 #endif

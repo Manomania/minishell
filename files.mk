@@ -10,6 +10,7 @@ SRC_F				= \
 						builtins/builtin_pwd \
 						builtins/builtin_export \
 						builtins/builtin_export_utils \
+						builtins/builtin_export_utils2 \
 						builtins/builtin_unset \
 						builtins/builtin_env \
 						builtins/builtin_exit \
