@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 16:02:49 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:06:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,6 +281,13 @@ char						*append_part(char *result, char *str, int start,
 								int end);
 char						*expand_variable(t_ctx *ctx, char *str, int *i);
 char						*get_env_value(t_env *env_list, char *key);
+char						*get_var_name(char *str, int *pos);
+char						*expand_special_var(t_ctx *ctx, char *str, int *i);
+
+// env_utils.c
+char						*expand_positional_param(char *str, int *i);
+char						*expand_env_var(t_ctx *ctx, char *str, int *i);
+char						*expand_variable(t_ctx *ctx, char *str, int *i);
 
 // env_dupe.c
 t_env						*duplicate_env_list(t_env *original_list);
