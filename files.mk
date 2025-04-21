@@ -24,8 +24,11 @@ SRC_F				= \
 						command/command_execute_utils2 \
 						command/command_execute_utils3 \
 						command/command_execute_utils4 \
+						command/command_execute_utils5 \
+						command/command_execute_utils6 \
 						command/command_parse \
 						command/command_parse_utils \
+						command/command_parse_utils2 \
 						command/command_add \
 						command/command_new \
 						command/command_redirections \
@@ -47,6 +50,8 @@ SRC_F				= \
 						exec/exec_cmdas_utils2 \
 						exec/exec_cmdas_utils3 \
 						exec/exec_cmdas_utils4 \
+						exec/exec_cmdas_utils5 \
+						exec/exec_cmdas_utils6 \
 						free/free_env \
 						free/free_2d_array \
 						free/free_ctx \

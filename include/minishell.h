@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 16:12:35 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 18:12:28 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,6 +215,13 @@ typedef struct s_pos
 	int						current;
 }							t_pos;
 
+typedef struct s_handle_token
+{
+	t_token					**current;
+	t_bool					*first_arg_processed;
+	t_bool					*has_redirections;
+}							t_handle_token;
+
 // *************************************************************************** #
 //                            Function Prototypes                              #
 // *************************************************************************** #
@@ -240,6 +247,9 @@ t_bool						command_bin(t_ctx *ctx);
 
 // command_execute.c
 int							command_execute(t_ctx *ctx);
+int							setup_command_redirections(t_ctx *ctx,
+								t_command *cmd);
+int							validate_cmd_in_child(t_ctx *ctx);
 
 // command_execute_utils.c
 int							get_exit_status(int status);
@@ -257,6 +267,26 @@ void						execute_child(t_ctx *ctx);
 // command_execute_utils4.c
 char						**create_env_array(t_env *env_list);
 
+// command_execute_utils5.c
+int							execute_single_command(t_ctx *ctx);
+int							process_signal_exit(int status);
+void						close_standard_io(int saved_stdin,
+								int saved_stdout);
+void						handle_standard_io(int saved_stdin,
+								int saved_stdout);
+void						execute_child_process(t_ctx *ctx, int saved_stdin,
+								int saved_stdout);
+void						handle_signal_output(int status);
+int							process_last_command_status(int status,
+								int *was_signaled);
+
+// command_execute_utils6.c
+int							handle_parent_process(pid_t pid, int saved_stdin,
+								int saved_stdout);
+int							execute_external_command(t_ctx *ctx,
+								int saved_stdin, int saved_stdout);
+int							process_command_type(t_ctx *ctx);
+
 // command_new.c
 t_command					*command_new(void);
 
@@ -270,6 +300,16 @@ t_bool						add_to_existing_args(t_command *cmd,
 								char *expanded_value);
 t_bool						process_word_token(t_command *cmd, t_token *token,
 								t_ctx *ctx);
+t_bool						process_word_token_case(t_command *cmd,
+								t_token **current, t_ctx *ctx,
+								t_bool *first_arg_processed);
+
+// command_parse_utils2.c
+int							handle_redirection_token(t_command *cmd,
+								t_token *token, t_token *next_token,
+								t_ctx *ctx);
+t_bool						handle_empty_first_arg(t_command *cmd,
+								t_token **current, t_ctx *ctx);
 
 // command_redirection.c
 int							handle_redirections(t_redirection *redirections);
@@ -321,6 +361,11 @@ char						*process_string(t_ctx *ctx, char *str,
 // exec_cmdas.c
 int							handle_descriptors(int prev_pipe, int pipe_fds[2],
 								int i, int cmd_count);
+int							handle_pipe_setup(int pipe_fds[2], int i,
+								int cmd_count);
+void						cleanup_pipe_fds(int pipe_fds[2]);
+pid_t						execute_pipeline_cmd_with_redir(t_ctx *ctx,
+								t_pipe_data *data, int input_fd, int output_fd);
 int							exec_cmdas(t_ctx *ctx);
 
 // exec_cmdas_utils.c
@@ -336,6 +381,7 @@ void						setup_child_process(t_ctx *ctx, t_command *cmd,
 pid_t						execute_redirections_only_pipeline(t_ctx *ctx,
 								t_pipe_data *data);
 void						execute_command(t_ctx *ctx, t_command *cmd);
+void						report_cmd_not_found_pipe(char *cmd_name);
 
 // exec_cmdas_utils3.c
 t_bool						check_command_binary(t_ctx *ctx, t_pipe_data *data);
@@ -347,6 +393,17 @@ t_bool						has_only_redirections_pipeline(t_command *command);
 int							prepare_all_pipeline_files(t_command *cmd);
 int							setup_child_pipeline_redirections(t_command *cmd,
 								int input_fd, int output_fd);
+
+// exec_cmdas_utils5
+void						handle_signal_output(int status);
+int							process_last_command_status(int status,
+								int *was_signaled);
+void						setup_pipe_redirections(t_pipe_data *data);
+char						*validate_and_resolve_command(t_ctx *ctx,
+								t_command *cmd);
+
+// exec_cmdas_utils6
+int							exec_cmdas(t_ctx *ctx);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);

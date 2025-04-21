@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:32:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 15:36:38 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 17:08:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,7 @@
 #include "minishell.h"
 
 /**
- * Executes a command that only has redirections in a pipeline
- *
- * This function ensures redirection failures are properly handled in pipeline
- * contexts, terminating the child process if redirection fails.
+ * @brief Executes a command that only has redirections in a pipeline
  *
  * @param ctx Context containing environment information
  * @param data Pipeline data structure
@@ -33,18 +30,7 @@ pid_t	execute_redirections_only_pipeline(t_ctx *ctx, t_pipe_data *data)
 	if (pid == 0)
 	{
 		reset_signals();
-		if (data->prev_pipe != STDIN_FILENO)
-		{
-			dup2(data->prev_pipe, STDIN_FILENO);
-			close(data->prev_pipe);
-		}
-		if (data->pipe_fds[1] != STDOUT_FILENO)
-		{
-			dup2(data->pipe_fds[1], STDOUT_FILENO);
-			close(data->pipe_fds[1]);
-		}
-		if (data->pipe_fds[0] != STDIN_FILENO)
-			close(data->pipe_fds[0]);
+		setup_pipe_redirections(data);
 		if (setup_heredocs(ctx, data->current) != 0
 			|| setup_redirections(data->current->redirection) != 0)
 		{
