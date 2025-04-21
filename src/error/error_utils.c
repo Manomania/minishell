@@ -13,9 +13,9 @@
 #include "error.h"
 
 /**
- * @brief Initialise les erreurs liées aux fichiers et commandes
+ * @brief Initializes file and command related errors
  *
- * @param error_table Tableau d'erreurs à initialiser
+ * @param error_table Error table to initialize
  */
 void	init_file_cmd_errors(t_error_info *error_table)
 {
@@ -29,9 +29,9 @@ void	init_file_cmd_errors(t_error_info *error_table)
 }
 
 /**
- * @brief Initialise les erreurs liées à l'environnement
+ * @brief Initializes file and command related errors
  *
- * @param error_table Tableau d'erreurs à initialiser
+ * @param error_table Error table to initialize
  */
 void	init_env_errors(t_error_info *error_table)
 {
@@ -49,9 +49,9 @@ void	init_env_errors(t_error_info *error_table)
 }
 
 /**
- * @brief Initialise les erreurs de validation et syntaxe
+ * @brief Initializes file and command related errors
  *
- * @param error_table Tableau d'erreurs à initialiser
+ * @param error_table Error table to initialize
  */
 void	init_validation_errors(t_error_info *error_table)
 {
@@ -69,9 +69,9 @@ void	init_validation_errors(t_error_info *error_table)
 }
 
 /**
- * @brief Initialise les erreurs système et d'entrée/sortie
+ * @brief Initializes file and command related errors
  *
- * @param error_table Tableau d'erreurs à initialiser
+ * @param error_table Error table to initialize
  */
 void	init_system_errors(t_error_info *error_table)
 {
@@ -82,9 +82,9 @@ void	init_system_errors(t_error_info *error_table)
 }
 
 /**
- * @brief Obtient le tableau des erreurs
+ * @brief Gets the error table
  *
- * @return t_error_info* Tableau d'informations sur les erreurs
+ * @return t_error_info* Table of error information
  */
 t_error_info	*get_error_table(void)
 {

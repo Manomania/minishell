@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "error.h"
+#include "minishell.h"
 
 /**
  * @brief Displays an error message to STDERR
