@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/17 16:54:03 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 15:54:19 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,17 +48,17 @@ typedef enum e_bool
 typedef enum e_token_type
 {
 	TOK_NONE,
-	TOK_WORD,          // Commands, args, filename
-	TOK_REDIR_FROM,    // <
-	TOK_REDIR_TO,      // >
-	TOK_HERE_DOC_FROM, // <<
-	TOK_HERE_DOC_TO,   // >>
-	TOK_PIPE,          // |
-	TOK_OR,            // ||
-	TOK_AND,           // &&
-	TOK_ESP,           // &
-	TOK_NEW_LINE,      // \n
-	TOK_EOF,           // '\0'
+	TOK_WORD,
+	TOK_REDIR_FROM,
+	TOK_REDIR_TO,
+	TOK_HERE_DOC_FROM,
+	TOK_HERE_DOC_TO,
+	TOK_PIPE,
+	TOK_OR,
+	TOK_AND,
+	TOK_ESP,
+	TOK_NEW_LINE,
+	TOK_EOF,
 }							t_token_type;
 
 typedef struct s_token
@@ -215,6 +215,11 @@ t_bool						builtins_try(t_ctx *ctx, t_command *cmd);
 
 // token_checker.c
 t_bool						validate_token_sequence(t_token *tokens);
+
+// token_checker_utils.c
+t_bool						check_pipe_tokens(t_token *current);
+t_bool						check_redir_combinations(t_token *current);
+t_bool						check_logical_tokens(t_token *token);
 
 // command_add.c
 int							command_add_argument(t_command *cmd, char *arg);

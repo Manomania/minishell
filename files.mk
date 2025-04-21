@@ -16,6 +16,7 @@ SRC_F				= \
 						builtins/builtin_pipeline \
 						builtins/builtin_pipeline_utils \
 						checker/token_checker \
+						checker/token_checker_utils \
 						command/command_execute \
 						command/command_execute_utils \
 						command/command_execute_utils2 \
