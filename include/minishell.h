@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 17:11:06 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 17:57:40 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -340,7 +340,11 @@ char						*process_string(t_ctx *ctx, char *str,
 // exec_cmdas.c
 int							handle_descriptors(int prev_pipe, int pipe_fds[2],
 								int i, int cmd_count);
-int							exec_cmdas(t_ctx *ctx);
+int							handle_pipe_setup(int pipe_fds[2], int i,
+								int cmd_count);
+void						cleanup_pipe_fds(int pipe_fds[2]);
+pid_t						execute_pipeline_cmd_with_redir(t_ctx *ctx,
+								t_pipe_data *data, int input_fd, int output_fd);
 
 // exec_cmdas_utils.c
 int							setup_pipe(int pipe_fds[2]);
@@ -375,6 +379,9 @@ int							process_last_command_status(int status,
 void						setup_pipe_redirections(t_pipe_data *data);
 char						*validate_and_resolve_command(t_ctx *ctx,
 								t_command *cmd);
+
+// exec_cmdas_utils6
+int							exec_cmdas(t_ctx *ctx);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);
