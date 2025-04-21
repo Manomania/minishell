@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:10:59 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/16 16:34:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:42:20 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
  * @param cmd Command containing redirections to set up
  * @return int 0 on success, 1 on error (generic redirection failure)
  */
-static int	setup_command_redirections(t_ctx *ctx, t_command *cmd)
+int	setup_command_redirections(t_ctx *ctx, t_command *cmd)
 {
 	if (setup_heredocs(ctx, cmd) != 0)
 		return (1);
@@ -39,7 +39,7 @@ static int	setup_command_redirections(t_ctx *ctx, t_command *cmd)
  * @return int Exit code for the child process (0 on success, error code
  * otherwise)
  */
-static int	validate_cmd_in_child(t_ctx *ctx)
+int	validate_cmd_in_child(t_ctx *ctx)
 {
 	if (!ctx->cmd->args || !ctx->cmd->args[0])
 		return (EXIT_SUCCESS);
@@ -55,122 +55,6 @@ static int	validate_cmd_in_child(t_ctx *ctx)
 		return (127);
 	}
 	return (0);
-}
-
-/**
- * @brief Executes a single command without a pipeline
- *
- * @param ctx Context containing environment and command info
- * @return Exit status of the command
- */
-static int	execute_single_command(t_ctx *ctx)
-{
-	pid_t	pid;
-	int		status;
-	int		was_signaled;
-	int		saved_stdout;
-	int		exit_code;
-	int		saved_stdin;
-
-	saved_stdin = -1;
-	saved_stdout = -1;
-	was_signaled = 0;
-	exit_code = 0;
-	saved_stdin = dup(STDIN_FILENO);
-	saved_stdout = dup(STDOUT_FILENO);
-	if (is_builtin_command(ctx->cmd->args ? ctx->cmd->args[0] : NULL))
-	{
-		if (setup_command_redirections(ctx, ctx->cmd) != 0)
-			exit_code = 1;
-		else
-		{
-			builtins_try(ctx, ctx->cmd);
-			exit_code = ctx->exit_status;
-		}
-		if (saved_stdin != -1)
-		{
-			dup2(saved_stdin, STDIN_FILENO);
-			close(saved_stdin);
-		}
-		if (saved_stdout != -1)
-		{
-			dup2(saved_stdout, STDOUT_FILENO);
-			close(saved_stdout);
-		}
-		return (exit_code);
-	}
-	setup_parent_signals();
-	pid = fork();
-	if (pid == -1)
-	{
-		if (saved_stdin != -1)
-		{
-			dup2(saved_stdin, STDIN_FILENO);
-			close(saved_stdin);
-		}
-		if (saved_stdout != -1)
-		{
-			dup2(saved_stdout, STDOUT_FILENO);
-			close(saved_stdout);
-		}
-		setup_signals();
-		return (error(NULL, "fork", ERR_CHILD));
-	}
-	if (pid == 0)
-	{
-		if (saved_stdin != -1)
-			close(saved_stdin);
-		if (saved_stdout != -1)
-			close(saved_stdout);
-		reset_signals();
-		if (setup_command_redirections(ctx, ctx->cmd) != 0)
-		{
-			cleanup_child_process(ctx);
-			exit(1);
-		}
-		exit_code = validate_cmd_in_child(ctx);
-		if (exit_code != 0)
-		{
-			cleanup_child_process(ctx);
-			exit(exit_code);
-		}
-		if (ctx->cmd->args && ctx->cmd->args[0])
-		{
-			execve(ctx->cmd->args[0], ctx->cmd->args, ctx->envp);
-			ctx_error_exit(ctx, ctx->cmd->args[0], "execve", ERR_CHILD);
-		}
-		else
-		{
-			cleanup_child_process(ctx);
-			exit(0);
-		}
-	}
-	else
-	{
-		if (saved_stdin != -1)
-			close(saved_stdin);
-		if (saved_stdout != -1)
-			close(saved_stdout);
-		waitpid(pid, &status, 0);
-		exit_code = get_exit_status(status);
-		if (WIFSIGNALED(status))
-		{
-			was_signaled = 1;
-			if (WTERMSIG(status) == SIGQUIT)
-				ft_printf_fd(STDERR_FILENO, "Quit (core dumped)\n");
-			else if (WTERMSIG(status) == SIGINT && isatty(STDOUT_FILENO))
-				write(STDOUT_FILENO, "\n", 1);
-			else if (WTERMSIG(status) == SIGPIPE)
-				ft_printf_fd(STDERR_FILENO, "Broken pipe: %d\n",
-					WTERMSIG(status));
-			else if (WTERMSIG(status) != SIGINT && isatty(STDOUT_FILENO))
-				write(STDOUT_FILENO, "\n", 1);
-			exit_code = 128 + WTERMSIG(status);
-		}
-		setup_signals();
-		return (exit_code);
-	}
-	return (ctx->exit_status);
 }
 
 /**

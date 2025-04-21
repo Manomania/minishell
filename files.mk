@@ -22,6 +22,8 @@ SRC_F				= \
 						command/command_execute_utils2 \
 						command/command_execute_utils3 \
 						command/command_execute_utils4 \
+						command/command_execute_utils5 \
+						command/command_execute_utils6 \
 						command/command_parse \
 						command/command_parse_utils \
 						command/command_add \

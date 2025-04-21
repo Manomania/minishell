@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 16:12:35 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:58:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,6 +240,9 @@ t_bool						command_bin(t_ctx *ctx);
 
 // command_execute.c
 int							command_execute(t_ctx *ctx);
+int							setup_command_redirections(t_ctx *ctx,
+								t_command *cmd);
+int							validate_cmd_in_child(t_ctx *ctx);
 
 // command_execute_utils.c
 int							get_exit_status(int status);
@@ -256,6 +259,22 @@ void						execute_child(t_ctx *ctx);
 
 // command_execute_utils4.c
 char						**create_env_array(t_env *env_list);
+
+// command_execute_utils5.c
+int							execute_single_command(t_ctx *ctx);
+int							process_signal_exit(int status);
+void						close_standard_io(int saved_stdin,
+								int saved_stdout);
+void						handle_standard_io(int saved_stdin,
+								int saved_stdout);
+void						execute_child_process(t_ctx *ctx, int saved_stdin,
+								int saved_stdout);
+
+// command_execute_utils6.c
+int							handle_parent_process(pid_t pid, int saved_stdin,
+								int saved_stdout);
+int							execute_external_command(t_ctx *ctx,
+								int saved_stdin, int saved_stdout);
 
 // command_new.c
 t_command					*command_new(void);
