@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:47:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/17 17:06:12 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 15:57:58 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
  *
  * @param ctx Context containing shell state
  */
-static void	process_command(t_ctx *ctx)
+void	process_command(t_ctx *ctx)
 {
 	if (ctx->cmd && ctx->cmd->args && ctx->cmd->args[0])
 	{
@@ -42,19 +42,14 @@ static void	process_command(t_ctx *ctx)
 }
 
 /**
- * @brief Tokenizes and parses user input
- * Processes input string into tokens and command structures
+ * @brief Validates and frees tokens if invalid
  *
  * @param ctx Context containing shell state
- * @param input User input string
- * @return true if successful, false on error
+ * @param input User input string to free
+ * @return t_bool false on validation error, true otherwise
  */
-static t_bool	parse_user_input(t_ctx *ctx, char *input)
+static t_bool	validate_tokens(t_ctx *ctx, char *input)
 {
-	t_bool	result;
-
-	ctx->tokens = tokenize(ctx, input);
-	result = true;
 	if (!validate_token_sequence(ctx->tokens))
 	{
 		free_all_token(ctx->tokens);
@@ -63,11 +58,20 @@ static t_bool	parse_user_input(t_ctx *ctx, char *input)
 		free(input);
 		return (false);
 	}
-	free(input);
-	if (!ctx->tokens)
-		return (false);
-	if (ctx->debug)
-		debug_print_tokens(ctx->tokens);
+	return (true);
+}
+
+/**
+ * @brief Validates and processes command structures
+ *
+ * @param ctx Context containing shell state
+ * @return t_bool false on command error, true otherwise
+ */
+static t_bool	process_commands(t_ctx *ctx)
+{
+	t_bool	result;
+
+	result = true;
 	ctx->cmd = command_parse(ctx, ctx->tokens);
 	if (!ctx->cmd)
 	{
@@ -83,6 +87,33 @@ static t_bool	parse_user_input(t_ctx *ctx, char *input)
 		ctx->cmd = NULL;
 		result = false;
 	}
+	return (result);
+}
+
+/**
+ * @brief Tokenizes and parses user input
+ * Processes input string into tokens and command structures
+ *
+ * @param ctx Context containing shell state
+ * @param input User input string
+ * @return t_bool true if successful, false on error
+ */
+t_bool	parse_user_input(t_ctx *ctx, char *input)
+{
+	t_bool	result;
+
+	ctx->tokens = tokenize(ctx, input);
+	if (!ctx->tokens)
+	{
+		free(input);
+		return (false);
+	}
+	if (!validate_tokens(ctx, input))
+		return (false);
+	free(input);
+	if (ctx->debug)
+		debug_print_tokens(ctx->tokens);
+	result = process_commands(ctx);
 	return (result);
 }
 
@@ -117,65 +148,4 @@ char	*create_prompt(int prev_status)
 	else
 		prompt = ft_strdup("\001" GREEN "\002$\001" RESET "\002 ");
 	return (prompt);
-}
-
-/**
- * @brief Gets user input with appropriate prompt
- * Displays prompt and reads input, handling SIGINT if received
- *
- * @param ctx Context containing shell state
- * @param prev_status Exit status of previous command
- * @return User input string or NULL on error/EOF
- */
-char	*get_user_input(t_ctx *ctx, int prev_status)
-{
-	char	*prompt;
-	char	*input;
-
-	prompt = create_prompt(prev_status);
-	if (!prompt)
-		ctx_error_exit(ctx, NULL, "prompt", ERR_ALLOC);
-	input = readline(prompt);
-	free(prompt);
-	/* Update status if SIGINT was received during readline */
-	update_signal_status(ctx);
-	if (!input)
-	{
-		ft_printf("exit\n");
-		return (NULL);
-	}
-	if (input[0] != '\0')
-		add_history(input);
-	if (!validate_input_length(input, ctx))
-	{
-		free(input);
-		return (NULL);
-	}
-	return (input);
-}
-
-/**
- * @brief Process the parsed command
- * Handles command execution and resource cleanup
- *
- * @param ctx Context containing shell state
- * @param input User input line
- */
-void	handle_command_in_main_loop(t_ctx *ctx, char *input)
-{
-	if (parse_user_input(ctx, input))
-		process_command(ctx);
-	else
-	{
-		if (ctx->tokens)
-		{
-			free_all_token(ctx->tokens);
-			ctx->tokens = NULL;
-		}
-		if (ctx->cmd)
-		{
-			free_all_commands(ctx->cmd);
-			ctx->cmd = NULL;
-		}
-	}
 }

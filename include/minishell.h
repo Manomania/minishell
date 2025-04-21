@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 15:54:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 15:59:20 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -446,6 +446,7 @@ int							parse_redirection(t_parse *parse, t_command *cmd,
 								t_ctx *ctx);
 void						add_redirection(t_command *cmd,
 								t_redirection *redirection);
+char						*create_prompt(int prev_status);
 
 // parser_command_utils.c
 int							add_argument(t_command *cmd, char *value);
@@ -454,12 +455,12 @@ int							add_argument(t_command *cmd, char *value);
 // A REMPLIR
 
 // main_utils.c
+t_bool						parse_user_input(t_ctx *ctx, char *input);
+void						process_command(t_ctx *ctx);
+
+// main_utils2.c
 char						*get_user_input(t_ctx *ctx, int prev_status);
 void						handle_command_in_main_loop(t_ctx *ctx,
 								char *input);
-
-// // parser_pipeline.c
-// t_command		*parse_pipeline(t_ctx *ctx, t_parse *parse);
-// t_command		*parse_command_sequence(t_ctx *ctx, t_parse *parse);
 
 #endif

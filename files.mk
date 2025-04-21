@@ -79,5 +79,6 @@ SRC_F				= \
 						signals/signals \
 						validation/validation \
 						main_utils \
+						main_utils2 \
 						main
 TSRC_F			=		$(subst main,test/main,$(SRC_F))
