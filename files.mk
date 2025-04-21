@@ -52,6 +52,7 @@ SRC_F				= \
 						exec/exec_cmdas_utils4 \
 						exec/exec_cmdas_utils5 \
 						exec/exec_cmdas_utils6 \
+						exec/exec_cmdas_utils7 \
 						free/free_env \
 						free/free_2d_array \
 						free/free_ctx \
