@@ -30,10 +30,6 @@ SRC_F				= \
 						command/command_new \
 						command/command_redirections \
 						command/command_bin \
-						debug/debug \
-						debug/debug_utils \
-						debug/debug_utils2 \
-						debug/debug_utils3 \
 						env/env \
 						env/env_utils \
 						env/env_dupe \
@@ -45,6 +41,7 @@ SRC_F				= \
 						error/error \
 						error/ctx_error_exit \
 						error/error_utils \
+						error/error_utils2 \
 						exec/exec_cmdas \
 						exec/exec_cmdas_utils \
 						exec/exec_cmdas_utils2 \

@@ -29,6 +29,8 @@ int				error_code(t_error_type err);
 // error_utils.c
 t_error_info	*get_error_table(void);
 int				error(const char *proof, const char *module, t_error_type err);
+
+// error_utils2.c
 void			error_print(const char *proof, const char *module,
 					const char *msg);
 

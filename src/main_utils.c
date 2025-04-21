@@ -111,8 +111,6 @@ t_bool	parse_user_input(t_ctx *ctx, char *input)
 	if (!validate_tokens(ctx, input))
 		return (false);
 	free(input);
-	if (ctx->debug)
-		debug_print_tokens(ctx->tokens);
 	result = process_commands(ctx);
 	return (result);
 }
