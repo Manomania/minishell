@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 16:58:35 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 17:11:06 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -355,6 +355,7 @@ void						setup_child_process(t_ctx *ctx, t_command *cmd,
 pid_t						execute_redirections_only_pipeline(t_ctx *ctx,
 								t_pipe_data *data);
 void						execute_command(t_ctx *ctx, t_command *cmd);
+void						report_cmd_not_found_pipe(char *cmd_name);
 
 // exec_cmdas_utils3.c
 t_bool						check_command_binary(t_ctx *ctx, t_pipe_data *data);
@@ -366,6 +367,14 @@ t_bool						has_only_redirections_pipeline(t_command *command);
 int							prepare_all_pipeline_files(t_command *cmd);
 int							setup_child_pipeline_redirections(t_command *cmd,
 								int input_fd, int output_fd);
+
+// exec_cmdas_utils5
+void						handle_signal_output(int status);
+int							process_last_command_status(int status,
+								int *was_signaled);
+void						setup_pipe_redirections(t_pipe_data *data);
+char						*validate_and_resolve_command(t_ctx *ctx,
+								t_command *cmd);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);

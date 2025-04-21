@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 11:30:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 14:11:18 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 17:03:22 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ int	prepare_redirections_files(t_command *cmd)
 			fd = open_redirection_file(redir);
 			if (fd != -1)
 			{
-				/* For > redirections, truncate the file immediately */
 				if (redir->type == TOK_REDIR_TO)
 					write(fd, "", 0);
 				close(fd);
@@ -124,7 +123,6 @@ int	apply_child_redirections(t_command *cmd)
 int	setup_child_pipeline_redirections(t_command *cmd, int input_fd,
 		int output_fd)
 {
-	/* Handle pipe redirections first */
 	if (input_fd != STDIN_FILENO)
 	{
 		if (dup2(input_fd, STDIN_FILENO) == -1)
@@ -143,6 +141,5 @@ int	setup_child_pipeline_redirections(t_command *cmd, int input_fd,
 		}
 		close(output_fd);
 	}
-	/* Then apply command's own redirections, which overrides pipes if needed */
 	return (apply_child_redirections(cmd));
 }
