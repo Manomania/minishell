@@ -56,6 +56,7 @@ SRC_F				= \
 						init/init_parse \
 						lexer/lexer_read \
 						lexer/lexer_read_utils \
+						lexer/lexer_read_utils2 \
 						lexer/lexer_token \
 						lexer/lexer_tokenize \
 						lexer/lexer_token_utils \

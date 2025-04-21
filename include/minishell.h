@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 15:59:20 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:02:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -366,6 +366,11 @@ char						*handle_dollar_sign(char *result);
 char						*handle_word_part(t_lexer *lexer, char *result);
 char						*handle_quoted_part(t_lexer *lexer, char *result,
 								char quote_char);
+
+// lexer_read_utils2.c
+void						set_quote_flags(t_lexer *lexer, char quote_char);
+char						*create_quoted_content(t_lexer *lexer, int start,
+								int end);
 
 // lexer_token.c
 t_token						*next_token_lexer(t_lexer *lexer);
