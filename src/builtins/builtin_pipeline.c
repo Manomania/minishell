@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "builtins.h"
-#include "debug.h"
 #include "error.h"
 #include "minishell.h"
 
@@ -52,7 +51,7 @@ t_bool	is_builtin_command(char *cmd_name)
  * @return int Exit status of the built-in
  */
 static int	execute_pipeline_builtin(t_ctx *ctx, t_command *cmd,
-									int *input_fd, int *output_fd)
+		int *input_fd, int *output_fd)
 {
 	int	fds[2];
 
