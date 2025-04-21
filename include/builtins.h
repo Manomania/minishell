@@ -54,7 +54,8 @@ t_bool	update_env_var(t_env **env_list, char *key, char *value,
 // builtin_export_utils2.c
 int		extract_export_data(char *arg, char **key_ptr, char **value_ptr,
 			t_bool *has_equals_ptr);
-int		update_or_add_env_var(t_ctx *ctx, char *key, char *value, t_bool has_equals);
+int		update_or_add_env_var(t_ctx *ctx, char *key, char *value,
+			t_bool has_equals);
 
 // builtin_pipeline.c
 t_bool	is_builtin_command(char *cmd_name);

@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "error.h"
 #include "minishell.h"
 #include "validation.h"
