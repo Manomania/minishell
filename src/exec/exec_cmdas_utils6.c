@@ -6,28 +6,30 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:55:33 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/21 17:58:05 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 18:48:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "builtins.h"
 #include "error.h"
 #include "minishell.h"
 
 /**
- * Process one command in the pipeline
+ * Process one command in the pipeline: setup pipes, fork, execute, manage FDs.
  *
  * @param ctx Context information
  * @param data Pipeline data structure
- * @return Updated prev_pipe descriptor or -1 on error
+ * @return Updated prev_pipe descriptor for the next stage, or -1 on error.
  */
 static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 {
 	pid_t	pid;
 	int		result;
-	int		next_pipe;
+	int		next_pipe_read_end;
 
 	if (handle_pipe_setup(data->pipe_fds, data->i, data->cmd_count) == -1)
 		return (-1);
+	next_pipe_read_end = data->pipe_fds[0];
 	setup_parent_signals();
 	result = handle_non_builtin(ctx, data);
 	if (result == -1)
@@ -36,40 +38,61 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 		return (-1);
 	}
 	else if (result > 0)
-		return (result);
-	pid = execute_pipeline_cmd_with_redir(ctx, data, data->prev_pipe,
-			data->pipe_fds[1]);
-	if (pid == -1)
 	{
 		cleanup_pipe_fds(data->pipe_fds);
+		return (result);
+	}
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("minishell: fork");
+		cleanup_pipe_fds(data->pipe_fds);
+		if (data->prev_pipe > 2)
+			close(data->prev_pipe);
 		return (-1);
 	}
-	next_pipe = handle_descriptors(data->prev_pipe, data->pipe_fds, data->i,
-			data->cmd_count);
-	return (next_pipe);
+	if (pid == 0)
+	{
+		reset_signals();
+		if (next_pipe_read_end != -1 && next_pipe_read_end > 2)
+			close(next_pipe_read_end);
+		result = setup_child_pipeline_redirections(data->current,
+				data->prev_pipe, data->pipe_fds[1]);
+		if (result != 0)
+		{
+			cleanup_child_process(ctx);
+			exit(EXIT_FAILURE);
+		}
+		if (setup_heredocs(ctx, data->current) != 0)
+		{
+			cleanup_child_process(ctx);
+			exit(EXIT_FAILURE);
+		}
+		if (!data->current->args || !data->current->args[0])
+		{
+			cleanup_child_process(ctx);
+			exit(EXIT_SUCCESS);
+		}
+		execute_command(ctx, data->current);
+		cleanup_child_process(ctx);
+		exit(127);
+	}
+	else
+	{
+		data->pids[data->i] = pid;
+		data->prev_pipe = handle_descriptors(data->prev_pipe, data->pipe_fds,
+				data->i, data->cmd_count);
+		return (data->prev_pipe);
+	}
 }
 
 /**
- * Handle error during pipeline execution
- *
- * @param pids Process IDs array
- * @param ctx Shell context
- * @return Error status
- */
-static int	handle_pipeline_error(pid_t *pids, t_ctx *ctx)
-{
-	free(pids);
-	ctx->exit_status = error(NULL, "exec_all_cmdas", ERR_PIPE);
-	return (0);
-}
-
-/**
- * Execute commands in pipeline
+ * Execute all commands in a pipeline sequence.
  *
  * @param ctx Context information
  * @param data Pipeline data structure
- * @param cmd_head Pointer to store original command head
- * @return True if successful, false on error
+ * @param cmd_head Pointer to store original command head (for context reset)
+ * @return True if pipeline setup was successful, false on critical error.
  */
 static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
 		t_command **cmd_head)
@@ -87,22 +110,24 @@ static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
 		if (pipe_result == -1)
 		{
 			ctx->cmd = *cmd_head;
-			return (handle_pipeline_error(data.pids, ctx));
+			return (false);
 		}
-		data.prev_pipe = pipe_result;
 		cmd_iter = cmd_iter->next;
 		data.current = cmd_iter;
 		data.i++;
 		i++;
 	}
-	return (1);
+	ctx->cmd = *cmd_head;
+	return (true);
 }
 
 /**
- * Execute the commands in a pipeline
+ * Execute the commands in a pipeline.
+ * Manages creation of pipes, forking processes, waiting for completion,
+ * and returning the exit status of the last command.
  *
  * @param ctx Context
- * @return Exit status of the last command
+ * @return Exit status of the last command in the pipeline.
  */
 int	exec_cmdas(t_ctx *ctx)
 {
@@ -110,25 +135,24 @@ int	exec_cmdas(t_ctx *ctx)
 	int			exit_status;
 	t_command	*cmd_head;
 	t_bool		success;
-	pid_t		*pids;
+	pid_t		*pids_copy;
 
 	if (!init_pipe_data(&data, ctx))
 	{
 		ctx->exit_status = error(NULL, "init_pipe_data", ERR_ALLOC);
 		return (ctx->exit_status);
 	}
-	setup_parent_signals();
 	cmd_head = ctx->cmd;
-	pids = data.pids;
+	pids_copy = data.pids;
 	success = exec_all_cmdas(ctx, data, &cmd_head);
+	exit_status = wait_for_pipeline_processes(pids_copy, data.cmd_count);
+	setup_signals();
+	free(pids_copy);
 	if (!success)
 	{
-		ctx->cmd = cmd_head;
+		if (ctx->exit_status == 0)
+			ctx->exit_status = 1;
 		return (ctx->exit_status);
 	}
-	exit_status = wait_for_pipeline_processes(pids, data.cmd_count);
-	setup_signals();
-	free(pids);
-	ctx->cmd = cmd_head;
 	return (exit_status);
 }
