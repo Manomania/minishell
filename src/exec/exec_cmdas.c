@@ -212,7 +212,6 @@ static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
 	cmd_iter = data.current;
 	while (i < data.cmd_count)
 	{
-		/* Process each command's redirections first */
 		ctx->cmd = cmd_iter;
 		pipe_result = process_pipeline_cmd(ctx, &data);
 		if (pipe_result == -1)
