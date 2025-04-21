@@ -11,17 +11,9 @@
 /* ************************************************************************** */
 
 #include "builtins.h"
-#include "debug.h"
 #include "error.h"
 #include "minishell.h"
 
-/**
- * @brief Determines the target directory for cd command
- *
- * @param ctx Context for shell environment
- * @param cmd Command containing arguments
- * @return char* Target directory path (must be freed by caller)
- */
 char	*get_target_directory(t_ctx *ctx, t_command *cmd)
 {
 	char	*target_dir;
@@ -67,7 +59,7 @@ static char	*get_current_pwd(t_ctx *ctx)
  * @param ctx Context for shell environment
  * @param old_pwd Old PWD value
  */
-void	update_environment_vars(t_ctx *ctx, char *old_pwd)
+static void	update_environment_vars(t_ctx *ctx, char *old_pwd)
 {
 	t_env	*old_pwd_node;
 	char	*new_pwd;

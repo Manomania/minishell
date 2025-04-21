@@ -19,7 +19,6 @@
  */
 
 #include "builtins.h"
-#include "debug.h"
 #include "error.h"
 #include "minishell.h"
 
