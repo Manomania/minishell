@@ -22,7 +22,7 @@
  * @param key Key to validate
  * @return t_bool true if valid, false otherwise
  */
-static t_bool	validate_env_key(char *key)
+t_bool	validate_env_key(char *key)
 {
 	int	i;
 
@@ -46,7 +46,7 @@ static t_bool	validate_env_key(char *key)
  * @param arg Export argument in form key=value
  * @return char* Value part (caller must free) or NULL if no value
  */
-static char	*get_env_value_from_export(char *arg)
+char	*get_env_value_from_export(char *arg)
 {
 	char	*equals;
 
@@ -70,23 +70,11 @@ static int	process_export_arg(t_ctx *ctx, char *arg)
 	t_bool	has_equals;
 	int		result;
 
-	key = get_env_key_from_export(arg);
-	if (!key)
-		return (1);
-	if (!validate_env_key(key))
-	{
-		(void)error(arg, "export", ERR_IDENTIFIER);
-		free(key);
-		return (1);
-	}
-	has_equals = (ft_strchr(arg, '=') != NULL);
+	key = NULL;
 	value = NULL;
-	if (has_equals)
-		value = get_env_value_from_export(arg);
-	if (!update_env_var(&ctx->env_list, key, value, has_equals))
-		result = add_env_var(&ctx->env_list, key, value);
-	else
-		result = 1;
+	if (extract_export_data(arg, &key, &value, &has_equals))
+		return (1);
+	result = update_or_add_env_var(ctx, key, value, has_equals);
 	free(key);
 	if (value)
 		free(value);

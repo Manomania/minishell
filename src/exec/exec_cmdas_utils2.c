@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/16 15:30:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 17:11:03 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,13 +56,13 @@ int	count_commands(t_command *cmd)
  *
  * @param cmd_name Name of the command that was not found
  */
-static void	report_cmd_not_found_pipe(char *cmd_name)
+void	report_cmd_not_found_pipe(char *cmd_name)
 {
 	ft_printf_fd(STDERR_FILENO, "minishell: %s: command not found\n", cmd_name);
 }
 
 /**
- * Handles command execution after redirection setup
+ * @brief Handles command execution after redirection setup
  *
  * @param ctx Context with environment
  * @param cmd Command to execute
@@ -76,19 +76,14 @@ void	execute_command(t_ctx *ctx, t_command *cmd)
 		cleanup_child_process(ctx);
 		exit(EXIT_SUCCESS);
 	}
-	if (!cmd->args || !cmd->args[0])
+	bin_path = validate_and_resolve_command(ctx, cmd);
+	if (!bin_path && (!cmd->args || !cmd->args[0]))
 	{
 		cleanup_child_process(ctx);
 		exit(EXIT_SUCCESS);
 	}
-	bin_path = bin_find(ctx, cmd->args[0]);
-	if (!bin_path)
+	else if (!bin_path)
 	{
-		if (cmd->args[0][0] == '.' && !ft_strchr(cmd->args[0], '/'))
-			ctx_error_exit(ctx, NULL, "exec", ERR_NO_FILE);
-		if (ft_strchr(cmd->args[0], '/'))
-			ctx_error_exit(ctx, cmd->args[0], "exec", ERR_IS_DIR);
-		report_cmd_not_found_pipe(cmd->args[0]);
 		cleanup_child_process(ctx);
 		exit(127);
 	}

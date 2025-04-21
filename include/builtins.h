@@ -306,4 +306,16 @@ char	*get_home_dir(t_ctx *ctx);
  */
 t_bool	execute_builtin(t_ctx *ctx, t_command *cmd, int *exit_status);
 
+int		extract_export_data(char *arg, char **key_ptr, char **value_ptr,
+			t_bool *has_equals_ptr);
+int		update_or_add_env_var(t_ctx *ctx, char *key, char *value,
+			t_bool has_equals);
+t_bool	validate_env_key(char *key);
+char	*get_env_value_from_export(char *arg);
+int		setup_builtin_pipeline_fds(int *fds, int saved_fds[2]);
+int		execute_builtin_command(t_ctx *ctx, t_command *cmd);
+int		run_builtin_with_redir(t_ctx *ctx, t_command *cmd);
+void	restore_all_fds(int saved_fds[2]);
+int		prepare_and_run_builtin(t_ctx *ctx, t_command *cmd, int *fds);
+
 #endif

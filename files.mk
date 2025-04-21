@@ -10,41 +10,48 @@ SRC_F				= \
 						builtins/builtin_pwd \
 						builtins/builtin_export \
 						builtins/builtin_export_utils \
+						builtins/builtin_export_utils2 \
 						builtins/builtin_unset \
 						builtins/builtin_env \
 						builtins/builtin_exit \
 						builtins/builtin_pipeline \
 						builtins/builtin_pipeline_utils \
+						builtins/builtin_pipeline_utils2 \
 						checker/token_checker \
+						checker/token_checker_utils \
 						command/command_execute \
 						command/command_execute_utils \
 						command/command_execute_utils2 \
 						command/command_execute_utils3 \
 						command/command_execute_utils4 \
+						command/command_execute_utils5 \
+						command/command_execute_utils6 \
 						command/command_parse \
 						command/command_parse_utils \
+						command/command_parse_utils2 \
 						command/command_add \
 						command/command_new \
 						command/command_redirections \
 						command/command_bin \
-						debug/debug \
-						debug/debug_utils \
-						debug/debug_utils2 \
-						debug/debug_utils3 \
 						env/env \
+						env/env_utils \
 						env/env_dupe \
 						env/env_find \
 						env/env_find_bin \
 						env/env_quotes \
+						env/env_quotes_utils \
 						env/env_special_vars \
 						error/error \
 						error/ctx_error_exit \
 						error/error_utils \
+						error/error_utils2 \
 						exec/exec_cmdas \
 						exec/exec_cmdas_utils \
 						exec/exec_cmdas_utils2 \
 						exec/exec_cmdas_utils3 \
 						exec/exec_cmdas_utils4 \
+						exec/exec_cmdas_utils5 \
+						exec/exec_cmdas_utils6 \
 						free/free_env \
 						free/free_2d_array \
 						free/free_ctx \
@@ -55,6 +62,7 @@ SRC_F				= \
 						init/init_parse \
 						lexer/lexer_read \
 						lexer/lexer_read_utils \
+						lexer/lexer_read_utils2 \
 						lexer/lexer_token \
 						lexer/lexer_tokenize \
 						lexer/lexer_token_utils \
@@ -78,5 +86,6 @@ SRC_F				= \
 						signals/signals \
 						validation/validation \
 						main_utils \
+						main_utils2 \
 						main
 TSRC_F			=		$(subst main,test/main,$(SRC_F))

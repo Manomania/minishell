@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/17 16:54:03 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 18:12:28 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,17 +48,17 @@ typedef enum e_bool
 typedef enum e_token_type
 {
 	TOK_NONE,
-	TOK_WORD,          // Commands, args, filename
-	TOK_REDIR_FROM,    // <
-	TOK_REDIR_TO,      // >
-	TOK_HERE_DOC_FROM, // <<
-	TOK_HERE_DOC_TO,   // >>
-	TOK_PIPE,          // |
-	TOK_OR,            // ||
-	TOK_AND,           // &&
-	TOK_ESP,           // &
-	TOK_NEW_LINE,      // \n
-	TOK_EOF,           // '\0'
+	TOK_WORD,
+	TOK_REDIR_FROM,
+	TOK_REDIR_TO,
+	TOK_HERE_DOC_FROM,
+	TOK_HERE_DOC_TO,
+	TOK_PIPE,
+	TOK_OR,
+	TOK_AND,
+	TOK_ESP,
+	TOK_NEW_LINE,
+	TOK_EOF,
 }							t_token_type;
 
 typedef struct s_token
@@ -206,6 +206,22 @@ typedef enum e_path_error
 	PATH_ERR_OTHER
 }							t_path_error;
 
+/**
+ * @brief Helper struct to track position data during processing
+ */
+typedef struct s_pos
+{
+	int						start;
+	int						current;
+}							t_pos;
+
+typedef struct s_handle_token
+{
+	t_token					**current;
+	t_bool					*first_arg_processed;
+	t_bool					*has_redirections;
+}							t_handle_token;
+
 // *************************************************************************** #
 //                            Function Prototypes                              #
 // *************************************************************************** #
@@ -215,6 +231,11 @@ t_bool						builtins_try(t_ctx *ctx, t_command *cmd);
 
 // token_checker.c
 t_bool						validate_token_sequence(t_token *tokens);
+
+// token_checker_utils.c
+t_bool						check_pipe_tokens(t_token *current);
+t_bool						check_redir_combinations(t_token *current);
+t_bool						check_logical_tokens(t_token *token);
 
 // command_add.c
 int							command_add_argument(t_command *cmd, char *arg);
@@ -226,6 +247,9 @@ t_bool						command_bin(t_ctx *ctx);
 
 // command_execute.c
 int							command_execute(t_ctx *ctx);
+int							setup_command_redirections(t_ctx *ctx,
+								t_command *cmd);
+int							validate_cmd_in_child(t_ctx *ctx);
 
 // command_execute_utils.c
 int							get_exit_status(int status);
@@ -243,6 +267,26 @@ void						execute_child(t_ctx *ctx);
 // command_execute_utils4.c
 char						**create_env_array(t_env *env_list);
 
+// command_execute_utils5.c
+int							execute_single_command(t_ctx *ctx);
+int							process_signal_exit(int status);
+void						close_standard_io(int saved_stdin,
+								int saved_stdout);
+void						handle_standard_io(int saved_stdin,
+								int saved_stdout);
+void						execute_child_process(t_ctx *ctx, int saved_stdin,
+								int saved_stdout);
+void						handle_signal_output(int status);
+int							process_last_command_status(int status,
+								int *was_signaled);
+
+// command_execute_utils6.c
+int							handle_parent_process(pid_t pid, int saved_stdin,
+								int saved_stdout);
+int							execute_external_command(t_ctx *ctx,
+								int saved_stdin, int saved_stdout);
+int							process_command_type(t_ctx *ctx);
+
 // command_new.c
 t_command					*command_new(void);
 
@@ -256,6 +300,16 @@ t_bool						add_to_existing_args(t_command *cmd,
 								char *expanded_value);
 t_bool						process_word_token(t_command *cmd, t_token *token,
 								t_ctx *ctx);
+t_bool						process_word_token_case(t_command *cmd,
+								t_token **current, t_ctx *ctx,
+								t_bool *first_arg_processed);
+
+// command_parse_utils2.c
+int							handle_redirection_token(t_command *cmd,
+								t_token *token, t_token *next_token,
+								t_ctx *ctx);
+t_bool						handle_empty_first_arg(t_command *cmd,
+								t_token **current, t_ctx *ctx);
 
 // command_redirection.c
 int							handle_redirections(t_redirection *redirections);
@@ -276,6 +330,13 @@ char						*append_part(char *result, char *str, int start,
 								int end);
 char						*expand_variable(t_ctx *ctx, char *str, int *i);
 char						*get_env_value(t_env *env_list, char *key);
+char						*get_var_name(char *str, int *pos);
+char						*expand_special_var(t_ctx *ctx, char *str, int *i);
+
+// env_utils.c
+char						*expand_positional_param(char *str, int *i);
+char						*expand_env_var(t_ctx *ctx, char *str, int *i);
+char						*expand_variable(t_ctx *ctx, char *str, int *i);
 
 // env_dupe.c
 t_env						*duplicate_env_list(t_env *original_list);
@@ -286,12 +347,25 @@ char						*env_find(t_ctx *ctx, char *var);
 // env_find_bin.c
 char						*env_find_bin(t_ctx *ctx, char *bin);
 
-// env_quotes
+// env_quotes.c
 char						*handle_quotes_and_vars(t_ctx *ctx, char *str);
+char						*append_text_part(int start, int i, char *result,
+								char *str);
+char						*handle_var_expansion(t_ctx *ctx, char *str, int *i,
+								char *result);
+
+// env_quotes_utils.c
+char						*process_string(t_ctx *ctx, char *str,
+								char *result);
 
 // exec_cmdas.c
 int							handle_descriptors(int prev_pipe, int pipe_fds[2],
 								int i, int cmd_count);
+int							handle_pipe_setup(int pipe_fds[2], int i,
+								int cmd_count);
+void						cleanup_pipe_fds(int pipe_fds[2]);
+pid_t						execute_pipeline_cmd_with_redir(t_ctx *ctx,
+								t_pipe_data *data, int input_fd, int output_fd);
 int							exec_cmdas(t_ctx *ctx);
 
 // exec_cmdas_utils.c
@@ -307,6 +381,7 @@ void						setup_child_process(t_ctx *ctx, t_command *cmd,
 pid_t						execute_redirections_only_pipeline(t_ctx *ctx,
 								t_pipe_data *data);
 void						execute_command(t_ctx *ctx, t_command *cmd);
+void						report_cmd_not_found_pipe(char *cmd_name);
 
 // exec_cmdas_utils3.c
 t_bool						check_command_binary(t_ctx *ctx, t_pipe_data *data);
@@ -318,6 +393,17 @@ t_bool						has_only_redirections_pipeline(t_command *command);
 int							prepare_all_pipeline_files(t_command *cmd);
 int							setup_child_pipeline_redirections(t_command *cmd,
 								int input_fd, int output_fd);
+
+// exec_cmdas_utils5
+void						handle_signal_output(int status);
+int							process_last_command_status(int status,
+								int *was_signaled);
+void						setup_pipe_redirections(t_pipe_data *data);
+char						*validate_and_resolve_command(t_ctx *ctx,
+								t_command *cmd);
+
+// exec_cmdas_utils6
+int							exec_cmdas(t_ctx *ctx);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);
@@ -361,6 +447,11 @@ char						*handle_dollar_sign(char *result);
 char						*handle_word_part(t_lexer *lexer, char *result);
 char						*handle_quoted_part(t_lexer *lexer, char *result,
 								char quote_char);
+
+// lexer_read_utils2.c
+void						set_quote_flags(t_lexer *lexer, char quote_char);
+char						*create_quoted_content(t_lexer *lexer, int start,
+								int end);
 
 // lexer_token.c
 t_token						*next_token_lexer(t_lexer *lexer);
@@ -441,6 +532,7 @@ int							parse_redirection(t_parse *parse, t_command *cmd,
 								t_ctx *ctx);
 void						add_redirection(t_command *cmd,
 								t_redirection *redirection);
+char						*create_prompt(int prev_status);
 
 // parser_command_utils.c
 int							add_argument(t_command *cmd, char *value);
@@ -449,12 +541,12 @@ int							add_argument(t_command *cmd, char *value);
 // A REMPLIR
 
 // main_utils.c
+t_bool						parse_user_input(t_ctx *ctx, char *input);
+void						process_command(t_ctx *ctx);
+
+// main_utils2.c
 char						*get_user_input(t_ctx *ctx, int prev_status);
 void						handle_command_in_main_loop(t_ctx *ctx,
 								char *input);
-
-// // parser_pipeline.c
-// t_command		*parse_pipeline(t_ctx *ctx, t_parse *parse);
-// t_command		*parse_command_sequence(t_ctx *ctx, t_parse *parse);
 
 #endif

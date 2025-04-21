@@ -6,59 +6,60 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 13:44:34 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 18:18:43 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Processes a redirection token during command parsing
+ * @brief Processes redirection token
  *
- * @param cmd Command to add redirection to
- * @param token Current redirection token
- * @param next_token The next token (containing filename)
+ * @param cmd Current command being built
+ * @param current Current token
+ * @param has_redirections Flag to track if redirections exist
  * @param ctx Context containing environment information
- * @return int 0 on success, -1 on failure
+ * @return t_bool true on success, false on failure
  */
-static int	handle_redirection_token(t_command *cmd, t_token *token,
-		t_token *next_token, t_ctx *ctx)
+static t_bool	process_redirection_token_case(t_command *cmd,
+		t_token **current, t_bool *has_redirections, t_ctx *ctx)
 {
-	int		fd;
-	int		result;
-	char	*expanded_filename;
-
-	if (!cmd || !token || !next_token)
-		return (-1);
-	if (next_token->type != TOK_WORD)
-		return (-1);
-	fd = 1;
-	if (token->type == TOK_REDIR_FROM || token->type == TOK_HERE_DOC_FROM)
-		fd = 0;
-	expanded_filename = handle_quotes_and_vars(ctx, next_token->value);
-	if (!expanded_filename)
-		return (-1);
-	result = command_add_redirection(cmd, token->type, expanded_filename);
-	free(expanded_filename);
-	return (result);
+	if ((*current)->next && handle_redirection_token(cmd, *current,
+			(*current)->next, ctx) == -1)
+		return (false);
+	*has_redirections = true;
+	if ((*current)->next)
+		*current = (*current)->next;
+	return (true);
 }
 
 /**
- * @brief Manages empty command when first arg is empty string
+ * @brief Handles token processing based on token type
  *
- * @param cmd Command being processed
- * @param current Token list being processed
+ * @param cmd Current command being built
  * @param ctx Context containing environment information
- * @return t_bool true if successfully updated command
+ * @param args Arguments for this function
+ * @return t_bool true on success, false on failure
  */
-static t_bool	handle_empty_first_arg(t_command *cmd, t_token **current,
-		t_ctx *ctx)
+static t_bool	handle_token_by_type(t_command *cmd, t_ctx *ctx,
+		t_handle_token args)
 {
-	if (*current && (*current)->type == TOK_WORD)
+	t_bool	result;
+
+	if ((*args.current)->type == TOK_WORD)
 	{
-		if (!process_word_token(cmd, *current, ctx))
+		result = process_word_token_case(cmd, args.current, ctx,
+				args.first_arg_processed);
+		if (!result)
 			return (false);
-		*current = (*current)->next;
+		if (*args.current && (*args.current)->type != TOK_WORD)
+			return (true);
+	}
+	else if (token_is_redirection((*args.current)->type))
+	{
+		if (!process_redirection_token_case(cmd, args.current,
+				args.has_redirections, ctx))
+			return (false);
 	}
 	return (true);
 }
@@ -74,42 +75,20 @@ static t_bool	handle_empty_first_arg(t_command *cmd, t_token **current,
 static t_bool	process_command_tokens(t_token **current, t_command *cmd,
 		t_ctx *ctx)
 {
-	char	*expanded_value;
-	t_bool	first_arg_processed;
-	t_bool	has_redirections;
+	t_bool			first_arg_processed;
+	t_bool			has_redirections;
+	t_bool			result;
+	t_handle_token	args;
 
 	first_arg_processed = false;
 	has_redirections = false;
 	while (*current && (*current)->type != TOK_PIPE)
 	{
-		if ((*current)->type == TOK_WORD)
-		{
-			expanded_value = handle_quotes_and_vars(ctx, (*current)->value);
-			if (!expanded_value)
-				return (false);
-			if (!first_arg_processed && expanded_value[0] == '\0')
-			{
-				free(expanded_value);
-				*current = (*current)->next;
-				first_arg_processed = true;
-				if (!handle_empty_first_arg(cmd, current, ctx))
-					return (false);
-				continue ;
-			}
-			free(expanded_value);
-			if (!process_word_token(cmd, *current, ctx))
-				return (false);
-			first_arg_processed = true;
-		}
-		else if (token_is_redirection((*current)->type))
-		{
-			if ((*current)->next && handle_redirection_token(cmd, *current,
-					(*current)->next, ctx) == -1)
-				return (false);
-			has_redirections = true;
-			if ((*current)->next)
-				*current = (*current)->next;
-		}
+		args = (t_handle_token){current, &first_arg_processed,
+			&has_redirections};
+		result = handle_token_by_type(cmd, ctx, args);
+		if (!result)
+			return (false);
 		if (*current)
 			*current = (*current)->next;
 	}
@@ -134,7 +113,7 @@ static t_bool	create_pipeline(t_command **cmd, t_token **current, t_ctx *ctx)
 	if (!new_cmd)
 		return (false);
 	prev_cmd->next = new_cmd;
-	prev_cmd->operator= TOK_PIPE;
+	prev_cmd->operator = TOK_PIPE;
 	*cmd = new_cmd;
 	*current = (*current)->next;
 	if (!process_command_tokens(current, *cmd, ctx))

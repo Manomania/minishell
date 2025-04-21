@@ -6,12 +6,66 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 08:32:58 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/15 18:50:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 15:53:24 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
 #include "minishell.h"
+
+/**
+ * @brief Checks for duplicate redirection tokens
+ *
+ * @param current Current token
+ * @return t_bool false if duplicated redirection found, true otherwise
+ */
+static t_bool	check_duplicate_redirs(t_token *current)
+{
+	if (current->type == TOK_REDIR_FROM
+		&& current->next->type == TOK_REDIR_FROM)
+	{
+		ft_putendl_fd("syntax error near unexpected token `<'", STDERR_FILENO);
+		return (false);
+	}
+	if (current->type == TOK_REDIR_TO && current->next->type == TOK_REDIR_TO)
+	{
+		ft_putendl_fd("syntax error near unexpected token `>'", STDERR_FILENO);
+		return (false);
+	}
+	if (current->type == TOK_HERE_DOC_TO
+		&& current->next->type == TOK_HERE_DOC_TO)
+	{
+		ft_putendl_fd("syntax error near unexpected token `>>'", STDERR_FILENO);
+		return (false);
+	}
+	if (current->type == TOK_HERE_DOC_FROM
+		&& current->next->type == TOK_HERE_DOC_FROM)
+	{
+		ft_putendl_fd("syntax error near unexpected token `<<'", STDERR_FILENO);
+		return (false);
+	}
+	return (true);
+}
+
+/**
+ * @brief Checks for missing target after redirection
+ *
+ * @param current Current token
+ * @return t_bool false if missing target found, true otherwise
+ */
+static t_bool	check_missing_target(t_token *current)
+{
+	if (token_is_redirection(current->type)
+		&& (token_is_redirection(current->next->type)
+			|| current->next->type == TOK_PIPE || current->next->type == TOK_EOF
+			|| current->next->type == TOK_NEW_LINE))
+	{
+		ft_putendl_fd("syntax error near unexpected token `newline'",
+			STDERR_FILENO);
+		return (false);
+	}
+	return (true);
+}
 
 /**
  * @brief Checks for invalid redirection sequences
@@ -26,99 +80,16 @@ static t_bool	check_invalid_tokens(t_token *tokens)
 	current = tokens;
 	while (current && current->next)
 	{
-		if (current->type == TOK_ESP)
-		{
-			ft_putendl_fd("syntax error near unexpected token `&'",
-				STDERR_FILENO);
+		if (!check_logical_tokens(current))
 			return (false);
-		}
-		if (current->type == TOK_OR)
-		{
-			ft_putendl_fd("syntax error near unexpected token `||'",
-				STDERR_FILENO);
+		if (!check_redir_combinations(current))
 			return (false);
-		}
-		if (current->type == TOK_AND)
-		{
-			ft_putendl_fd("syntax error near unexpected token `&&'",
-				STDERR_FILENO);
+		if (!check_pipe_tokens(current))
 			return (false);
-		}
-		if (current->type == TOK_REDIR_FROM
-			&& current->next->type == TOK_REDIR_TO)
-		{
-			ft_putendl_fd("syntax error near unexpected token `newline'",
-				STDERR_FILENO);
+		if (!check_duplicate_redirs(current))
 			return (false);
-		}
-		if (token_is_redirection(current->type)
-			&& current->next->type == TOK_REDIR_TO)
-		{
-			ft_putendl_fd("syntax error near unexpected token `>'",
-				STDERR_FILENO);
+		if (!check_missing_target(current))
 			return (false);
-		}
-		if (token_is_redirection(current->type)
-			&& current->next->type == TOK_REDIR_FROM)
-		{
-			ft_putendl_fd("syntax error near unexpected token `<'",
-				STDERR_FILENO);
-			return (false);
-		}
-		if ((current->type == TOK_PIPE
-				&& token_is_redirection(current->next->type))
-			|| (token_is_redirection(current->type)
-				&& current->next->type == TOK_PIPE))
-		{
-			ft_putendl_fd("syntax error near unexpected token `|'",
-				STDERR_FILENO);
-			return (false);
-		}
-		if (current->type == TOK_PIPE && (current->next->type == TOK_PIPE
-				|| current->next->type == TOK_EOF))
-		{
-			ft_putendl_fd("syntax error near unexpected token `|'",
-				STDERR_FILENO);
-			return (false);
-		}
-		if (current->type == TOK_REDIR_FROM
-			&& current->next->type == TOK_REDIR_FROM)
-		{
-			ft_putendl_fd("syntax error near unexpected token `<'",
-				STDERR_FILENO);
-			return (false);
-		}
-		if (current->type == TOK_REDIR_TO
-			&& current->next->type == TOK_REDIR_TO)
-		{
-			ft_putendl_fd("syntax error near unexpected token `>'",
-				STDERR_FILENO);
-			return (false);
-		}
-		if (current->type == TOK_HERE_DOC_TO
-			&& current->next->type == TOK_HERE_DOC_TO)
-		{
-			ft_putendl_fd("syntax error near unexpected token `>>'",
-				STDERR_FILENO);
-			return (false);
-		}
-		if (current->type == TOK_HERE_DOC_FROM
-			&& current->next->type == TOK_HERE_DOC_FROM)
-		{
-			ft_putendl_fd("syntax error near unexpected token `<<'",
-				STDERR_FILENO);
-			return (false);
-		}
-		if (token_is_redirection(current->type)
-			&& (token_is_redirection(current->next->type)
-				|| current->next->type == TOK_PIPE
-				|| current->next->type == TOK_EOF
-				|| current->next->type == TOK_NEW_LINE))
-		{
-			ft_putendl_fd("syntax error near unexpected token `newline'",
-				STDERR_FILENO);
-			return (false);
-		}
 		current = current->next;
 	}
 	return (true);

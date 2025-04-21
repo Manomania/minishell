@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 12:30:04 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/26 13:15:40 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:06:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ char	*expand_var(t_ctx *ctx, char *var_name)
  * @param pos Position in the string (will be updated)
  * @return Newly allocated string with variable name or NULL
  */
-static char	*get_var_name(char *str, int *pos)
+char	*get_var_name(char *str, int *pos)
 {
 	char	*name;
 	int		len;
@@ -112,53 +112,32 @@ static char	*get_var_name(char *str, int *pos)
 }
 
 /**
- * @brief Handles variable expansion based on quote context
+ * @brief Handles special variable expansion (exit status, $#, $0)
  *
  * @param ctx Shell context
  * @param str Input string
  * @param i Current position (will be updated)
- * @param in_squote Whether in single quotes
- * @return Expanded variable or dollar sign
+ * @return char* Expanded value for special variables
  */
-char	*expand_variable(t_ctx *ctx, char *str, int *i)
+char	*expand_special_var(t_ctx *ctx, char *str, int *i)
 {
-	char	*var_name;
-	char	*var_value;
-	char	*full_varname;
-
 	(*i)++;
-	if (str[*i] && str[*i] == '?')
+	if (str[*i] == '?')
 	{
 		(*i)++;
 		return (ft_itoa(ctx->exit_status));
 	}
-	if (str[*i] && str[*i] == '#')
-
+	if (str[*i] == '#')
 	{
 		(*i)++;
 		return (ft_strdup("0"));
 	}
-	if (str[*i] && str[*i] == '0')
+	if (str[*i] == '0')
 	{
 		(*i)++;
 		if (ctx->argv && ctx->argv[0])
 			return (ft_strdup(ctx->argv[0]));
 		return (ft_strdup("minishell"));
 	}
-	if (str[*i] && (str[*i] == '@' || str[*i] == '!' || str[*i] == '&' || (str[*i] >= '1'
-			&& str[*i] <= '9')))
-	{
-		(*i)++;
-		return (ft_strdup(""));
-	}
-	var_name = get_var_name(str, i);
-	if (!var_name)
-		return (ft_strdup("$"));
-	full_varname = ft_strjoin(var_name, "=");
-	var_value = expand_var(ctx, var_name);
-	free(var_name);
-	free(full_varname);
-	if (!var_value)
-		return (ft_strdup(""));
-	return (var_value);
+	return (NULL);
 }

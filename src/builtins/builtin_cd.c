@@ -62,6 +62,22 @@ static char	*get_current_pwd(t_ctx *ctx)
 }
 
 /**
+ * @brief Updates PWD and OLDPWD environment variables
+ *
+ * @param ctx Context for shell environment
+ * @param old_pwd Old PWD value
+ */
+void	update_environment_vars(t_ctx *ctx, char *old_pwd)
+{
+	t_env	*old_pwd_node;
+	char	*new_pwd;
+
+	new_pwd = getcwd(NULL, 0);
+	old_pwd_node = update_pwd_variable(ctx->env_list, new_pwd);
+	update_oldpwd_variable(old_pwd_node, old_pwd);
+}
+
+/**
  * @brief Executes the cd built-in command
  *
  * @param ctx Context for shell environment
@@ -73,13 +89,9 @@ int	builtin_cd(t_ctx *ctx, t_command *cmd)
 	char	*target_dir;
 	char	*old_pwd;
 	int		result;
-	t_env	*old_pwd_node;
 
 	if (cmd->arg_count > 1)
-	{
-		error(NULL, "cd", ERR_TOO_MANY_ARGS);
-		return (1);
-	}
+		return (error(NULL, "cd", ERR_TOO_MANY_ARGS), 1);
 	old_pwd = get_current_pwd(ctx);
 	target_dir = get_target_directory(ctx, cmd);
 	if (!target_dir)
@@ -92,8 +104,7 @@ int	builtin_cd(t_ctx *ctx, t_command *cmd)
 		free(old_pwd);
 		return (1);
 	}
-	old_pwd_node = update_pwd_variable(ctx->env_list, getcwd(NULL, 0));
-	update_oldpwd_variable(old_pwd_node, old_pwd);
+	update_environment_vars(ctx, old_pwd);
 	free(target_dir);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:27:07 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/16 15:31:43 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:01:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,8 @@ char	*read_word_lexer(t_lexer *lexer)
  */
 char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 {
-	int		start;
-	int		end;
-	char	*content;
+	int	start;
+	int	end;
 
 	start = lexer->position + 1;
 	advance_lexer(lexer);
@@ -70,19 +69,9 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 		return (NULL);
 	}
 	end = lexer->position;
-	if (quote_char == '"')
-		lexer->quote.in_double_quote = 1;
-	else if (quote_char == '\'')
-		lexer->quote.in_single_quote = 1;
+	set_quote_flags(lexer, quote_char);
 	advance_lexer(lexer);
-	if (start == end)
-		return (ft_strdup(""));
-	content = malloc((end - start + 1));
-	if (!content)
-		return (NULL);
-	ft_strlcpy(content, lexer->input + start, (size_t)(end - start + 1));
-	content[end - start] = '\0';
-	return (content);
+	return (create_quoted_content(lexer, start, end));
 }
 
 /**

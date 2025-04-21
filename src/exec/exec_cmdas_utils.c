@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:33:08 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/16 16:35:05 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 17:07:24 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,17 +68,7 @@ int	wait_for_pids(pid_t *pids, int count)
 		i++;
 	}
 	if (was_signaled)
-	{
-		if (WTERMSIG(status) == SIGQUIT)
-			ft_printf_fd(STDERR_FILENO, "Quit (core dumped)\n");
-		else if (WTERMSIG(status) == SIGINT)
-		{
-			// For Ctrl+C, no additional text is needed,
-			// the newline is already handled
-		}
-		else if (isatty(STDOUT_FILENO))
-			write(STDOUT_FILENO, "\n", 1);
-	}
+		handle_signal_output(status);
 	return (last_status);
 }
 
@@ -138,22 +128,11 @@ int	wait_for_pipeline_processes(pid_t *pids, int count)
 	last_status = 0;
 	while (i < count)
 	{
+		status = 0;
 		was_signaled |= process_child_wait(pids[i], &status);
 		if (i == count - 1 && pids[i] > 0)
-		{
-			if (WIFEXITED(status))
-				last_status = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status))
-				last_status = 128 + WTERMSIG(status);
-		}
+			last_status = process_last_command_status(status, &was_signaled);
 		i++;
-	}
-	if (was_signaled)
-	{
-		if (WTERMSIG(status) == SIGQUIT)
-			ft_printf_fd(STDERR_FILENO, "Quit (core dumped)\n");
-		else if (isatty(STDOUT_FILENO))
-			write(STDOUT_FILENO, "\n", 1);
 	}
 	return (last_status);
 }
