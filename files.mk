@@ -28,10 +28,6 @@ SRC_F				= \
 						command/command_new \
 						command/command_redirections \
 						command/command_bin \
-						debug/debug \
-						debug/debug_utils \
-						debug/debug_utils2 \
-						debug/debug_utils3 \
 						env/env \
 						env/env_utils \
 						env/env_dupe \
