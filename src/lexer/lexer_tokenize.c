@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "debug.h"
+
 #include "error.h"
 #include "memory.h"
 #include "minishell.h"
