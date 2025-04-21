@@ -82,6 +82,7 @@ static int	process_export_arg(t_ctx *ctx, char *arg)
 		return (0);
 	return (1);
 }
+
 /**
  * @brief Executes the export built-in command
  *
