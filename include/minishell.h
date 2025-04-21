@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 18:12:28 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 19:20:59 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -394,7 +394,7 @@ int							prepare_all_pipeline_files(t_command *cmd);
 int							setup_child_pipeline_redirections(t_command *cmd,
 								int input_fd, int output_fd);
 
-// exec_cmdas_utils5
+// exec_cmdas_utils5.c
 void						handle_signal_output(int status);
 int							process_last_command_status(int status,
 								int *was_signaled);
@@ -402,8 +402,15 @@ void						setup_pipe_redirections(t_pipe_data *data);
 char						*validate_and_resolve_command(t_ctx *ctx,
 								t_command *cmd);
 
-// exec_cmdas_utils6
+// exec_cmdas_utils6.c
 int							exec_cmdas(t_ctx *ctx);
+
+// exec_cmdas_utils7.c
+int							setup_child_redirections_bruh(t_ctx *ctx,
+								t_command *current, int prev_pipe,
+								int next_write);
+void						handle_child_process(t_ctx *ctx,
+								t_command *current);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);
