@@ -21,11 +21,10 @@
  * @param result Current result string
  * @return Updated result string
  */
-static char	*handle_var_expansion(t_ctx *ctx, char *str, int *i, char *result)
+char	*handle_var_expansion(t_ctx *ctx, char *str, int *i, char *result)
 {
 	char	*var_value;
 	char	dollar[2];
-
 
 	dollar[0] = '$';
 	dollar[1] = '\0';
@@ -43,7 +42,7 @@ static char	*handle_var_expansion(t_ctx *ctx, char *str, int *i, char *result)
 	return (result);
 }
 
-static char	*append_text_part(int start, int i, char *result, char *str)
+char	*append_text_part(int start, int i, char *result, char *str)
 {
 	char	*temp_result;
 
@@ -55,51 +54,6 @@ static char	*append_text_part(int start, int i, char *result, char *str)
 		result = temp_result;
 		return (result);
 	}
-	return (result);
-}
-
-/**
- * @brief Processes a string, handling quotes and variable expansion
- *
- * @param ctx Context containing variable information
- * @param str String to process
- * @param result Current result string
- * @return Updated result string
- */
-static char	*process_string(t_ctx *ctx, char *str, char *result)
-{
-	int		i;
-	int		start;
-
-	i = 0;
-	start = 0;
-	while (str[i])
-	{
-		if (ctx->quote.in_single_quote == 1 && ctx->quote.in_double_quote == 0)
-		{
-			result = append_text_part(start, i, result, str);
-			if (!result)
-				return (NULL);
-			start = i;
-			i++;
-			continue ;
-		}
-		if (str[i] == '$')
-		{
-			result = append_text_part(start, i, result, str);
-			if (!result)
-				return (NULL);
-			result = handle_var_expansion(ctx, str, &i, result);
-			if (!result)
-				return (NULL);
-			start = i;
-			continue ;
-		}
-		i++;
-	}
-	result = append_text_part(start, i, result, str);
-	if (!result)
-		return (NULL);
 	return (result);
 }
 

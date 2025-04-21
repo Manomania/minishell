@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 16:06:34 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:12:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,6 +206,15 @@ typedef enum e_path_error
 	PATH_ERR_OTHER
 }							t_path_error;
 
+/**
+ * @brief Helper struct to track position data during processing
+ */
+typedef struct s_pos
+{
+	int						start;
+	int						current;
+}							t_pos;
+
 // *************************************************************************** #
 //                            Function Prototypes                              #
 // *************************************************************************** #
@@ -298,8 +307,16 @@ char						*env_find(t_ctx *ctx, char *var);
 // env_find_bin.c
 char						*env_find_bin(t_ctx *ctx, char *bin);
 
-// env_quotes
+// env_quotes.c
 char						*handle_quotes_and_vars(t_ctx *ctx, char *str);
+char						*append_text_part(int start, int i, char *result,
+								char *str);
+char						*handle_var_expansion(t_ctx *ctx, char *str, int *i,
+								char *result);
+
+// env_quotes_utils.c
+char						*process_string(t_ctx *ctx, char *str,
+								char *result);
 
 // exec_cmdas.c
 int							handle_descriptors(int prev_pipe, int pipe_fds[2],
