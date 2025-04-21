@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 16:26:01 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/21 16:58:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 18:03:54 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,4 +88,31 @@ int	execute_external_command(t_ctx *ctx, int saved_stdin, int saved_stdout)
 		exit_code = handle_parent_process(pid, saved_stdin, saved_stdout);
 	}
 	return (exit_code);
+}
+
+/**
+ * @brief Checks if the command is part of a pipeline
+ *
+ * @param cmd Command to check
+ * @return true if command is part of pipeline, false otherwise
+ */
+static t_bool	is_pipeline(t_command *cmd)
+{
+	return (cmd && cmd->next);
+}
+
+/**
+ * @brief Determines command type and executes appropriate handler
+ *
+ * @param ctx Context containing environment and command info
+ * @return int Status code from command execution
+ */
+int	process_command_type(t_ctx *ctx)
+{
+	if (has_only_redirections(ctx->cmd))
+		return (execute_single_command(ctx));
+	else if (is_pipeline(ctx->cmd))
+		return (exec_cmdas(ctx));
+	else
+		return (execute_single_command(ctx));
 }

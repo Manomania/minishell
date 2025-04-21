@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 17:57:40 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/21 18:06:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,12 +269,16 @@ void						handle_standard_io(int saved_stdin,
 								int saved_stdout);
 void						execute_child_process(t_ctx *ctx, int saved_stdin,
 								int saved_stdout);
+void						handle_signal_output(int status);
+int							process_last_command_status(int status,
+								int *was_signaled);
 
 // command_execute_utils6.c
 int							handle_parent_process(pid_t pid, int saved_stdin,
 								int saved_stdout);
 int							execute_external_command(t_ctx *ctx,
 								int saved_stdin, int saved_stdout);
+int							process_command_type(t_ctx *ctx);
 
 // command_new.c
 t_command					*command_new(void);
@@ -345,6 +349,7 @@ int							handle_pipe_setup(int pipe_fds[2], int i,
 void						cleanup_pipe_fds(int pipe_fds[2]);
 pid_t						execute_pipeline_cmd_with_redir(t_ctx *ctx,
 								t_pipe_data *data, int input_fd, int output_fd);
+int							exec_cmdas(t_ctx *ctx);
 
 // exec_cmdas_utils.c
 int							setup_pipe(int pipe_fds[2]);
