@@ -39,6 +39,7 @@ SRC_F				= \
 						error/error \
 						error/ctx_error_exit \
 						error/error_utils \
+						error/error_utils2 \
 						exec/exec_cmdas \
 						exec/exec_cmdas_utils \
 						exec/exec_cmdas_utils2 \
