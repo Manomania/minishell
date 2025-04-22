@@ -40,7 +40,6 @@ SRC_F				= \
 						env/env_find_bin \
 						env/env_quotes \
 						env/env_quotes_utils \
-						env/env_special_vars \
 						error/error \
 						error/ctx_error_exit \
 						error/error_utils \
