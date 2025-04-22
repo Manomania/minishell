@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:52:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/21 15:53:35 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/22 19:07:20 by maximart         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,9 +76,11 @@ t_bool	check_redir_combinations(t_token *current)
  */
 t_bool	check_pipe_tokens(t_token *current)
 {
-	if ((current->type == TOK_PIPE && token_is_redirection(current->next->type))
+	if ((current->type == TOK_PIPE && token_is_redirection(current->next->type)
+			&& current->next->next->type == TOK_EOF)
 		|| (token_is_redirection(current->type)
-			&& current->next->type == TOK_PIPE))
+			&& current->next->type == TOK_PIPE
+			&& current->next->next->type == TOK_EOF))
 	{
 		ft_putendl_fd("syntax error near unexpected token `|'", STDERR_FILENO);
 		return (false);
