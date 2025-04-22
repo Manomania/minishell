@@ -53,7 +53,7 @@ int	handle_redirection_token(t_command *cmd, t_token *token,
  */
 t_bool	handle_empty_first_arg(t_command *cmd, t_token **current, t_ctx *ctx)
 {
-	if (*current && (*current)->type == TOK_WORD)
+	while (*current && (*current)->type == TOK_WORD)
 	{
 		if (!process_word_token(cmd, *current, ctx))
 			return (false);
