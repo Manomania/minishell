@@ -42,25 +42,19 @@ static char	*process_one_variable(t_ctx *ctx, char *result, char *var_start)
 	int		i;
 	int		j;
 	char	*var_name;
-	char	*var_value;
 	char	*new_result;
+	char	*replacement;
 
 	i = var_start - result;
 	j = find_var_end(result, i);
 	var_name = extract_var_name(result, i, j);
 	if (!var_name)
-	{
-		free(result);
-		return (NULL);
-	}
-	var_value = get_env_value(ctx->env_list, var_name);
-	if (!var_value)
-	{
-		free(result);
-		return (NULL);
-	}
-	new_result = replace_substring(result, i, j, var_value);
-	free(var_value);
+		return (result);
+	replacement = get_env_value(ctx->env_list, var_name);
+	free(var_name);
+	if (!replacement)
+		replacement = "";
+	new_result = replace_substring(result, i, j, replacement);
 	return (new_result);
 }
 

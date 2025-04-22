@@ -39,12 +39,7 @@ char	*init_expansion(char *line)
 char	*extract_var_name(char *str, int start, int end)
 {
 	char	*var_name;
-	char	*temp;
 
 	var_name = ft_substr(str, start + 1, end - start - 1);
-	if (!var_name)
-		return (NULL);
-	temp = ft_strjoin(var_name, "=");
-	free(var_name);
-	return (temp);
+	return (var_name);
 }
