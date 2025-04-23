@@ -79,6 +79,7 @@ SRC_F				= \
 						redir/heredoc \
 						redir/heredoc_utils \
 						redir/heredoc_utils2 \
+						redir/heredoc_utils3 \
 						redir/heredoc_expand \
 						redir/heredoc_expand_utils \
 						redir/redirections \

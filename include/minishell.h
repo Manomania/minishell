@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 19:20:59 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/23 12:58:33 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,7 +226,7 @@ typedef struct s_handle_token
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
-static int	g_signal_status = 0;
+static int					g_signal_status = 0;
 
 // builtins_try.c
 t_bool						builtins_try(t_ctx *ctx, t_command *cmd);
@@ -515,6 +515,13 @@ char						*replace_substring(char *str, int start, int end,
 
 // heredoc_utils2.c
 void						close_heredoc_fds(t_command *cmd);
+int							read_heredoc_line(char *delimiter, char **line);
+int							setup_heredoc_pipes(int pipe_fds[2]);
+int							wait_heredoc_child(int pipe_fds[2], t_ctx *ctx);
+
+// heredoc_utils3.c
+int							process_heredoc_content(int pipe_fd,
+								char *delimiter, t_ctx *ctx);
 
 // heredoc_expand.c
 char						*expand_variables_in_line(t_ctx *ctx, char *line);
