@@ -12,6 +12,8 @@
 
 #include "minishell.h"
 
+int				g_signal_status = 0;
+
 /**
  * @brief Signal handler for interactive mode (shell prompt)
  * Handles SIGINT (CTRL+C) by setting signal status

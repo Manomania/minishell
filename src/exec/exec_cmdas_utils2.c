@@ -12,6 +12,7 @@
 
 #include "error.h"
 #include "minishell.h"
+#include "builtins.h"
 
 /**
  * Creates a pipe for the next command

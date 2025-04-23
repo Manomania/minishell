@@ -15,32 +15,10 @@
 #include "minishell.h"
 
 /**
- * @brief Closes all open heredoc file descriptors
+ * @brief Affiche un avertissement pour EOF dans un heredoc
  *
- * @param cmd Command containing redirections
- */
-void	close_heredoc_fds(t_command *cmd)
-{
-	t_redirection	*redir;
-
-	while (cmd)
-	{
-		redir = cmd->redirection;
-		while (redir)
-		{
-			if (redir->fd > 2)
-			{
-				close(redir->fd);
-				redir->fd = -1;
-			}
-			redir = redir->next;
-		}
-		cmd = cmd->next;
-	}
-}
-
-/**
- * @brief Displays warning message for EOF in heredoc
+ * Message formaté en jaune pour indiquer la fin d'un heredoc par EOF
+ * Utilise les constantes de couleur définies pour les messages
  */
 static void	display_heredoc_eof_warning(void)
 {
@@ -56,36 +34,78 @@ static void	display_heredoc_eof_warning(void)
 }
 
 /**
- * @brief Handles reading and checking heredoc content
+ * @brief Vérifie si le heredoc a été interrompu par un signal
+ * @return true si interrompu, false sinon
  *
- * @param delimiter String marking end of heredoc
- * @param line Pointer to store the read line
- * @return 1 if delimiter is found, 0 to continue, -1 on error
+ * Utilise la variable globale g_signal_status pour détecter SIGINT
+ * Fonctionne sans nécessiter de variables globales supplémentaires
+ */
+static t_bool	is_heredoc_interrupted(void)
+{
+	return (g_signal_status == 130);
+}
+
+/**
+ * @brief Lit une ligne du heredoc et vérifie le délimiteur
+ * @param delimiter Délimiteur de fin du heredoc
+ * @param line Pointeur pour stocker la ligne lue
+ * @return 1 si délimiteur trouvé, 0 pour continuer, -1 si EOF ou interruption
+ *
+ * Version optimisée pour Linux/Windows avec détection d'interruption
+ * améliorée avant et après l'appel à readline
  */
 int	read_heredoc_line(char *delimiter, char **line)
 {
-	int	delimiter_len;
+	int		delimiter_len;
 
 	delimiter_len = ft_strlen(delimiter);
+
+	/* Vérification critique avant d'appeler readline */
+	if (is_heredoc_interrupted())
+		return (-1);
+
+	/* Paramétrage de readline pour cette ligne */
+	rl_catch_signals = 0;          /* Laisse notre gestionnaire gérer les signaux */
+	rl_catch_sigwinch = 0;         /* Ignore les signaux de redimensionnement */
+
+	/* Lecture de la ligne avec le prompt spécifique au heredoc */
 	*line = readline("> ");
+
+	/* Vérification immédiate après readline */
+	if (is_heredoc_interrupted())
+	{
+		if (*line)
+		{
+			free(*line);
+			*line = NULL;
+		}
+		return (-1);
+	}
+
+	/* Gestion d'EOF (Ctrl+D) */
 	if (!(*line))
 	{
 		display_heredoc_eof_warning();
 		return (-1);
 	}
+
+	/* Vérification du délimiteur */
 	if (ft_strncmp(*line, delimiter, delimiter_len + 1) == 0)
 	{
 		free(*line);
 		return (1);
 	}
+
 	return (0);
 }
 
 /**
- * @brief Sets up pipes for heredoc
+ * @brief Configure les pipes pour un heredoc
+ * @param pipe_fds Tableau pour stocker les descripteurs
+ * @return 0 si succès, -1 si erreur
  *
- * @param pipe_fds Array to store pipe file descriptors
- * @return 0 on success, -1 on error
+ * Crée un pipe pour la communication entre le processus
+ * de lecture et le processus utilisant le heredoc
  */
 int	setup_heredoc_pipes(int pipe_fds[2])
 {
@@ -95,10 +115,12 @@ int	setup_heredoc_pipes(int pipe_fds[2])
 }
 
 /**
- * @brief Checks if a command has any heredoc redirections
+ * @brief Vérifie si une commande contient des redirections heredoc
+ * @param cmd Commande à vérifier
+ * @return t_bool true si contient au moins un heredoc, false sinon
  *
- * @param cmd Command to check
- * @return t_bool True if it has heredoc, false otherwise
+ * Parcourt la liste des redirections pour trouver une redirection
+ * de type heredoc (<<)
  */
 t_bool	has_heredoc_redirection(t_command *cmd)
 {

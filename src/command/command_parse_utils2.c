@@ -24,7 +24,6 @@
 int	handle_redirection_token(t_command *cmd, t_token *token,
 		t_token *next_token, t_ctx *ctx)
 {
-	int		fd;
 	int		result;
 	char	*expanded_filename;
 
@@ -32,9 +31,6 @@ int	handle_redirection_token(t_command *cmd, t_token *token,
 		return (-1);
 	if (next_token->type != TOK_WORD)
 		return (-1);
-	fd = 1;
-	if (token->type == TOK_REDIR_FROM || token->type == TOK_HERE_DOC_FROM)
-		fd = 0;
 	expanded_filename = handle_quotes_and_vars(ctx, next_token->value);
 	if (!expanded_filename)
 		return (-1);

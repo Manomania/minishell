@@ -90,8 +90,6 @@ void	ctx_clear(t_ctx *ctx)
  */
 void	final_cleanup(t_ctx *ctx)
 {
-	if (ctx->cmd)
-		close_heredoc_fds(ctx->cmd);
 	if (ctx->tokens)
 	{
 		free_all_token(ctx->tokens);

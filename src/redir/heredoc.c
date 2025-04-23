@@ -15,22 +15,30 @@
 
 /**
  * @brief Signal handler for heredoc mode
- *
  * @param sig Signal number
+ *
+ * Gestionnaire amélioré qui force une interruption complète sur SIGINT
+ * Les fonctions readline sont utilisées pour nettoyer l'état du terminal
  */
 static void	sig_heredoc_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
 		g_signal_status = 130;
-		write(STDOUT_FILENO, "\n", 1);
-		rl_replace_line("", 0);
+		write(STDOUT_FILENO, "^C", 2);
 		rl_done = 1;
+		rl_replace_line("", 0);
+		rl_free_line_state();
+		rl_cleanup_after_signal();
 	}
 }
 
 /**
  * @brief Sets up signal handlers for heredoc mode
+ *
+ * Configure les gestionnaires pour SIGINT et SIGQUIT en mode heredoc
+ * SIGINT est capturé avec notre gestionnaire personnalisé
+ * SIGQUIT est ignoré
  */
 static void	setup_heredoc_signals(void)
 {
@@ -48,18 +56,10 @@ static void	setup_heredoc_signals(void)
 }
 
 /**
- * @brief Restores normal signal handlers after heredoc processing
- */
-static void	restore_normal_signals(void)
-{
-	setup_signals();
-}
-
-/**
- * @brief Creates a heredoc pipe without using fork
- *
- * @param delimiter String marking end of heredoc
+ * @brief Creates a heredoc pipe
  * @return Pipe file descriptors array, or NULL on error
+ *
+ * Crée un pipe pour transmettre le contenu du heredoc
  */
 static int	*create_heredoc_pipe(void)
 {
@@ -77,12 +77,43 @@ static int	*create_heredoc_pipe(void)
 }
 
 /**
- * @brief Handles reading heredoc input and writing to pipe
+ * @brief Vérifie si une interruption par SIGINT est en cours
+ * @return true si interrompu, false sinon
  *
+ * Fonction utilitaire pour centraliser la vérification de l'état
+ * du signal, utilisant uniquement la variable globale existante
+ */
+static t_bool	is_heredoc_interrupted(void)
+{
+	return (g_signal_status == 130);
+}
+
+/**
+ * @brief Vérifie les interruptions durant les opérations readline
+ * @return 1 si interrompu, 0 sinon
+ *
+ * Fonction callback pour readline qui force l'arrêt si un signal
+ * a été reçu entre les vérifications
+ */
+static int	interrupt_check_hook(void)
+{
+	if (is_heredoc_interrupted())
+	{
+		rl_done = 1;
+		return (1);
+	}
+	return (0);
+}
+
+/**
+ * @brief Handles reading heredoc input and writing to pipe
  * @param pipe_fds Pipe file descriptors
  * @param delimiter String marking end of heredoc
  * @param ctx Shell context
  * @return 0 on success, -1 on error or interrupt
+ *
+ * Lit les lignes du heredoc jusqu'au délimiteur ou interruption
+ * Utilise un hook readline pour vérifier les interruptions
  */
 static int	read_heredoc_content(int *pipe_fds, char *delimiter, t_ctx *ctx)
 {
@@ -90,19 +121,23 @@ static int	read_heredoc_content(int *pipe_fds, char *delimiter, t_ctx *ctx)
 	char	*expanded_line;
 	int		status;
 
+	rl_event_hook = interrupt_check_hook;
 	while (1)
 	{
+		if (is_heredoc_interrupted())
+			return (-1);
 		status = read_heredoc_line(delimiter, &line);
+		if (is_heredoc_interrupted())
+		{
+			if (line)
+				free(line);
+			return (-1);
+		}
 		if (status != 0)
 		{
 			if (status < 0)
 				return (-1);
 			return (0);
-		}
-		if (g_signal_status == 130)
-		{
-			free(line);
-			return (-1);
 		}
 		expanded_line = expand_variables_in_line(ctx, line);
 		free(line);
@@ -116,11 +151,28 @@ static int	read_heredoc_content(int *pipe_fds, char *delimiter, t_ctx *ctx)
 }
 
 /**
- * @brief Creates a heredoc without using fork
+ * @brief Restaure l'état du shell en mode interactif
  *
+ * Réinitialise les signaux et le terminal pour le mode interactif
+ * Assure une transition propre après un heredoc
+ */
+static void	restore_shell_state(void)
+{
+	setup_signals();
+	rl_event_hook = NULL;
+	rl_clear_signals();
+	rl_on_new_line();
+	rl_replace_line("", 0);
+}
+
+/**
+ * @brief Creates a heredoc without using fork
  * @param ctx Shell context
  * @param delimiter String marking end of heredoc
  * @return File descriptor to read from, or -1 on error
+ *
+ * Fonction principale de gestion des heredocs avec support
+ * pour l'interruption immédiate sur Ctrl+C
  */
 int	create_heredoc(t_ctx *ctx, char *delimiter)
 {
@@ -134,26 +186,31 @@ int	create_heredoc(t_ctx *ctx, char *delimiter)
 	setup_heredoc_signals();
 	result = read_heredoc_content(pipe_fds, delimiter, ctx);
 	close(pipe_fds[1]);
-	restore_normal_signals();
-	if (result == -1 || g_signal_status == 130)
+	if (result == -1 || is_heredoc_interrupted())
 	{
 		close(pipe_fds[0]);
 		free(pipe_fds);
-		ctx->exit_status = 130;
-		g_signal_status = 0;
+		if (is_heredoc_interrupted())
+		{
+			ctx->exit_status = 130;
+			g_signal_status = 0;
+		}
+		restore_shell_state();
 		return (-1);
 	}
 	read_fd = pipe_fds[0];
 	free(pipe_fds);
+	restore_shell_state();
 	return (read_fd);
 }
 
 /**
  * @brief Handles here_doc redirections for a command
- *
  * @param ctx Context containing environment information
  * @param cmd Command containing redirections
  * @return 0 on success, non-zero on error
+ *
+ * Configure les redirections de type heredoc pour la commande
  */
 int	setup_heredocs(t_ctx *ctx, t_command *cmd)
 {

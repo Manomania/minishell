@@ -146,7 +146,7 @@ static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
  * @param ctx Context
  * @return Exit status of the last command in the pipeline.
  */
-int	exec_cmdas(t_ctx *ctx)
+int		exec_cmdas(t_ctx *ctx)
 {
 	t_pipe_data	data;
 	int			exit_status;
