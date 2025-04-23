@@ -12,9 +12,6 @@
 
 #include "minishell.h"
 
-/* Global variable for signal status - required for POSIX signal handlers */
-static int	g_signal_status = 0;
-
 /**
  * @brief Signal handler for interactive mode (shell prompt)
  * Handles SIGINT (CTRL+C) by setting signal status

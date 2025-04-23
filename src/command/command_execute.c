@@ -96,7 +96,6 @@ int	command_execute(t_ctx *ctx)
 	if (read_all_heredocs(ctx) != 0)
 	{
 		close_heredoc_fds(ctx->cmd);
-		ctx->exit_status = 1;
 		return (ctx->exit_status);
 	}
 	status = process_command_type(ctx);

@@ -6,36 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 14:01:23 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/23 10:02:33 by maximart         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
 #include "minishell.h"
-
-/**
- * @brief Processes a line read for heredoc
- *
- * @param line Line read from input
- * @param ctx Context containing environment information
- * @param pipe_fd File descriptor to write to
- * @return 0 on success, -1 on error
- */
-static int	process_heredoc_line(char *line, t_ctx *ctx, int pipe_fd)
-{
-	char	*expanded_line;
-
-	if (!line)
-		return (-1);
-	expanded_line = expand_variables_in_line(ctx, line);
-	free(line);
-	if (!expanded_line)
-		return (-1);
-	write(pipe_fd, expanded_line, ft_strlen(expanded_line));
-	write(pipe_fd, "\n", 1);
-	free(expanded_line);
-	return (0);
-}
 
 /**
  * @brief Displays warning message for EOF in heredoc
@@ -54,18 +30,50 @@ static void	display_heredoc_eof_warning(void)
 }
 
 /**
- * @brief Reads content for heredoc until delimiter is found
+ * @brief Signal handler for heredoc mode
  *
- * @param pipe_fd File descriptor to write heredoc content to
- * @param delimiter String marking end of heredoc
- * @param ctx Context containing environment information
- * @return 0 on success, -1 on error, 1 on EOF
+ * @param sig Signal number
  */
-static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
+static void sig_heredoc_handler(int sig)
 {
-	char	*line;
-	int		delimiter_len;
-	int		result;
+	if (sig == SIGINT)
+	{
+		g_signal_status = 130;  // Signal status for SIGINT
+		write(STDOUT_FILENO, "\n", 1);
+		exit(130);  // Exit the child process with signal code
+	}
+}
+
+/**
+ * @brief Sets up signal handlers for heredoc mode
+ */
+static void setup_heredoc_signals(void)
+{
+	struct sigaction sa_int;
+	struct sigaction sa_quit;
+
+	sigemptyset(&sa_int.sa_mask);
+	sigemptyset(&sa_quit.sa_mask);
+	sa_int.sa_flags = 0;
+	sa_quit.sa_flags = 0;
+	sa_int.sa_handler = sig_heredoc_handler;
+	sa_quit.sa_handler = SIG_IGN;
+	sigaction(SIGINT, &sa_int, NULL);
+	sigaction(SIGQUIT, &sa_quit, NULL);
+}
+
+/**
+ * @brief Processes heredoc content and writes to pipe
+ *
+ * @param pipe_fd Write end of pipe
+ * @param delimiter String marking end of heredoc
+ * @param ctx Shell context
+ * @return 0 on success, non-zero on error
+ */
+static int process_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
+{
+	char *line;
+	int delimiter_len;
 
 	delimiter_len = ft_strlen(delimiter);
 	while (1)
@@ -79,42 +87,63 @@ static int	read_heredoc_content(int pipe_fd, char *delimiter, t_ctx *ctx)
 		if (ft_strncmp(line, delimiter, delimiter_len + 1) == 0)
 		{
 			free(line);
-			break ;
+			break;
 		}
-		result = process_heredoc_line(line, ctx, pipe_fd);
-		if (result == -1)
+		char *expanded_line = expand_variables_in_line(ctx, line);
+		free(line);
+		if (!expanded_line)
 			return (-1);
+		write(pipe_fd, expanded_line, ft_strlen(expanded_line));
+		write(pipe_fd, "\n", 1);
+		free(expanded_line);
 	}
 	return (0);
 }
 
 /**
- * @brief Creates a here-document for input redirection
+ * @brief Creates a heredoc and handles signal interruption
  *
- * @param ctx Context containing environment information
+ * @param ctx Shell context
  * @param delimiter String marking end of heredoc
  * @return File descriptor to read from, or -1 on error
  */
-int	create_heredoc(t_ctx *ctx, char *delimiter)
+int create_heredoc(t_ctx *ctx, char *delimiter)
 {
-	int	pipe_fds[2];
-	int	result;
-	int	read_fd;
+	int pipe_fds[2];
+	pid_t pid;
+	int status;
+	int heredoc_fd;
 
 	if (pipe(pipe_fds) == -1)
-	{
-		(void)error(NULL, "heredoc", ERR_PIPE);
-		return (-1);
-	}
-	result = read_heredoc_content(pipe_fds[1], delimiter, ctx);
-	close(pipe_fds[1]);
-	if (result == -1)
+		return (error(NULL, "heredoc", ERR_PIPE));
+	setup_parent_signals();  // Parent uses non-interactive mode
+	pid = fork();
+	if (pid == -1)
 	{
 		close(pipe_fds[0]);
+		close(pipe_fds[1]);
+		return (error(NULL, "heredoc", ERR_CHILD));
+	}
+	if (pid == 0)
+	{
+		close(pipe_fds[0]);
+		setup_heredoc_signals();
+		process_heredoc_content(pipe_fds[1], delimiter, ctx);
+		close(pipe_fds[1]);
+		exit(EXIT_SUCCESS);
+	}
+	close(pipe_fds[1]);
+	waitpid(pid, &status, 0);
+	if (WIFSIGNALED(status) || (WIFEXITED(status) && WEXITSTATUS(status) == 130))
+	{
+		close(pipe_fds[0]);
+		ctx->exit_status = 130;
+		g_signal_status = 130;
 		return (-1);
 	}
-	read_fd = pipe_fds[0];
-	return (read_fd);
+	heredoc_fd = pipe_fds[0];
+	setup_signals();  // Restore normal signals
+	return (heredoc_fd);
 }
 
 /**
