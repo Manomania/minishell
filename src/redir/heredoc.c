@@ -24,7 +24,8 @@ static void	sig_heredoc_handler(int sig)
 	{
 		g_signal_status = 130;
 		write(STDOUT_FILENO, "\n", 1);
-		exit(130);
+		rl_replace_line("", 0);
+		rl_done = 1;
 	}
 }
 
@@ -47,24 +48,75 @@ static void	setup_heredoc_signals(void)
 }
 
 /**
- * @brief Handles the child process for heredoc
+ * @brief Restores normal signal handlers after heredoc processing
+ */
+static void	restore_normal_signals(void)
+{
+	setup_signals();
+}
+
+/**
+ * @brief Creates a heredoc pipe without using fork
+ *
+ * @param delimiter String marking end of heredoc
+ * @return Pipe file descriptors array, or NULL on error
+ */
+static int	*create_heredoc_pipe(void)
+{
+	int	*pipe_fds;
+
+	pipe_fds = malloc(sizeof(int) * 2);
+	if (!pipe_fds)
+		return (NULL);
+	if (pipe(pipe_fds) == -1)
+	{
+		free(pipe_fds);
+		return (NULL);
+	}
+	return (pipe_fds);
+}
+
+/**
+ * @brief Handles reading heredoc input and writing to pipe
  *
  * @param pipe_fds Pipe file descriptors
  * @param delimiter String marking end of heredoc
  * @param ctx Shell context
- * @return void, exits process
+ * @return 0 on success, -1 on error or interrupt
  */
-void	handle_heredoc_child(int pipe_fds[2], char *delimiter, t_ctx *ctx)
+static int	read_heredoc_content(int *pipe_fds, char *delimiter, t_ctx *ctx)
 {
-	close(pipe_fds[0]);
-	setup_heredoc_signals();
-	process_heredoc_content(pipe_fds[1], delimiter, ctx);
-	close(pipe_fds[1]);
-	exit(EXIT_SUCCESS);
+	char	*line;
+	char	*expanded_line;
+	int		status;
+
+	while (1)
+	{
+		status = read_heredoc_line(delimiter, &line);
+		if (status != 0)
+		{
+			if (status < 0)
+				return (-1);
+			return (0);
+		}
+		if (g_signal_status == 130)
+		{
+			free(line);
+			return (-1);
+		}
+		expanded_line = expand_variables_in_line(ctx, line);
+		free(line);
+		if (!expanded_line)
+			return (-1);
+		write(pipe_fds[1], expanded_line, ft_strlen(expanded_line));
+		write(pipe_fds[1], "\n", 1);
+		free(expanded_line);
+	}
+	return (0);
 }
 
 /**
- * @brief Creates a heredoc and handles signal interruption
+ * @brief Creates a heredoc without using fork
  *
  * @param ctx Shell context
  * @param delimiter String marking end of heredoc
@@ -72,24 +124,28 @@ void	handle_heredoc_child(int pipe_fds[2], char *delimiter, t_ctx *ctx)
  */
 int	create_heredoc(t_ctx *ctx, char *delimiter)
 {
-	int		pipe_fds[2];
-	pid_t	pid;
+	int		*pipe_fds;
+	int		read_fd;
 	int		result;
 
-	if (setup_heredoc_pipes(pipe_fds) < 0)
-		return (-1);
-	pid = fork();
-	if (pid == -1)
+	pipe_fds = create_heredoc_pipe();
+	if (!pipe_fds)
+		return (error(NULL, "heredoc", ERR_PIPE));
+	setup_heredoc_signals();
+	result = read_heredoc_content(pipe_fds, delimiter, ctx);
+	close(pipe_fds[1]);
+	restore_normal_signals();
+	if (result == -1 || g_signal_status == 130)
 	{
 		close(pipe_fds[0]);
-		close(pipe_fds[1]);
-		return (error(NULL, "heredoc", ERR_CHILD));
+		free(pipe_fds);
+		ctx->exit_status = 130;
+		g_signal_status = 0;
+		return (-1);
 	}
-	if (pid == 0)
-		handle_heredoc_child(pipe_fds, delimiter, ctx);
-	close(pipe_fds[1]);
-	result = wait_heredoc_child(pipe_fds, ctx);
-	return (result);
+	read_fd = pipe_fds[0];
+	free(pipe_fds);
+	return (read_fd);
 }
 
 /**

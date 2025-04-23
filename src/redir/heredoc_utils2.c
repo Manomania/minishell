@@ -82,41 +82,36 @@ int	read_heredoc_line(char *delimiter, char **line)
 }
 
 /**
- * @brief Sets up pipes and initializes the heredoc process
+ * @brief Sets up pipes for heredoc
  *
  * @param pipe_fds Array to store pipe file descriptors
- * @return 0 on success, negative value on error
+ * @return 0 on success, -1 on error
  */
 int	setup_heredoc_pipes(int pipe_fds[2])
 {
 	if (pipe(pipe_fds) == -1)
 		return (error(NULL, "heredoc", ERR_PIPE));
-	setup_parent_signals();
 	return (0);
 }
 
 /**
- * @brief Waits for heredoc child and processes result
+ * @brief Checks if a command has any heredoc redirections
  *
- * @param pipe_fds Pipe file descriptors
- * @param ctx Shell context
- * @return Read file descriptor or -1 on error
+ * @param cmd Command to check
+ * @return t_bool True if it has heredoc, false otherwise
  */
-int	wait_heredoc_child(int pipe_fds[2], t_ctx *ctx)
+t_bool	has_heredoc_redirection(t_command *cmd)
 {
-	int	status;
-	int	heredoc_fd;
+	t_redirection	*redir;
 
-	waitpid(-1, &status, 0);
-	if (WIFSIGNALED(status) || (WIFEXITED(status)
-			&& WEXITSTATUS(status) == 130))
+	if (!cmd || !cmd->redirection)
+		return (false);
+	redir = cmd->redirection;
+	while (redir)
 	{
-		close(pipe_fds[0]);
-		ctx->exit_status = 130;
-		g_signal_status = 130;
-		return (-1);
+		if (redir->type == TOK_HERE_DOC_FROM)
+			return (true);
+		redir = redir->next;
 	}
-	heredoc_fd = pipe_fds[0];
-	setup_signals();
-	return (heredoc_fd);
+	return (false);
 }
