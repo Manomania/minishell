@@ -226,6 +226,8 @@ typedef struct s_handle_token
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
+static int	g_signal_status = 0;
+
 // builtins_try.c
 t_bool						builtins_try(t_ctx *ctx, t_command *cmd);
 
