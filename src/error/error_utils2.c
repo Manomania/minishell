@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   error_utils2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 16:57:36 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 16:57:42 by maximart         ###   ########.fr       */
+/*   Updated: 2025/04/24 17:18:05 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	error_print(const char *proof, const char *module, const char *msg)
 {
 	ft_printf_fd(STDERR_FILENO, "minishell: ");
 	if (module && proof)
-		ft_printf_fd(STDERR_FILENO, "%s: %s: %s", module, proof, msg);
+		ft_printf_fd(STDERR_FILENO, "%s: %s: %s\n", module, proof, msg);
 	else if (module)
 		ft_printf_fd(STDERR_FILENO, "%s: %s\n", module, msg);
 	else if (proof)
