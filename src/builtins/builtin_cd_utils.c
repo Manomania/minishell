@@ -12,6 +12,7 @@
 
 #include "error.h"
 #include "minishell.h"
+#include "builtins.h"
 
 /**
  * @brief Gets the old PWD directory from environment

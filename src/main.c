@@ -29,12 +29,14 @@ static int	command_loop(t_ctx *ctx)
 	running = 1;
 	while (running)
 	{
+		g_signal_status = 0;
 		input = get_user_input(ctx, ctx->exit_status);
 		if (!input)
 			return (ctx->exit_status);
 		handle_command_in_main_loop(ctx, input);
 		if (ctx->exit_requested)
 			running = 0;
+		g_signal_status = 0;
 	}
 	return (ctx->exit_status);
 }
