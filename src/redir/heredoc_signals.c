@@ -18,11 +18,19 @@ void	sig_heredoc_handler(int sig)
 	{
 		g_signal_status = 130;
 		write(STDOUT_FILENO, "^C", 2);
-		rl_done = 1;
 		rl_replace_line("", 0);
-		rl_free_line_state();
-		rl_cleanup_after_signal();
+		rl_redisplay();
 	}
+}
+
+void	reset_heredoc_state(void)
+{
+	rl_event_hook = NULL;
+	g_signal_status = 0;
+	rl_cleanup_after_signal();
+	rl_deprep_terminal();
+	rl_reset_terminal(NULL);
+	setup_signals();
 }
 
 void	setup_heredoc_signals(void)

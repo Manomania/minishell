@@ -510,6 +510,7 @@ char						*extract_var_name(char *str, int start, int end);
 
 /* heredoc_signal.c */
 void						sig_heredoc_handler(int sig);
+void						reset_heredoc_state(void);
 void						setup_heredoc_signals(void);
 t_bool						is_heredoc_interrupted(void);
 int							interrupt_check_hook(void);

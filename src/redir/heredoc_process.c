@@ -32,6 +32,7 @@ int	read_heredoc_content(int *pipe_fds, char *delimiter, t_ctx *ctx)
 	char	*line;
 	int		status;
 
+	g_signal_status = 0;
 	rl_event_hook = interrupt_check_hook;
 	while (1)
 	{
@@ -53,7 +54,6 @@ int	read_heredoc_content(int *pipe_fds, char *delimiter, t_ctx *ctx)
 		if (process_heredoc_line(pipe_fds[1], line, ctx) == -1)
 			return (-1);
 	}
-	return (0);
 }
 
 t_bool	has_heredoc_redirection(t_command *cmd)

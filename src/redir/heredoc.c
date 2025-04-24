@@ -15,11 +15,10 @@
 
 static void	restore_shell_state(void)
 {
+	reset_heredoc_state();
 	setup_signals();
 	rl_event_hook = NULL;
-	rl_clear_signals();
-	rl_on_new_line();
-	rl_replace_line("", 0);
+	g_signal_status = 0;
 }
 
 int	create_heredoc(t_ctx *ctx, char *delimiter)
@@ -28,6 +27,7 @@ int	create_heredoc(t_ctx *ctx, char *delimiter)
 	int		read_fd;
 	int		result;
 
+	g_signal_status = 0;
 	if (pipe(pipe_fds) == -1)
 		return (error(NULL, "heredoc", ERR_PIPE));
 	setup_heredoc_signals();

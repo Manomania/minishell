@@ -40,10 +40,12 @@ int	read_heredoc_line(char *delimiter, char **line)
 	if (!(*line) || g_signal_status == 130)
 	{
 		if (*line && g_signal_status == 130)
+		{
 			free(*line);
+			*line = NULL;
+		}
 		else if (!(*line))
 			display_heredoc_eof_warning();
-		*line = NULL;
 		return (-1);
 	}
 	if (ft_strncmp(*line, delimiter, delimiter_len + 1) == 0)
