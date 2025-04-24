@@ -31,24 +31,19 @@ int	read_heredoc_line(char *delimiter, char **line)
 {
 	int	delimiter_len;
 
-	delimiter_len = ft_strlen(delimiter);
 	if (g_signal_status == 130)
 		return (-1);
+	delimiter_len = ft_strlen(delimiter);
 	rl_catch_signals = 0;
 	rl_catch_sigwinch = 0;
 	*line = readline("> ");
-	if (g_signal_status == 130)
+	if (!(*line) || g_signal_status == 130)
 	{
-		if (*line)
-		{
+		if (*line && g_signal_status == 130)
 			free(*line);
-			*line = NULL;
-		}
-		return (-1);
-	}
-	if (!(*line))
-	{
-		display_heredoc_eof_warning();
+		else if (!(*line))
+			display_heredoc_eof_warning();
+		*line = NULL;
 		return (-1);
 	}
 	if (ft_strncmp(*line, delimiter, delimiter_len + 1) == 0)
