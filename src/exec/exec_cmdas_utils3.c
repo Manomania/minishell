@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:32:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/21 17:08:25 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/24 14:13:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,24 +103,32 @@ t_bool	validate_pipeline_command(t_pipe_data *data)
  *
  * @param ctx Context information
  * @param data Structure with pipe information
- * @return int -1 on error, updated previous pipe fd otherwise
+ * @return int 0 if command is valid to proceed, -1 if pipeline should stop,
+ * prev_pipe value if command failed pre-fork but pipeline continues.
  */
 int	handle_non_builtin(t_ctx *ctx, t_pipe_data *data)
 {
-	t_bool	bin_found;
+	t_bool		bin_found;
+	t_command	*original_cmd;
 
 	if (!validate_pipeline_command(data))
-		return (-1);
-	if (has_only_redirections_pipeline(data->current))
 	{
-		data->pids[data->i] = -1;
+		data->pids[data->i] = 0;
 		return (data->prev_pipe);
 	}
+	if (has_only_redirections_pipeline(data->current))
+		return (0);
 	if (!is_builtin_command(data->current->args[0]))
 	{
-		bin_found = check_command_binary(ctx, data);
+		original_cmd = ctx->cmd;
+		ctx->cmd = data->current;
+		bin_found = command_bin(ctx);
+		ctx->cmd = original_cmd;
 		if (bin_found == false)
+		{
+			data->pids[data->i] = -1;
 			return (data->prev_pipe);
+		}
 	}
 	return (0);
 }

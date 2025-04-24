@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/23 12:58:33 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/24 14:17:01 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -374,7 +374,8 @@ int							exec_cmdas(t_ctx *ctx);
 int							setup_pipe(int pipe_fds[2]);
 int							wait_for_pids(pid_t *pids, int count);
 t_bool						init_pipe_data(t_pipe_data *data, t_ctx *ctx);
-int							wait_for_pipeline_processes(pid_t *pids, int count);
+int							wait_for_pipeline_processes(pid_t *pids, int count,
+								t_ctx *ctx);
 
 // exec_cmdas_utils2.c
 int							count_commands(t_command *cmd);
@@ -411,8 +412,8 @@ int							exec_cmdas(t_ctx *ctx);
 int							setup_child_redirections_bruh(t_ctx *ctx,
 								t_command *current, int prev_pipe,
 								int next_write);
-void						handle_child_process(t_ctx *ctx,
-								t_command *current);
+void						handle_child_process(t_ctx *ctx, t_command *current,
+								int pipe_read_end);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);

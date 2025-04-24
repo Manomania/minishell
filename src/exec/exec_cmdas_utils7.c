@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 19:18:09 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/21 19:21:00 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/24 14:12:12 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,13 @@ int	setup_child_redirections_bruh(t_ctx *ctx, t_command *current, int prev_pipe,
  *
  * @param ctx Context information
  * @param current Current command structure
+ * @param pipe_read_end The read end of the current pipe (to be closed)
  */
-void	handle_child_process(t_ctx *ctx, t_command *current)
+void	handle_child_process(t_ctx *ctx, t_command *current, int pipe_read_end)
 {
 	reset_signals();
+	if (pipe_read_end > 2)
+		close(pipe_read_end);
 	if (!current->args || !current->args[0])
 	{
 		cleanup_child_process(ctx);

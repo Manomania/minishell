@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:33:08 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/21 17:07:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/24 14:17:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,46 +92,53 @@ t_bool	init_pipe_data(t_pipe_data *data, t_ctx *ctx)
 }
 
 /**
- * @brief Processes a child's wait status
+ * Handle waiting for pipeline processes and determine final status.
  *
- * @param pid Process ID
- * @param status Pointer to status variable
- * @return int 1 if process was signaled, 0 otherwise
+ * @param pids Array of process IDs or status indicators (-1, -2).
+ * @param count Number of commands in the pipeline.
+ * @param ctx Shell context (needed for builtin status).
+ * @return int Exit status of the last command in the pipeline.
  */
-static int	process_child_wait(pid_t pid, int *status)
-{
-	if (pid > 0)
-	{
-		waitpid(pid, status, 0);
-		if (WIFSIGNALED(*status))
-			return (1);
-	}
-	return (0);
-}
-
-/**
- * @brief Handle waiting for pipeline processes
- *
- * @param pids Array of process IDs
- * @param count Number of processes
- * @return int Exit status of the last command
- */
-int	wait_for_pipeline_processes(pid_t *pids, int count)
+int	wait_for_pipeline_processes(pid_t *pids, int count, t_ctx *ctx)
 {
 	int	i;
 	int	status;
 	int	last_status;
 	int	was_signaled;
 
-	was_signaled = 0;
 	i = 0;
+	status = 0;
 	last_status = 0;
+	was_signaled = 0;
+	if (count <= 0)
+		return (0);
 	while (i < count)
 	{
-		status = 0;
-		was_signaled |= process_child_wait(pids[i], &status);
-		if (i == count - 1 && pids[i] > 0)
-			last_status = process_last_command_status(status, &was_signaled);
+		if (pids[i] > 0)
+		{
+			waitpid(pids[i], &status, 0);
+			if (WIFSIGNALED(status))
+				was_signaled = 1;
+			if (i == count - 1)
+				last_status = process_last_command_status(status,
+						&was_signaled);
+		}
+		else if (pids[i] == -2)
+		{
+			if (i == count - 1)
+				last_status = ctx->exit_status;
+		}
+		else if (pids[i] == -1)
+		{
+			if (i == count - 1)
+				last_status = 127;
+		}
+		else if (pids[i] == 0)
+		{
+			if (i == count - 1)
+			{
+			}
+		}
 		i++;
 	}
 	return (last_status);

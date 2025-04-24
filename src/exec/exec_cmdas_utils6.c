@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:55:33 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/21 19:21:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/24 14:17:53 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,14 @@
  *
  * @param ctx Context information
  * @param data Pipeline data structure
- * @param next_read Next pipe read end
+ * @param next_read Next pipe read end (read end of the *current* pipe)
  * @return -1 on error, 0 on success
  */
 static int	create_child_process(t_ctx *ctx, t_pipe_data *data, int next_read)
 {
 	pid_t	pid;
 
+	(void)next_read;
 	pid = fork();
 	if (pid == -1)
 	{
@@ -37,15 +38,13 @@ static int	create_child_process(t_ctx *ctx, t_pipe_data *data, int next_read)
 	}
 	if (pid == 0)
 	{
-		if (next_read != -1 && next_read > 2)
-			close(next_read);
 		if (setup_child_redirections_bruh(ctx, data->current, data->prev_pipe,
 				data->pipe_fds[1]) != 0)
 		{
 			cleanup_child_process(ctx);
 			exit(EXIT_FAILURE);
 		}
-		handle_child_process(ctx, data->current);
+		handle_child_process(ctx, data->current, data->pipe_fds[0]);
 	}
 	data->pids[data->i] = pid;
 	return (0);
@@ -161,15 +160,17 @@ int	exec_cmdas(t_ctx *ctx)
 	}
 	cmd_head = ctx->cmd;
 	pids_copy = data.pids;
+	if (prepare_all_pipeline_files(cmd_head) != 0)
+	{
+		free(pids_copy);
+		return (1);
+	}
 	success = exec_all_cmdas(ctx, data, &cmd_head);
-	exit_status = wait_for_pipeline_processes(pids_copy, data.cmd_count);
+	exit_status = wait_for_pipeline_processes(pids_copy, data.cmd_count, ctx);
 	setup_signals();
 	free(pids_copy);
 	if (!success)
-	{
-		if (ctx->exit_status == 0)
-			ctx->exit_status = 1;
-		return (ctx->exit_status);
-	}
+		if (exit_status == 0)
+			exit_status = 1;
 	return (exit_status);
 }
