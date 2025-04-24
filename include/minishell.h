@@ -226,7 +226,7 @@ typedef struct s_handle_token
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
-extern int	g_signal_status;
+static int				g_signal_status = 0;
 
 // token_checker.c
 t_bool						validate_token_sequence(t_token *tokens);
@@ -501,6 +501,24 @@ char						*bin_find_path(const char *dir, char *bin);
 int							setup_heredocs(t_ctx *ctx, t_command *cmd);
 int							create_heredoc(t_ctx *ctx, char *delimiter);
 
+// heredoc_expand.c
+char						*expand_variables_in_line(t_ctx *ctx, char *line);
+
+// heredoc_expand_utils.c
+char						*init_expansion(char *line);
+char						*extract_var_name(char *str, int start, int end);
+
+/* heredoc_signal.c */
+void						sig_heredoc_handler(int sig);
+void						setup_heredoc_signals(void);
+t_bool						is_heredoc_interrupted(void);
+int							interrupt_check_hook(void);
+
+/* heredoc_process.c */
+int							read_heredoc_content(int *pipe_fds, char *delimiter,
+								t_ctx *ctx);
+t_bool						has_heredoc_redirection(t_command *cmd);
+
 // heredoc_utils.c
 char						*replace_substring(char *str, int start, int end,
 								char *replacement);
@@ -509,13 +527,6 @@ char						*replace_substring(char *str, int start, int end,
 int							read_heredoc_line(char *delimiter, char **line);
 int							setup_heredoc_pipes(int pipe_fds[2]);
 int							wait_heredoc_child(int pipe_fds[2], t_ctx *ctx);
-
-// heredoc_expand.c
-char						*expand_variables_in_line(t_ctx *ctx, char *line);
-
-// heredoc_expand_utils.c
-char						*init_expansion(char *line);
-char						*extract_var_name(char *str, int start, int end);
 
 // redir_cleanup.c
 void						cleanup_heredoc_resources(t_ctx *ctx);

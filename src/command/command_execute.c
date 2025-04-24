@@ -94,8 +94,12 @@ int	command_execute(t_ctx *ctx)
 	if (!validate_command_context(ctx))
 		return (ctx->exit_status);
 	if (read_all_heredocs(ctx) != 0)
+	{
+		cleanup_heredoc_resources(ctx);
 		return (ctx->exit_status);
+	}
 	status = process_command_type(ctx);
 	ctx->exit_status = status;
+	cleanup_heredoc_resources(ctx);
 	return (status);
 }
