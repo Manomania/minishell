@@ -38,11 +38,15 @@ static int	open_redirect_file(t_token_type type, char *filename)
 	if (fd == -1)
 	{
 		if (errno == EACCES)
+		{
 			error(filename, "redir", ERR_NO_PERMS);
+			return (-1);
+		}
 		else
+		{
 			error(filename, "redir", ERR_NO_FILE);
-		ft_printf_fd(STDERR_FILENO, "minishell: ");
-		perror(filename);
+			return (-1);
+		}
 	}
 	return (fd);
 }
