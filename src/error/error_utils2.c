@@ -24,7 +24,7 @@ void	error_print(const char *proof, const char *module, const char *msg)
 {
 	ft_printf_fd(STDERR_FILENO, "minishell: ");
 	if (module && proof)
-		ft_printf_fd(STDERR_FILENO, "%s: %s: %s", module, proof, msg);
+		ft_printf_fd(STDERR_FILENO, "%s: %s: %s\n", module, proof, msg);
 	else if (module)
 		ft_printf_fd(STDERR_FILENO, "%s: %s\n", module, msg);
 	else if (proof)
