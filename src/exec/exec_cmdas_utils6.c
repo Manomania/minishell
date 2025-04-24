@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:55:33 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/24 14:17:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/24 16:10:50 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ static int	create_child_process(t_ctx *ctx, t_pipe_data *data, int next_read)
 	}
 	if (pid == 0)
 	{
+		free(data->pids);
 		if (setup_child_redirections_bruh(ctx, data->current, data->prev_pipe,
 				data->pipe_fds[1]) != 0)
 		{
