@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:27:07 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 16:01:25 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/25 13:27:14 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 	if (lexer->position >= lexer->length)
 	{
 		ft_printf_fd(STDERR_FILENO,
-			"syntax error near unexpected unclosed quote\n");
+			"minishell: syntax error near unexpected unclosed quote\n");
 		return (NULL);
 	}
 	end = lexer->position;

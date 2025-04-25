@@ -6,12 +6,18 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 08:32:58 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 15:53:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/25 13:18:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
 #include "minishell.h"
+
+void	print_token_error(const char *s)
+{
+	ft_printf_fd(STDERR_FILENO,
+		"minishell: syntax error near unexpected token `%s'\n", s);
+}
 
 /**
  * @brief Checks for duplicate redirection tokens
@@ -24,24 +30,25 @@ static t_bool	check_duplicate_redirs(t_token *current)
 	if (current->type == TOK_REDIR_FROM
 		&& current->next->type == TOK_REDIR_FROM)
 	{
-		ft_putendl_fd("syntax error near unexpected token `<'", STDERR_FILENO);
+		print_token_error("&");
+		print_token_error("<");
 		return (false);
 	}
 	if (current->type == TOK_REDIR_TO && current->next->type == TOK_REDIR_TO)
 	{
-		ft_putendl_fd("syntax error near unexpected token `>'", STDERR_FILENO);
+		print_token_error(">");
 		return (false);
 	}
 	if (current->type == TOK_HERE_DOC_TO
 		&& current->next->type == TOK_HERE_DOC_TO)
 	{
-		ft_putendl_fd("syntax error near unexpected token `>>'", STDERR_FILENO);
+		print_token_error(">>");
 		return (false);
 	}
 	if (current->type == TOK_HERE_DOC_FROM
 		&& current->next->type == TOK_HERE_DOC_FROM)
 	{
-		ft_putendl_fd("syntax error near unexpected token `<<'", STDERR_FILENO);
+		print_token_error("<<");
 		return (false);
 	}
 	return (true);
@@ -50,6 +57,7 @@ static t_bool	check_duplicate_redirs(t_token *current)
 /**
  * @brief Checks for missing target after redirection
  *
+ * @param ctx Context
  * @param current Current token
  * @return t_bool false if missing target found, true otherwise
  */
@@ -60,8 +68,7 @@ static t_bool	check_missing_target(t_token *current)
 			|| current->next->type == TOK_PIPE || current->next->type == TOK_EOF
 			|| current->next->type == TOK_NEW_LINE))
 	{
-		ft_putendl_fd("syntax error near unexpected token `newline'",
-			STDERR_FILENO);
+		print_token_error("newline");
 		return (false);
 	}
 	return (true);

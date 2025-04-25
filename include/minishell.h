@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/24 14:17:01 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/25 13:18:02 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,6 +233,7 @@ t_bool						builtins_try(t_ctx *ctx, t_command *cmd);
 
 // token_checker.c
 t_bool						validate_token_sequence(t_token *tokens);
+void						print_token_error(const char *s);
 
 // token_checker_utils.c
 t_bool						check_pipe_tokens(t_token *current);
