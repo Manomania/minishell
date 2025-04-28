@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:49:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 19:32:03 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/25 12:40:52 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 /**
  * @brief Frees memory allocated for all redirections in a linked list
  *
- * This function traverses a linked list of redirections and frees each one.
+ * This function traverses a linked list of redirections and frees each one,
+ * including the filename string within each redirection.
  *
  * @param redirection First redirection in the linked list
  */
@@ -37,6 +38,8 @@ static void	free_all_redirections(t_redirection *redirection)
 
 /**
  * @brief Frees memory allocated for a command structure
+ * Frees the arguments array, individual arguments, redirections, and the
+ * command struct itself.
  *
  * @param cmd Command structure to free
  */
@@ -56,8 +59,10 @@ void	free_command(t_command *cmd)
 			i++;
 		}
 		free(cmd->args);
+		cmd->args = NULL;
 	}
 	free_all_redirections(cmd->redirection);
+	cmd->redirection = NULL;
 	free(cmd);
 }
 

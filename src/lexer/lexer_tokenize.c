@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:28:06 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/07 19:15:48 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/25 13:25:36 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ t_token	*tokenize(t_ctx *ctx, char *input)
 	lexer->quote.in_single_quote = 0;
 	if (!build_token_list(lexer, &head))
 	{
-		(void)error(NULL, "lexer", ERR_TOKEN_LIST);
 		free(lexer);
 		return (NULL);
 	}
