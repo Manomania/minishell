@@ -226,10 +226,7 @@ typedef struct s_handle_token
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
-static int					g_signal_status = 0;
-
-// builtins_try.c
-t_bool						builtins_try(t_ctx *ctx, t_command *cmd);
+static int				g_signal_status = 0;
 
 // token_checker.c
 t_bool						validate_token_sequence(t_token *tokens);
@@ -279,9 +276,6 @@ void						handle_standard_io(int saved_stdin,
 								int saved_stdout);
 void						execute_child_process(t_ctx *ctx, int saved_stdin,
 								int saved_stdout);
-void						handle_signal_output(int status);
-int							process_last_command_status(int status,
-								int *was_signaled);
 
 // command_execute_utils6.c
 int							handle_parent_process(pid_t pid, int saved_stdin,
@@ -331,7 +325,6 @@ void						print_redirection_type(t_token_type type);
 char						*expand_var(t_ctx *ctx, char *var_name);
 char						*append_part(char *result, char *str, int start,
 								int end);
-char						*expand_variable(t_ctx *ctx, char *str, int *i);
 char						*get_env_value(t_env *env_list, char *key);
 char						*get_var_name(char *str, int *pos);
 char						*expand_special_var(t_ctx *ctx, char *str, int *i);
@@ -369,7 +362,6 @@ int							handle_pipe_setup(int pipe_fds[2], int i,
 void						cleanup_pipe_fds(int pipe_fds[2]);
 pid_t						execute_pipeline_cmd_with_redir(t_ctx *ctx,
 								t_pipe_data *data, int input_fd, int output_fd);
-int							exec_cmdas(t_ctx *ctx);
 
 // exec_cmdas_utils.c
 int							setup_pipe(int pipe_fds[2]);
@@ -511,26 +503,33 @@ char						*bin_find_path(const char *dir, char *bin);
 int							setup_heredocs(t_ctx *ctx, t_command *cmd);
 int							create_heredoc(t_ctx *ctx, char *delimiter);
 
-// heredoc_utils.c
-char						*replace_substring(char *str, int start, int end,
-								char *replacement);
-
-// heredoc_utils2.c
-void						close_heredoc_fds(t_command *cmd);
-int							read_heredoc_line(char *delimiter, char **line);
-int							setup_heredoc_pipes(int pipe_fds[2]);
-int							wait_heredoc_child(int pipe_fds[2], t_ctx *ctx);
-
-// heredoc_utils3.c
-int							process_heredoc_content(int pipe_fd,
-								char *delimiter, t_ctx *ctx);
-
 // heredoc_expand.c
 char						*expand_variables_in_line(t_ctx *ctx, char *line);
 
 // heredoc_expand_utils.c
 char						*init_expansion(char *line);
 char						*extract_var_name(char *str, int start, int end);
+
+/* heredoc_signal.c */
+void						sig_heredoc_handler(int sig);
+void						reset_heredoc_state(void);
+void						setup_heredoc_signals(void);
+t_bool						is_heredoc_interrupted(void);
+int							interrupt_check_hook(void);
+
+/* heredoc_process.c */
+int							read_heredoc_content(int *pipe_fds, char *delimiter,
+								t_ctx *ctx);
+t_bool						has_heredoc_redirection(t_command *cmd);
+
+// heredoc_utils.c
+char						*replace_substring(char *str, int start, int end,
+								char *replacement);
+
+// heredoc_utils2.c
+int							read_heredoc_line(char *delimiter, char **line);
+int							setup_heredoc_pipes(int pipe_fds[2]);
+int							wait_heredoc_child(int pipe_fds[2], t_ctx *ctx);
 
 // redir_cleanup.c
 void						cleanup_heredoc_resources(t_ctx *ctx);

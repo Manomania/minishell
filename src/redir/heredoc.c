@@ -13,92 +13,42 @@
 #include "error.h"
 #include "minishell.h"
 
-/**
- * @brief Signal handler for heredoc mode
- *
- * @param sig Signal number
- */
-static void	sig_heredoc_handler(int sig)
+static void	restore_shell_state(void)
 {
-	if (sig == SIGINT)
-	{
-		g_signal_status = 130;
-		write(STDOUT_FILENO, "\n", 1);
-		exit(130);
-	}
+	reset_heredoc_state();
+	setup_signals();
+	rl_event_hook = NULL;
+	g_signal_status = 0;
 }
 
-/**
- * @brief Sets up signal handlers for heredoc mode
- */
-static void	setup_heredoc_signals(void)
-{
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
-
-	sigemptyset(&sa_int.sa_mask);
-	sigemptyset(&sa_quit.sa_mask);
-	sa_int.sa_flags = 0;
-	sa_quit.sa_flags = 0;
-	sa_int.sa_handler = sig_heredoc_handler;
-	sa_quit.sa_handler = SIG_IGN;
-	sigaction(SIGINT, &sa_int, NULL);
-	sigaction(SIGQUIT, &sa_quit, NULL);
-}
-
-/**
- * @brief Handles the child process for heredoc
- *
- * @param pipe_fds Pipe file descriptors
- * @param delimiter String marking end of heredoc
- * @param ctx Shell context
- * @return void, exits process
- */
-void	handle_heredoc_child(int pipe_fds[2], char *delimiter, t_ctx *ctx)
-{
-	close(pipe_fds[0]);
-	setup_heredoc_signals();
-	process_heredoc_content(pipe_fds[1], delimiter, ctx);
-	close(pipe_fds[1]);
-	exit(EXIT_SUCCESS);
-}
-
-/**
- * @brief Creates a heredoc and handles signal interruption
- *
- * @param ctx Shell context
- * @param delimiter String marking end of heredoc
- * @return File descriptor to read from, or -1 on error
- */
 int	create_heredoc(t_ctx *ctx, char *delimiter)
 {
 	int		pipe_fds[2];
-	pid_t	pid;
+	int		read_fd;
 	int		result;
 
-	if (setup_heredoc_pipes(pipe_fds) < 0)
-		return (-1);
-	pid = fork();
-	if (pid == -1)
+	g_signal_status = 0;
+	if (pipe(pipe_fds) == -1)
+		return (error(NULL, "heredoc", ERR_PIPE));
+	setup_heredoc_signals();
+	result = read_heredoc_content(pipe_fds, delimiter, ctx);
+	close(pipe_fds[1]);
+	if (result == -1 || is_heredoc_interrupted())
 	{
 		close(pipe_fds[0]);
-		close(pipe_fds[1]);
-		return (error(NULL, "heredoc", ERR_CHILD));
+		if (is_heredoc_interrupted())
+		{
+			ctx->exit_status = 130;
+			g_signal_status = 0;
+		}
+		restore_shell_state();
+		return (-1);
 	}
-	if (pid == 0)
-		handle_heredoc_child(pipe_fds, delimiter, ctx);
-	close(pipe_fds[1]);
-	result = wait_heredoc_child(pipe_fds, ctx);
-	return (result);
+	read_fd = pipe_fds[0];
+	restore_shell_state();
+	return (read_fd);
 }
 
-/**
- * @brief Handles here_doc redirections for a command
- *
- * @param ctx Context containing environment information
- * @param cmd Command containing redirections
- * @return 0 on success, non-zero on error
- */
 int	setup_heredocs(t_ctx *ctx, t_command *cmd)
 {
 	t_redirection	*redir;

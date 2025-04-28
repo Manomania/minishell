@@ -27,6 +27,7 @@ char	*get_user_input(t_ctx *ctx, int prev_status)
 	char	*prompt;
 	char	*input;
 
+	update_signal_status(ctx);
 	prompt = create_prompt(prev_status);
 	if (!prompt)
 		ctx_error_exit(ctx, NULL, "prompt", ERR_ALLOC);

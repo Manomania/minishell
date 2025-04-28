@@ -29,12 +29,14 @@ static int	command_loop(t_ctx *ctx)
 	running = 1;
 	while (running)
 	{
+		g_signal_status = 0;
 		input = get_user_input(ctx, ctx->exit_status);
 		if (!input)
 			return (ctx->exit_status);
 		handle_command_in_main_loop(ctx, input);
 		if (ctx->exit_requested)
 			running = 0;
+		g_signal_status = 0;
 	}
 	return (ctx->exit_status);
 }
@@ -52,6 +54,11 @@ int	main(int argc, char **argv, char **envp)
 	t_ctx	*ctx;
 	int		final_status;
 
+	// if (!isatty(STDOUT_FILENO) || !isatty(STDIN_FILENO))
+	// {
+	// 	ft_printf_fd(2, RED"Not a TTY\n"RESET);
+	// 	exit(EXIT_FAILURE);
+	// }
 	ctx = init_ctx(argc, argv, envp);
 	if (!ctx)
 		ctx_error_exit(ctx, NULL, "main", ERR_ALLOC);

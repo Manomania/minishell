@@ -95,11 +95,11 @@ int	command_execute(t_ctx *ctx)
 		return (ctx->exit_status);
 	if (read_all_heredocs(ctx) != 0)
 	{
-		close_heredoc_fds(ctx->cmd);
+		cleanup_heredoc_resources(ctx);
 		return (ctx->exit_status);
 	}
 	status = process_command_type(ctx);
-	close_heredoc_fds(ctx->cmd);
 	ctx->exit_status = status;
+	cleanup_heredoc_resources(ctx);
 	return (status);
 }

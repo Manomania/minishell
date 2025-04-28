@@ -98,7 +98,6 @@ int					ft_putstr_fd(const char *str, int fd);
 void				*ft_calloc(size_t nmemb, size_t size);
 void				ft_lstadd_back(t_list **lst, t_list *new);
 void				*ft_memchr(const void *s, int c, size_t n);
-void				*ft_memchr(const void *s, int c, size_t n);
 void				*ft_memset(void *adr, int value, size_t n);
 void				ft_lstadd_front(t_list **lst, t_list *new);
 void				ft_lstiter(t_list *lst, void (*f)(void *));

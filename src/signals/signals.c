@@ -23,7 +23,7 @@ static void	sig_interactive_handler(int sig)
 	if (sig == SIGINT)
 	{
 		g_signal_status = 130;
-		write(STDOUT_FILENO, "\n", 1);
+		write(STDOUT_FILENO, "^C\n", 3);
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
@@ -40,15 +40,17 @@ void	setup_signals(void)
 	struct sigaction	sa_int;
 	struct sigaction	sa_quit;
 
-	g_signal_status = 0;
+	rl_catch_signals = 0;
+	rl_catch_sigwinch = 1;
 	sigemptyset(&sa_int.sa_mask);
 	sigemptyset(&sa_quit.sa_mask);
-	sa_int.sa_flags = 0;
+	sa_int.sa_flags = SA_RESTART;
 	sa_quit.sa_flags = 0;
 	sa_int.sa_handler = sig_interactive_handler;
 	sa_quit.sa_handler = SIG_IGN;
 	sigaction(SIGINT, &sa_int, NULL);
 	sigaction(SIGQUIT, &sa_quit, NULL);
+	g_signal_status = 0;
 }
 
 /**
