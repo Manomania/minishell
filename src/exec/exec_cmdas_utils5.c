@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:04:51 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/21 17:11:23 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/28 13:31:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,32 +25,6 @@ void	handle_signal_output(int status)
 		ft_printf_fd(STDERR_FILENO, "Quit (core dumped)\n");
 	else if (WTERMSIG(status) != SIGINT && isatty(STDOUT_FILENO))
 		write(STDOUT_FILENO, "\n", 1);
-}
-
-/**
- * @brief Process the last command status in a pipeline
- *
- * @param status Process status from waitpid
- * @param was_signaled Flag indicating if signal occurred
- * @return int Processed exit status
- */
-int	process_last_command_status(int status, int *was_signaled)
-{
-	int	last_status;
-
-	last_status = 0;
-	if (WIFEXITED(status))
-		last_status = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-	{
-		last_status = 128 + WTERMSIG(status);
-		*was_signaled = 1;
-		if (WTERMSIG(status) == SIGQUIT)
-			ft_printf_fd(STDERR_FILENO, "Quit (core dumped)\n");
-		else if (isatty(STDOUT_FILENO))
-			write(STDOUT_FILENO, "\n", 1);
-	}
-	return (last_status);
 }
 
 /**
@@ -98,4 +72,29 @@ char	*validate_and_resolve_command(t_ctx *ctx, t_command *cmd)
 		report_cmd_not_found_pipe(cmd->args[0]);
 	}
 	return (bin_path);
+}
+
+/**
+ * @brief Handles the last process's status
+ *
+ * @param pids Array of process IDs
+ * @param status Status of the process
+ * @param i Current process index
+ * @return int Exit status code
+ */
+int	handle_last_process_status(pid_t *pids, int status, int i)
+{
+	int	last_status;
+
+	last_status = 0;
+	if (pids[i] > 0)
+	{
+		if (WIFEXITED(status))
+			last_status = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+			last_status = 128 + WTERMSIG(status);
+	}
+	else if (pids[i] == -2)
+		last_status = 0;
+	return (last_status);
 }

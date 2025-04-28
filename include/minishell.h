@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/25 13:18:02 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/28 13:27:14 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,7 +226,7 @@ typedef struct s_handle_token
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
-static int				g_signal_status = 0;
+static int					g_signal_status = 0;
 
 // token_checker.c
 t_bool						validate_token_sequence(t_token *tokens);
@@ -397,6 +397,8 @@ int							process_last_command_status(int status,
 void						setup_pipe_redirections(t_pipe_data *data);
 char						*validate_and_resolve_command(t_ctx *ctx,
 								t_command *cmd);
+int							handle_last_process_status(pid_t *pids, int status,
+								int i);
 
 // exec_cmdas_utils6.c
 int							exec_cmdas(t_ctx *ctx);
@@ -407,6 +409,10 @@ int							setup_child_redirections_bruh(t_ctx *ctx,
 								int next_write);
 void						handle_child_process(t_ctx *ctx, t_command *current,
 								int pipe_read_end);
+int							update_parent_pipes(int prev_pipe, int *pipe_fds,
+								int i, int cmd_count);
+int							setup_and_validate_pipes(int *pipe_fds, int i,
+								int cmd_count, int prev_pipe);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);
@@ -534,8 +540,12 @@ int							wait_heredoc_child(int pipe_fds[2], t_ctx *ctx);
 // redir_cleanup.c
 void						cleanup_heredoc_resources(t_ctx *ctx);
 
-// redirections.c
+// redir.c
 int							setup_redirections(t_redirection *redirections);
+
+// redir_utils.c
+int							handle_redirection_error(char *filename,
+								int last_input_fd, int last_output_fd);
 
 // signals.c
 void						setup_signals(void);

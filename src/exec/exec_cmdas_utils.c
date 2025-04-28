@@ -6,37 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:33:08 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/24 14:17:31 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/28 13:31:42 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 #include "minishell.h"
-
-/**
- * @brief Handles the last process's status
- *
- * @param pids Array of process IDs
- * @param status Status of the process
- * @param i Current process index
- * @return int Exit status code
- */
-static int	handle_last_process_status(pid_t *pids, int status, int i)
-{
-	int	last_status;
-
-	last_status = 0;
-	if (pids[i] > 0)
-	{
-		if (WIFEXITED(status))
-			last_status = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-			last_status = 128 + WTERMSIG(status);
-	}
-	else if (pids[i] == -2)
-		last_status = 0;
-	return (last_status);
-}
 
 /**
  * @brief Waits for all child processes and reports status
@@ -92,6 +67,52 @@ t_bool	init_pipe_data(t_pipe_data *data, t_ctx *ctx)
 }
 
 /**
+ * Process the status of the last command in the pipeline.
+ *
+ * @param status The status from waitpid.
+ * @param was_signaled Pointer to flag indicating if a signal was received.
+ * @return int Processed exit status.
+ */
+int	process_last_command_status(int status, int *was_signaled)
+{
+	int	result;
+
+	result = 0;
+	if (WIFSIGNALED(status))
+	{
+		*was_signaled = 1;
+		result = 128 + WTERMSIG(status);
+	}
+	else if (WIFEXITED(status))
+		result = WEXITSTATUS(status);
+	return (result);
+}
+
+/**
+ * Handle the status for the last command based on its pid value.
+ *
+ * @param pid Process ID or special status indicator.
+ * @param status Current status from waitpid.
+ * @param was_signaled Pointer to flag indicating if a signal was received.
+ * @param ctx Shell context.
+ * @return int Final status for this command.
+ */
+int	handle_last_command_status(pid_t pid, int status, int *was_signaled,
+		t_ctx *ctx)
+{
+	int	last_status;
+
+	last_status = 0;
+	if (pid > 0)
+		last_status = process_last_command_status(status, was_signaled);
+	else if (pid == -2)
+		last_status = ctx->exit_status;
+	else if (pid == -1)
+		last_status = 127;
+	return (last_status);
+}
+
+/**
  * Handle waiting for pipeline processes and determine final status.
  *
  * @param pids Array of process IDs or status indicators (-1, -2).
@@ -119,26 +140,10 @@ int	wait_for_pipeline_processes(pid_t *pids, int count, t_ctx *ctx)
 			waitpid(pids[i], &status, 0);
 			if (WIFSIGNALED(status))
 				was_signaled = 1;
-			if (i == count - 1)
-				last_status = process_last_command_status(status,
-						&was_signaled);
 		}
-		else if (pids[i] == -2)
-		{
-			if (i == count - 1)
-				last_status = ctx->exit_status;
-		}
-		else if (pids[i] == -1)
-		{
-			if (i == count - 1)
-				last_status = 127;
-		}
-		else if (pids[i] == 0)
-		{
-			if (i == count - 1)
-			{
-			}
-		}
+		if (i == count - 1)
+			last_status = handle_last_command_status(pids[i], status,
+					&was_signaled, ctx);
 		i++;
 	}
 	return (last_status);

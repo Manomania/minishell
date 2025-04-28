@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:55:33 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/25 12:56:31 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/28 13:28:08 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,30 +57,34 @@ static pid_t	create_child_process(t_ctx *ctx, t_pipe_data *data,
 }
 
 /**
- * Handle parent process pipe descriptors after forking a child.
- * Closes the necessary ends of the previous and current pipes in the parent.
+ * Handle validation and cleanup for non-builtin commands.
  *
- * @param prev_pipe Previous pipe read end descriptor.
- * @param pipe_fds Current pipe file descriptors [read, write].
- * @param i Current command index.
- * @param cmd_count Total command count.
- * @return The read end fd of the *current* pipe, to be used as prev_pipe
- * for the next iteration. Returns STDIN_FILENO if it's the last command.
+ * @param ctx Context information.
+ * @param data Pipeline data structure.
+ * @param pipe_fds Array of pipe file descriptors.
+ * @return 0 on success, >0 for command not found, -1 on error.
  */
-static int	update_parent_pipes(int prev_pipe, int *pipe_fds, int i,
-		int cmd_count)
+static int	validate_and_cleanup(t_ctx *ctx, t_pipe_data *data, int *pipe_fds)
 {
-	if (prev_pipe > 2)
-		close(prev_pipe);
-	if (pipe_fds[1] > 2)
-		close(pipe_fds[1]);
-	if (i == cmd_count - 1)
+	int	validation_result;
+
+	validation_result = handle_non_builtin(ctx, data);
+	if (validation_result == -1)
 	{
-		if (pipe_fds[0] > 2)
-			close(pipe_fds[0]);
-		return (STDIN_FILENO);
+		cleanup_pipe_fds(pipe_fds);
+		if (data->prev_pipe > 2)
+			close(data->prev_pipe);
+		return (-1);
 	}
-	return (pipe_fds[0]);
+	else if (validation_result > 0)
+	{
+		cleanup_pipe_fds(pipe_fds);
+		if (data->prev_pipe > 2)
+			close(data->prev_pipe);
+		data->pids[data->i] = -1;
+		return (validation_result);
+	}
+	return (0);
 }
 
 /**
@@ -96,31 +100,16 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
 {
 	int		validation_result;
 	pid_t	child_pid;
+	int		pipe_check;
 
-	if (handle_pipe_setup(data->pipe_fds, data->i, data->cmd_count) == -1)
-	{
-		perror("minishell: pipe setup failed");
-		if (data->prev_pipe > 2)
-			close(data->prev_pipe);
+	pipe_check = setup_and_validate_pipes(data->pipe_fds, data->i,
+			data->cmd_count, data->prev_pipe);
+	if (pipe_check == -1)
 		return (-1);
-	}
 	setup_parent_signals();
-	validation_result = handle_non_builtin(ctx, data);
-	if (validation_result == -1)
-	{
-		cleanup_pipe_fds(data->pipe_fds);
-		if (data->prev_pipe > 2)
-			close(data->prev_pipe);
+	validation_result = validate_and_cleanup(ctx, data, data->pipe_fds);
+	if (validation_result != 0)
 		return (-1);
-	}
-	else if (validation_result > 0)
-	{
-		cleanup_pipe_fds(data->pipe_fds);
-		if (data->prev_pipe > 2)
-			close(data->prev_pipe);
-		data->pids[data->i] = -1;
-		return (-1);
-	}
 	child_pid = create_child_process(ctx, data, data->pipe_fds[0]);
 	if (child_pid == -1)
 		return (-1);
@@ -134,12 +123,12 @@ static int	process_pipeline_cmd(t_ctx *ctx, t_pipe_data *data)
  * Execute all commands in a pipeline sequence by iterating through them.
  *
  * @param ctx Context information.
- * @param data Pipeline data structure (passed by value,
-	careful with pointers inside).
-
-	* @param cmd_head Pointer to the original head of the command list (for context reset).
- * @return True if all stages were initiated successfully,
-	false on critical error.
+ * @param data Pipeline data structure (passed by value, careful with pointers
+ * inside).
+ * @param cmd_head Pointer to the original head of the command list (for context
+ * reset).
+ * @return True if all stages were initiated successfully, false on critical
+ * error.
  */
 static t_bool	exec_all_cmdas(t_ctx *ctx, t_pipe_data data,
 		t_command **cmd_head)

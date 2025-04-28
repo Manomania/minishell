@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/17 17:04:52 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/28 13:03:40 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,6 @@ int	main(int argc, char **argv, char **envp)
 	t_ctx	*ctx;
 	int		final_status;
 
-	// if (!isatty(STDOUT_FILENO) || !isatty(STDIN_FILENO))
-	// {
-	// 	ft_printf_fd(2, RED"Not a TTY\n"RESET);
-	// 	exit(EXIT_FAILURE);
-	// }
 	ctx = init_ctx(argc, argv, envp);
 	if (!ctx)
 		ctx_error_exit(ctx, NULL, "main", ERR_ALLOC);
