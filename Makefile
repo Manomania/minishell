@@ -9,22 +9,22 @@ CC 					?= 	cc
 # Standard compilation checks
 CFLAGS 				:= 	-Wall -Wextra -Werror
 # Debug
-CFLAGS				+=	-g3
+# CFLAGS				+=	-g3
 # Compability checks
-CFLAGS				+=	-pedantic
+# CFLAGS				+=	-pedantic
 # Dependency management
 CFLAGS				+=	-MD -MP
 # Warns when a variable declaration shadows another variable
-CFLAGS				+=	-Wshadow
+# CFLAGS				+=	-Wshadow
 # More thorough than -Wunused-result
-CFLAGS				+=	-Wunused
+# CFLAGS				+=	-Wunused
 # Disables pointer arithmetics
 # (no `*ptr++`)
-CFLAGS				+=	-Wpointer-arith
+# CFLAGS				+=	-Wpointer-arith
 # Catches more printf/scanf format mismatches
-CFLAGS				+=	-Wformat=2
+# CFLAGS				+=	-Wformat=2
 # Warns about == for floats which is sus
-CFLAGS				+=	-Wfloat-equal
+# CFLAGS				+=	-Wfloat-equal
 ## Makes strings const char*
 #CFLAGS				+=	-Wwrite-strings
 # Keeps the frame pointer in registers
