@@ -61,18 +61,20 @@ typedef enum e_token_type
 	TOK_EOF,
 }							t_token_type;
 
-typedef struct s_token
-{
-	t_token_type			type;
-	struct s_token			*next;
-	char					*value;
-}							t_token;
 
 typedef struct s_quote_state
 {
 	int						in_single_quote;
 	int						in_double_quote;
 }							t_quote_state;
+
+typedef struct s_token
+{
+	t_token_type			type;
+	t_quote_state			quote;
+	struct s_token			*next;
+	char					*value;
+}							t_token;
 
 typedef struct s_lexer
 {
