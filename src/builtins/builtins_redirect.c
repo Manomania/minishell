@@ -6,44 +6,13 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:52:58 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 17:59:44 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 13:21:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 #include "error.h"
 #include "minishell.h"
-
-/**
- * @brief Opens a file for redirection (shared logic)
- *
- * @param redir Redirection information
- * @return int File descriptor or -1 on error
- */
-int	open_redirection_file(t_redirection *redir)
-{
-	int	fd;
-	int	flags;
-
-	fd = -1;
-	if (redir->type == TOK_REDIR_FROM)
-		flags = O_RDONLY;
-	else if (redir->type == TOK_REDIR_TO)
-		flags = O_WRONLY | O_CREAT | O_TRUNC;
-	else if (redir->type == TOK_HERE_DOC_TO)
-		flags = O_WRONLY | O_CREAT | O_APPEND;
-	else if (redir->type == TOK_HERE_DOC_FROM)
-	{
-		if (redir->fd >= 0)
-			return (redir->fd);
-		else
-			return (-1);
-	}
-	else
-		return (-1);
-	fd = open(redir->filename, flags, 0644);
-	return (fd);
-}
 
 /**
  * @brief Sets up redirections for a built-in command. Stops on first error.

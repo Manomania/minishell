@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:54:30 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 16:31:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 12:55:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
  * @param cmd Command containing redirections
  * @return 0 on success, non-zero on error
  */
-static int	setup_child_redirections(t_ctx *ctx, t_command *cmd)
+int	setup_child_redirections(t_ctx *ctx, t_command *cmd)
 {
 	int	result;
 

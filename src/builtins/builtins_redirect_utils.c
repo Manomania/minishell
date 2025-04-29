@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 12:35:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/16 16:33:00 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 13:05:09 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,39 +57,5 @@ int	apply_output_redirection(int fd)
 		return (-1);
 	}
 	close(fd);
-	return (0);
-}
-
-/**
- * Applies a redirection for a command
- *
- * This function first opens the file and then redirects the standard
- * file descriptor to it. It properly handles error cases.
- *
- * @param redir Redirection to apply
- * @return 0 on success, -1 on error
- */
-int	apply_redirection(t_redirection *redir)
-{
-	int	fd;
-	int	result;
-
-	fd = open_redirection_file(redir);
-	if (fd == -1)
-	{
-		ft_printf_fd(STDERR_FILENO, "minishell: %s: %s\n", redir->filename,
-			strerror(errno));
-		return (-1);
-	}
-	if (redir->type == TOK_REDIR_FROM || redir->type == TOK_HERE_DOC_FROM)
-		result = apply_input_redirection(fd);
-	else
-		result = apply_output_redirection(fd);
-	if (result == -1)
-	{
-		ft_printf_fd(STDERR_FILENO, "minishell: %s: %s\n", redir->filename,
-			strerror(errno));
-		return (-1);
-	}
 	return (0);
 }

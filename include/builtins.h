@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:51:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 15:57:08 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 12:48:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,15 +59,13 @@ int		update_or_add_env_var(t_ctx *ctx, char *key, char *value,
 
 // builtin_pipeline.c
 t_bool	is_builtin_command(char *cmd_name);
-pid_t	execute_pipeline_command(t_ctx *ctx, t_command *cmd, int *input_fd,
-			int *output_fd);
 
 // builtin_pipeline_utils.c
 void	restore_pipeline_fds(int saved_in, int saved_out);
 
 // builtin_pipeline_utils2.c
 int		setup_builtin_pipeline_fds(int *fds, int saved_fds[2]);
-int		execute_builtin_command(t_ctx *ctx, t_command *cmd);
+int		execute_builtin_command(t_ctx *ctx, int saved_stdin, int saved_stdout);
 int		run_builtin_with_redir(t_ctx *ctx, t_command *cmd);
 void	restore_all_fds(int saved_fds[2]);
 int		prepare_and_run_builtin(t_ctx *ctx, t_command *cmd, int *fds);

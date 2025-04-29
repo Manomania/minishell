@@ -19,13 +19,6 @@ SRC_F				= \
 						builtins/builtin_pipeline_utils2 \
 						checker/token_checker \
 						checker/token_checker_utils \
-						command/command_execute \
-						command/command_execute_utils \
-						command/command_execute_utils2 \
-						command/command_execute_utils3 \
-						command/command_execute_utils4 \
-						command/command_execute_utils5 \
-						command/command_execute_utils6 \
 						command/command_parse \
 						command/command_parse_utils \
 						command/command_parse_utils2 \
@@ -33,6 +26,8 @@ SRC_F				= \
 						command/command_new \
 						command/command_redirections \
 						command/command_bin \
+						command/command_execute \
+						command/command_execute_utils \
 						env/env \
 						env/env_utils \
 						env/env_dupe \
@@ -44,14 +39,13 @@ SRC_F				= \
 						error/ctx_error_exit \
 						error/error_utils \
 						error/error_utils2 \
-						exec/exec_cmdas \
-						exec/exec_cmdas_utils \
-						exec/exec_cmdas_utils2 \
-						exec/exec_cmdas_utils3 \
-						exec/exec_cmdas_utils4 \
-						exec/exec_cmdas_utils5 \
-						exec/exec_cmdas_utils6 \
-						exec/exec_cmdas_utils7 \
+						exec/execute_pipeline \
+						exec/execute_single_command \
+						exec/execute_redirection \
+						exec/execute_pipeline_builtin \
+						exec/execute_pipeline_command \
+						exec/execute_pipeline_setup \
+						exec/execute_pipeline_utils \
 						free/free_env \
 						free/free_2d_array \
 						free/free_ctx \
@@ -84,7 +78,6 @@ SRC_F				= \
 						redir/heredoc_utils \
 						redir/heredoc_utils2 \
 						redir/redir_cleanup \
-						redir/redir \
 						redir/redir_utils \
 						signals/signals \
 						validation/validation \

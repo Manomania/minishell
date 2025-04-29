@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/28 13:27:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 13:06:07 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ typedef enum e_token_type
 	TOK_NEW_LINE,
 	TOK_EOF,
 }							t_token_type;
-
 
 typedef struct s_quote_state
 {
@@ -254,37 +253,7 @@ int							setup_command_redirections(t_ctx *ctx,
 int							validate_cmd_in_child(t_ctx *ctx);
 
 // command_execute_utils.c
-int							get_exit_status(int status);
-int							handle_child_redirections(t_ctx *ctx);
-
-// command_execute_utils2.c
 t_bool						has_only_redirections(t_command *cmd);
-int							execute_redirections_only(t_ctx *ctx);
-void						cleanup_child_process(t_ctx *ctx);
-int							read_all_heredocs(t_ctx *ctx);
-
-// command_execute_utils3.c
-void						execute_child(t_ctx *ctx);
-
-// command_execute_utils4.c
-char						**create_env_array(t_env *env_list);
-
-// command_execute_utils5.c
-int							execute_single_command(t_ctx *ctx);
-int							process_signal_exit(int status);
-void						close_standard_io(int saved_stdin,
-								int saved_stdout);
-void						handle_standard_io(int saved_stdin,
-								int saved_stdout);
-void						execute_child_process(t_ctx *ctx, int saved_stdin,
-								int saved_stdout);
-
-// command_execute_utils6.c
-int							handle_parent_process(pid_t pid, int saved_stdin,
-								int saved_stdout);
-int							execute_external_command(t_ctx *ctx,
-								int saved_stdin, int saved_stdout);
-int							process_command_type(t_ctx *ctx);
 
 // command_new.c
 t_command					*command_new(void);
@@ -365,56 +334,47 @@ void						cleanup_pipe_fds(int pipe_fds[2]);
 pid_t						execute_pipeline_cmd_with_redir(t_ctx *ctx,
 								t_pipe_data *data, int input_fd, int output_fd);
 
-// exec_cmdas_utils.c
-int							setup_pipe(int pipe_fds[2]);
-int							wait_for_pids(pid_t *pids, int count);
-t_bool						init_pipe_data(t_pipe_data *data, t_ctx *ctx);
-int							wait_for_pipeline_processes(pid_t *pids, int count,
-								t_ctx *ctx);
+// execute_single_command.c
+int							execute_single_command(t_ctx *ctx);
+char						**create_env_array(t_env *env_list);
 
-// exec_cmdas_utils2.c
-int							count_commands(t_command *cmd);
-void						setup_child_process(t_ctx *ctx, t_command *cmd,
-								int input_fd, int output_fd);
-pid_t						execute_redirections_only_pipeline(t_ctx *ctx,
-								t_pipe_data *data);
-void						execute_command(t_ctx *ctx, t_command *cmd);
-void						report_cmd_not_found_pipe(char *cmd_name);
-
-// exec_cmdas_utils3.c
-t_bool						check_command_binary(t_ctx *ctx, t_pipe_data *data);
-t_bool						validate_pipeline_command(t_pipe_data *data);
-int							handle_non_builtin(t_ctx *ctx, t_pipe_data *data);
-t_bool						has_only_redirections_pipeline(t_command *command);
-
-// exec_cmdas_utils4.c
+// execute_pipeline.c
+int							execute_pipeline(t_ctx *ctx);
 int							prepare_all_pipeline_files(t_command *cmd);
+void						execute_pipeline_command(t_ctx *ctx, t_command *cmd,
+								int input_fd, int output_fd);
+
+// execute_pipeline_utils.c
+int							count_commands(t_command *cmd);
+int							process_pipeline_command(t_ctx *ctx, t_command *cmd,
+								int prev_pipe, int pipe_fds[2], pid_t *pids,
+								int cmd_index);
+void						execute_command(t_ctx *ctx, t_command *cmd);
 int							setup_child_pipeline_redirections(t_command *cmd,
 								int input_fd, int output_fd);
-
-// exec_cmdas_utils5.c
-void						handle_signal_output(int status);
-int							process_last_command_status(int status,
-								int *was_signaled);
-void						setup_pipe_redirections(t_pipe_data *data);
+void						cleanup_child_process(t_ctx *ctx);
 char						*validate_and_resolve_command(t_ctx *ctx,
 								t_command *cmd);
-int							handle_last_process_status(pid_t *pids, int status,
-								int i);
+int							apply_child_redirections(t_command *cmd);
 
-// exec_cmdas_utils6.c
-int							exec_cmdas(t_ctx *ctx);
+// execute_pipeline_setup.c
+void						setup_child_process(t_ctx *ctx, t_command *cmd,
+								int input_fd, int output_fd);
+int							setup_pipe(int pipe_fds[2]);
+int							setup_pipeline_redirections(t_command *cmd,
+								int input_fd, int output_fd);
 
-// exec_cmdas_utils7.c
-int							setup_child_redirections_bruh(t_ctx *ctx,
-								t_command *current, int prev_pipe,
-								int next_write);
-void						handle_child_process(t_ctx *ctx, t_command *current,
-								int pipe_read_end);
-int							update_parent_pipes(int prev_pipe, int *pipe_fds,
-								int i, int cmd_count);
-int							setup_and_validate_pipes(int *pipe_fds, int i,
-								int cmd_count, int prev_pipe);
+// execute_pipeline_builtin.c
+int							execute_pipeline_builtin(t_ctx *ctx, t_command *cmd,
+								int input_fd, int output_fd);
+
+// execute_redirections.c
+int							read_all_heredocs(t_ctx *ctx);
+int							execute_redirections_only(t_ctx *ctx);
+int							setup_command_redirections(t_ctx *ctx,
+								t_command *cmd);
+int							setup_redirections(t_redirection *redirections);
+int							open_redirection_file(t_redirection *redir);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);
@@ -541,9 +501,6 @@ int							wait_heredoc_child(int pipe_fds[2], t_ctx *ctx);
 
 // redir_cleanup.c
 void						cleanup_heredoc_resources(t_ctx *ctx);
-
-// redir.c
-int							setup_redirections(t_redirection *redirections);
 
 // redir_utils.c
 int							handle_redirection_error(char *filename,
