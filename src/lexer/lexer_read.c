@@ -136,6 +136,14 @@ char	*read_complex_word(t_lexer *lexer)
 	result = NULL;
 	while (peek_lexer(lexer))
 	{
+		if (get_lexer(lexer) == '$' && lexer->position + 1 < lexer->length
+			&& (lexer->input[lexer->position + 1] == '"'
+				|| lexer->input[lexer->position + 1] == '\''))
+		{
+			if (result)
+				return (result);
+			return (handle_dollar_quotes(lexer));
+		}
 		quote_char = 0;
 		if (get_lexer(lexer) == '"' || get_lexer(lexer) == '\'')
 			quote_char = get_lexer(lexer);
