@@ -41,11 +41,16 @@ SRC_F				= \
 						error/error_utils2 \
 						exec/execute_pipeline \
 						exec/execute_single_command \
+						exec/execute_single_command_child \
+						exec/execute_single_command_env_array \
 						exec/execute_redirection \
+						exec/execute_redirection_utils \
 						exec/execute_pipeline_builtin \
 						exec/execute_pipeline_command \
 						exec/execute_pipeline_setup \
 						exec/execute_pipeline_utils \
+						exec/execute_pipeline_utils2 \
+						exec/execute_pipeline_process_command \
 						free/free_env \
 						free/free_2d_array \
 						free/free_ctx \

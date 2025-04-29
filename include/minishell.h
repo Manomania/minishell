@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/29 13:06:07 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 15:27:29 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,6 +223,25 @@ typedef struct s_handle_token
 	t_bool					*has_redirections;
 }							t_handle_token;
 
+typedef struct s_pipeline_process_loop_args
+{
+	pid_t					*pids;
+	int						*i;
+	int						*status;
+	int						cmd_count;
+	int						*last_status;
+}							t_pipeline_process_loop_args;
+
+// originally called t_process_pipeline_command_args
+typedef struct s_ppca
+{
+	t_command				*cmd;
+	int						prev_pipe;
+	int						*pipe_fds;
+	pid_t					*pids;
+	int						cmd_index;
+}							t_ppca;
+
 // *************************************************************************** #
 //                            Function Prototypes                              #
 // *************************************************************************** #
@@ -336,19 +355,17 @@ pid_t						execute_pipeline_cmd_with_redir(t_ctx *ctx,
 
 // execute_single_command.c
 int							execute_single_command(t_ctx *ctx);
+
+// execute_single_command_env_array.c
 char						**create_env_array(t_env *env_list);
 
 // execute_pipeline.c
 int							execute_pipeline(t_ctx *ctx);
-int							prepare_all_pipeline_files(t_command *cmd);
 void						execute_pipeline_command(t_ctx *ctx, t_command *cmd,
 								int input_fd, int output_fd);
 
 // execute_pipeline_utils.c
 int							count_commands(t_command *cmd);
-int							process_pipeline_command(t_ctx *ctx, t_command *cmd,
-								int prev_pipe, int pipe_fds[2], pid_t *pids,
-								int cmd_index);
 void						execute_command(t_ctx *ctx, t_command *cmd);
 int							setup_child_pipeline_redirections(t_command *cmd,
 								int input_fd, int output_fd);
@@ -356,6 +373,13 @@ void						cleanup_child_process(t_ctx *ctx);
 char						*validate_and_resolve_command(t_ctx *ctx,
 								t_command *cmd);
 int							apply_child_redirections(t_command *cmd);
+
+// execute_pipeline_proces_command.c
+int							process_pipeline_command(t_ctx *ctx, t_ppca a);
+
+// execute_single_command_child.c
+void						execute_child_process(t_ctx *ctx, int saved_stdin,
+								int saved_stdout);
 
 // execute_pipeline_setup.c
 void						setup_child_process(t_ctx *ctx, t_command *cmd,
@@ -370,11 +394,14 @@ int							execute_pipeline_builtin(t_ctx *ctx, t_command *cmd,
 
 // execute_redirections.c
 int							read_all_heredocs(t_ctx *ctx);
-int							execute_redirections_only(t_ctx *ctx);
 int							setup_command_redirections(t_ctx *ctx,
 								t_command *cmd);
 int							setup_redirections(t_redirection *redirections);
 int							open_redirection_file(t_redirection *redir);
+
+// execute_redirection_utils.c
+int							execute_redirections_only(t_ctx *ctx);
+int							prepare_all_pipeline_files(t_command *cmd);
 
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);

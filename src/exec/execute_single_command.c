@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:15:06 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 12:50:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 15:18:42 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,98 +47,6 @@ int	execute_builtin_command(t_ctx *ctx, int saved_stdin, int saved_stdout)
 		close(saved_stdout);
 	}
 	return (exit_code);
-}
-
-/**
- * @brief Creates environment array from environment list
- *
- * @param env_list Environment variable list
- * @return char** New environment array or NULL on error
- */
-char	**create_env_array(t_env *env_list)
-{
-	t_env	*current;
-	char	**env_array;
-	int		count;
-	int		i;
-
-	count = 0;
-	current = env_list;
-	while (current)
-	{
-		count++;
-		current = current->next;
-	}
-	env_array = malloc(sizeof(char *) * (count + 1));
-	if (!env_array)
-		return (NULL);
-	i = 0;
-	current = env_list;
-	while (current)
-	{
-		if (current->value)
-			env_array[i] = ft_strjoin(ft_strjoin(current->key, "="),
-					current->value);
-		else
-			env_array[i] = ft_strdup(current->key);
-		if (!env_array[i])
-		{
-			free_2d_array((void **)env_array);
-			return (NULL);
-		}
-		i++;
-		current = current->next;
-	}
-	env_array[i] = NULL;
-	return (env_array);
-}
-
-/**
- * @brief Function executed by child process
- *
- * @param ctx Context containing environment and command info
- * @param saved_stdin Saved standard input descriptor
- * @param saved_stdout Saved standard output descriptor
- */
-static void	execute_child_process(t_ctx *ctx, int saved_stdin, int saved_stdout)
-{
-	char	**env_array;
-	int		result;
-
-	if (saved_stdin != -1)
-		close(saved_stdin);
-	if (saved_stdout != -1)
-		close(saved_stdout);
-	reset_signals();
-	result = setup_command_redirections(ctx, ctx->cmd);
-	if (result != 0)
-	{
-		cleanup_child_process(ctx);
-		exit(1);
-	}
-	if (!command_bin(ctx))
-	{
-		if (ctx->cmd->args && ctx->cmd->args[0])
-		{
-			if (ft_strchr(ctx->cmd->args[0], '/'))
-				exit(126);
-			else
-				exit(127);
-		}
-		cleanup_child_process(ctx);
-		exit(127);
-	}
-	env_array = create_env_array(ctx->env_list);
-	if (!env_array)
-	{
-		cleanup_child_process(ctx);
-		exit(1);
-	}
-	execve(ctx->cmd->args[0], ctx->cmd->args, env_array);
-	perror("execve");
-	free_2d_array((void **)env_array);
-	cleanup_child_process(ctx);
-	exit(126);
 }
 
 /**

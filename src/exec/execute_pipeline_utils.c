@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 13:40:50 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 15:26:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,66 +33,6 @@ int	count_commands(t_command *cmd)
 		current = current->next;
 	}
 	return (count);
-}
-
-/**
- * @brief Process one command in the pipeline
- *
- * @param ctx Context containing shell state
- * @param cmd Current command to process
- * @param prev_pipe Previous pipe read end
- * @param pipe_fds Current pipe file descriptors
- * @param pids Array of process IDs
- * @param cmd_index Current command index
- * @return int 0 on success, -1 on error
- */
-int	process_pipeline_command(t_ctx *ctx, t_command *cmd, int prev_pipe,
-		int pipe_fds[2], pid_t *pids, int cmd_index)
-{
-	int		is_last;
-	int		output_fd;
-	pid_t	pid;
-
-	is_last = (cmd->next == NULL);
-	output_fd = is_last ? STDOUT_FILENO : pipe_fds[1];
-	if (is_builtin_command(cmd->args[0]))
-	{
-		ctx->exit_status = execute_pipeline_builtin(ctx, cmd, prev_pipe,
-				output_fd);
-		pids[cmd_index] = -2;
-		if (prev_pipe != STDIN_FILENO)
-			close(prev_pipe);
-		if (!is_last && pipe_fds[1] != STDOUT_FILENO)
-			close(pipe_fds[1]);
-		return (0);
-	}
-	setup_parent_signals();
-	pid = fork();
-	if (pid == -1)
-	{
-		perror("fork");
-		if (prev_pipe != STDIN_FILENO)
-			close(prev_pipe);
-		if (!is_last)
-		{
-			close(pipe_fds[0]);
-			close(pipe_fds[1]);
-		}
-		return (-1);
-	}
-	if (pid == 0)
-	{
-		if (!is_last)
-			close(pipe_fds[0]);
-		execute_pipeline_command(ctx, cmd, prev_pipe, output_fd);
-		exit(EXIT_FAILURE);
-	}
-	pids[cmd_index] = pid;
-	if (prev_pipe != STDIN_FILENO)
-		close(prev_pipe);
-	if (!is_last && pipe_fds[1] != STDOUT_FILENO)
-		close(pipe_fds[1]);
-	return (0);
 }
 
 /**
@@ -199,52 +139,4 @@ char	*validate_and_resolve_command(t_ctx *ctx, t_command *cmd)
 			cmd->args[0]);
 	}
 	return (bin_path);
-}
-
-/**
- * Handles here-doc redirection in a child process
- *
- * @param redir Redirection to handle
- * @return 0 on success, -1 on error
- */
-static int	apply_heredoc_redirection(t_redirection *redir)
-{
-	int	result;
-
-	if (redir->fd >= 0)
-	{
-		result = dup2(redir->fd, STDIN_FILENO);
-		close(redir->fd);
-		redir->fd = -1;
-		if (result == -1)
-			return (-1);
-	}
-	return (0);
-}
-
-/**
- * Applies redirections for a specific command in a child process
- *
- * @param cmd Command containing redirections
- * @return 0 on success, -1 on error
- */
-int	apply_child_redirections(t_command *cmd)
-{
-	t_redirection	*redir;
-	int				result;
-
-	if (!cmd || !cmd->redirection)
-		return (0);
-	redir = cmd->redirection;
-	while (redir)
-	{
-		if (redir->type == TOK_HERE_DOC_FROM)
-			result = apply_heredoc_redirection(redir);
-		else
-			result = apply_redirection(redir);
-		if (result == -1)
-			return (-1);
-		redir = redir->next;
-	}
-	return (0);
 }

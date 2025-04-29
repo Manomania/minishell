@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:18:29 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 12:18:58 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 15:24:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,46 +111,6 @@ int	setup_command_redirections(t_ctx *ctx, t_command *cmd)
 }
 
 /**
- * @brief Handles redirect-only commands (like "> file")
- *
- * @param ctx Context containing environment info
- * @return int Exit status (0 for success, non-zero on error)
- */
-int	execute_redirections_only(t_ctx *ctx)
-{
-	pid_t	pid;
-	int		status;
-
-	setup_parent_signals();
-	pid = fork();
-	if (pid == -1)
-		return (error(NULL, "execute_redirections_only", ERR_CHILD));
-	if (pid == 0)
-	{
-		reset_signals();
-		if (setup_heredocs(ctx, ctx->cmd) != 0
-			|| setup_redirections(ctx->cmd->redirection) != 0)
-		{
-			ctx_clear(ctx);
-			exit(EXIT_FAILURE);
-		}
-		ctx_clear(ctx);
-		exit(EXIT_SUCCESS);
-	}
-	waitpid(pid, &status, 0);
-	setup_signals();
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	else if (WIFSIGNALED(status))
-	{
-		if (WTERMSIG(status) == SIGINT && isatty(STDOUT_FILENO))
-			write(STDOUT_FILENO, "\n", 1);
-		return (128 + WTERMSIG(status));
-	}
-	return (0);
-}
-
-/**
  * @brief Reads heredoc content for all commands in a pipeline
  *
  * @param ctx Context containing environment information
@@ -174,39 +134,6 @@ int	read_all_heredocs(t_ctx *ctx)
 				if (heredoc_fd == -1)
 					return (-1);
 				redir->fd = heredoc_fd;
-			}
-			redir = redir->next;
-		}
-		current = current->next;
-	}
-	return (0);
-}
-
-/**
- * @brief Creates files for all output redirections in pipeline
- *
- * @param cmd First command in the pipeline
- * @return int 0 on success
- */
-int	prepare_all_pipeline_files(t_command *cmd)
-{
-	t_command		*current;
-	t_redirection	*redir;
-	int				fd;
-
-	current = cmd;
-	while (current)
-	{
-		redir = current->redirection;
-		while (redir)
-		{
-			if (redir->type == TOK_REDIR_TO || redir->type == TOK_HERE_DOC_TO)
-			{
-				fd = open_redirection_file(redir);
-				if (fd != -1)
-				{
-					close(fd);
-				}
 			}
 			redir = redir->next;
 		}
