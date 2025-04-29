@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/29 15:27:29 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:02:41 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -484,6 +484,7 @@ void						advance_parse(t_parse *parse);
 char						*bin_find(t_ctx *ctx, char *bin);
 char						*resolve_relative_path(char *bin);
 t_bool						is_directory(const char *path);
+t_bool						is_path(const char *str);
 
 // bin_find_utils.c
 char						*check_relative_path(char *bin,
@@ -493,6 +494,11 @@ void						display_path_error(char *bin,
 
 // bin_find_path.c
 char						*bin_find_path(const char *dir, char *bin);
+
+// path_error.c
+int							handle_path_error(char *path,
+								t_error_type err_type);
+int							get_path_error_code(t_error_type err_type);
 
 // heredoc.c
 int							setup_heredocs(t_ctx *ctx, t_command *cmd);

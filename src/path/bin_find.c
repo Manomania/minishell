@@ -6,73 +6,42 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/10 17:36:16 by maximart         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:03:26 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
 #include "minishell.h"
+#include <sys/stat.h>
 
 /**
- * @brief Checks if a string is a path and not just a command
+ * @brief Determines if a string is a path rather than a simple command
+ *
+ * Checks if the string contains path components like '/', './', '../', etc.
  *
  * @param str The string to check
- * @return t_bool true if the string is a path, false if just a command
+ * @return t_bool true if it's a path, false if it's a simple command
  */
-static t_bool	is_path(const char *str)
+t_bool	is_path(const char *str)
 {
-	int	i;
-
-	i = 0;
 	if (!str)
 		return (false);
-	if (str[0] == '~' && (str[1] == '/' || str[1] == '\0'))
+	if (str[0] == '/' || str[0] == '.')
 		return (true);
-	if (str[0] == '/')
-		return (true);
-	while (str[i])
+	while (*str)
 	{
-		if (str[i] == '/' || (str[i] == '.' && (str[i + 1] == '/' || str[i
-						+ 1] == '\0' || (str[i + 1] == '.' && (str[i + 2] == '/'
-							|| str[i + 2] == '\0')))))
+		if (*str == '/')
 			return (true);
-		i++;
+		str++;
 	}
 	return (false);
 }
 
 /**
- * @brief Tries to execute file directly if it's a path
+ * @brief Resolves a relative path to an absolute one using current directory
  *
- * @param bin Binary path to check
- * @param error_state Pointer to error state variable
- * @return char* strdup of bin if executable, NULL otherwise
- */
-static char	*try_direct_path(char *bin, t_path_error *error_state)
-{
-	if (access(bin, F_OK) != 0)
-	{
-		*error_state = PATH_ERR_NOT_FOUND;
-		return (NULL);
-	}
-	if (is_directory(bin))
-	{
-		*error_state = PATH_ERR_IS_DIR;
-		return (NULL);
-	}
-	if (access(bin, X_OK) != 0)
-	{
-		*error_state = PATH_ERR_NO_PERMISSION;
-		return (NULL);
-	}
-	return (ft_strdup(bin));
-}
-
-/**
- * @brief Resolves a relative path to an absolute path
- *
- * @param bin Path to resolve
- * @return char* Absolute path or NULL on error
+ * @param bin The path to resolve
+ * @return char* New allocated absolute path or NULL on error
  */
 char	*resolve_relative_path(char *bin)
 {
@@ -95,54 +64,55 @@ char	*resolve_relative_path(char *bin)
 }
 
 /**
- * @brief Handles the case when the binary is a path
+ * @brief Handles the case when a command is specified as a path
  *
- * @param bin Binary path to check
- * @param error_state Pointer to error state variable
- * @return char* Path to binary if found, NULL otherwise
+ * Checks existence, permission, and whether it's a directory
+ *
+ * @param bin The command path to check
+ * @return char* Path if valid and executable, NULL otherwise with error display
  */
-static char	*handle_bin_as_path(char *bin, t_path_error *error_state)
+static char	*handle_command_path(char *bin)
 {
-	char	*path;
+	struct stat	file_stat;
 
-	path = try_direct_path(bin, error_state);
-	if (path)
-		return (path);
-	if (*error_state == PATH_ERR_IS_DIR)
-		return (display_path_error(bin, *error_state), NULL);
-	if (*error_state == PATH_ERR_NO_PERMISSION)
-		return (display_path_error(bin, *error_state), NULL);
-	path = check_relative_path(bin, error_state);
-	if (path)
-		return (path);
-	path = bin_find_path(".", bin);
-	if (!path)
-		display_path_error(bin, *error_state);
-	return (path);
+	if (access(bin, F_OK) != 0)
+	{
+		error(bin, NULL, ERR_NO_FILE);
+		return (NULL);
+	}
+	if (stat(bin, &file_stat) == 0 && S_ISDIR(file_stat.st_mode))
+	{
+		error(bin, NULL, ERR_IS_DIR);
+		return (NULL);
+	}
+	if (access(bin, X_OK) != 0)
+	{
+		error(bin, NULL, ERR_NO_PERMS);
+		return (NULL);
+	}
+	return (ft_strdup(bin));
 }
 
 /**
- * @brief Finds a binary in the PATH or current directory
+ * @brief Finds a binary in the PATH or as a direct path
+ *
+ * Tries to find the binary in PATH if it's a simple command,
+ * or validates it as a direct path if specified as such.
  *
  * @param ctx Context
- * @param bin The binary to search for
- * @return char* Path to binary if found, NULL otherwise
+ * @param bin The binary name or path to find
+ * @return char* Path to binary if found, NULL otherwise (with proper error)
  */
 char	*bin_find(t_ctx *ctx, char *bin)
 {
-	char			*path;
-	t_path_error	error_state;
+	char	*path;
 
-	error_state = PATH_ERR_NONE;
 	if (!bin)
 		return (NULL);
 	if (is_path(bin))
-		return (handle_bin_as_path(bin, &error_state));
-	else
-	{
-		path = env_find_bin(ctx, bin);
-		if (!path)
-			(void)error(bin, "exec", ERR_CMD_NOT_FOUND);
-	}
+		return (handle_command_path(bin));
+	path = env_find_bin(ctx, bin);
+	if (!path)
+		error(bin, NULL, ERR_CMD_NOT_FOUND);
 	return (path);
 }

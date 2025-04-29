@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 15:26:31 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:00:55 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,10 +131,8 @@ char	*validate_and_resolve_command(t_ctx *ctx, t_command *cmd)
 	bin_path = bin_find(ctx, cmd->args[0]);
 	if (!bin_path)
 	{
-		if (cmd->args[0][0] == '.' && !ft_strchr(cmd->args[0], '/'))
-			ctx_error_exit(ctx, NULL, "exec", ERR_NO_FILE);
-		if (ft_strchr(cmd->args[0], '/'))
-			ctx_error_exit(ctx, cmd->args[0], "exec", ERR_IS_DIR);
+		if (is_path(cmd->args[0]))
+			return (NULL);
 		ft_printf_fd(STDERR_FILENO, "minishell: %s: command not found\n",
 			cmd->args[0]);
 	}

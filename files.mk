@@ -75,6 +75,7 @@ SRC_F				= \
 						path/bin_find \
 						path/bin_find_utils \
 						path/bin_find_path \
+						path/path_error \
 						redir/heredoc \
 						redir/heredoc_expand \
 						redir/heredoc_expand_utils \

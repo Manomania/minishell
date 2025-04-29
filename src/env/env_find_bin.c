@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:40:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:12:38 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:59:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,99 +14,72 @@
 #include "minishell.h"
 
 /**
- * @brief Creates default path directories when PATH env var is not set
+ * @brief Gets PATH variable value from environment
  *
- * @return char** Array of default path directories or NULL if error
+ * @param ctx Context containing environment variables
+ * @return char* PATH value or NULL if not found/unset
  */
-static char	**create_default_path_dirs(void)
+static char	*get_path_from_env(t_ctx *ctx)
 {
-	char	**path_dirs;
+	t_env	*env;
 
-	path_dirs = malloc(sizeof(char *) * 5);
-	if (!path_dirs)
-		return (NULL);
-	path_dirs[0] = ft_strdup("/bin");
-	path_dirs[1] = ft_strdup("/usr/bin");
-	path_dirs[2] = ft_strdup("/usr/local/bin");
-	path_dirs[3] = ft_strdup("/sbin");
-	path_dirs[4] = NULL;
-	return (path_dirs);
+	env = ctx->env_list;
+	while (env)
+	{
+		if (ft_strncmp(env->key, "PATH", 5) == 0)
+			return (env->value);
+		env = env->next;
+	}
+	return (NULL);
 }
 
 /**
  * @brief Normalizes path directories by removing trailing slashes
  *
- * @param path_dirs Array of path directories to normalize
+ * @param path_dir Path directory string
+ * @return Normalized path with no trailing slash
  */
-static void	normalize_path_dirs(char **path_dirs)
+static char	*normalize_path_dir(char *path_dir)
 {
-	int	i;
 	int	len;
 
-	i = 0;
-	while (path_dirs[i])
-	{
-		len = (int)ft_strlen(path_dirs[i]);
-		if (len > 0 && path_dirs[i][len - 1] == '/')
-			path_dirs[i][len - 1] = '\0';
-		i++;
-	}
+	len = ft_strlen(path_dir);
+	if (len > 0 && path_dir[len - 1] == '/')
+		path_dir[len - 1] = '\0';
+	return (path_dir);
 }
 
 /**
- * @brief Gets PATH directories from environment
+ * @brief Searches for a binary in the PATH environment directories
  *
- * @param ctx Context
- * @return char** Array of path directories or NULL if error
- */
-static char	**env_get_path_dirs(t_ctx *ctx)
-{
-	char	*path_var;
-	char	**path_dirs;
-
-	path_var = env_find(ctx, (char *)"PATH=");
-	if (!path_var)
-		return (create_default_path_dirs());
-	path_dirs = ft_split(path_var, ':');
-	free(path_var);
-	if (!path_dirs)
-	{
-		error(NULL, "env_get_path_dirs", ERR_ALLOC);
-		return (NULL);
-	}
-	normalize_path_dirs(path_dirs);
-	return (path_dirs);
-}
-
-/**
- * @brief Tries to find a binary in PATH
- *
- * @param ctx Context
- * @param bin The binary to search for
- * @return char* A full path to the binary if found and executable, or NULL
+ * @param ctx Context containing environment
+ * @param bin Binary name to search for
+ * @return char* Full path to the binary if found, NULL otherwise
  */
 char	*env_find_bin(t_ctx *ctx, char *bin)
 {
+	char	*path_var;
 	char	**path_dirs;
-	char	**og_path_dirs;
-	char	*path;
+	char	**current_dir;
+	char	*bin_path;
 
 	if (!bin)
 		return (NULL);
-	path_dirs = env_get_path_dirs(ctx);
+	path_var = get_path_from_env(ctx);
+	if (!path_var)
+		return (NULL);
+	path_dirs = ft_split(path_var, ':');
 	if (!path_dirs)
 		return (NULL);
-	og_path_dirs = path_dirs;
-	while (*path_dirs)
+	current_dir = path_dirs;
+	while (*current_dir)
 	{
-		path = bin_find_path(*path_dirs, bin);
-		if (path)
-		{
-			free_2d_array((void **)og_path_dirs);
-			return (path);
-		}
-		path_dirs++;
+		*current_dir = normalize_path_dir(*current_dir);
+		bin_path = bin_find_path(*current_dir, bin);
+		if (bin_path)
+			return (free_2d_array((void **)path_dirs), bin_path);
+		current_dir++;
 	}
-	free_2d_array((void **)og_path_dirs);
+	free_2d_array((void **)path_dirs);
 	return (NULL);
 }

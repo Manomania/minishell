@@ -6,35 +6,41 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:59:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:22:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:03:47 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
 #include "minishell.h"
+#include <sys/stat.h>
 
 /**
  * @brief Checks if a file exists and is executable
  *
- * @param path Path to the file to check
- * @return int 1 if file exists and is executable, 0 otherwise
+ * @param path Full path to the file
+ * @return t_bool true if file exists and is executable, false otherwise
  */
-static int	is_executable(const char *path)
+static t_bool	is_executable(const char *path)
 {
-	if (access(path, F_OK) == 0)
-	{
-		if (access(path, X_OK) == 0)
-			return (1);
-	}
-	return (0);
+	struct stat	path_stat;
+
+	if (access(path, F_OK) != 0)
+		return (false);
+	if (stat(path, &path_stat) != 0)
+		return (false);
+	if (S_ISDIR(path_stat.st_mode))
+		return (false);
+	if (access(path, X_OK) != 0)
+		return (false);
+	return (true);
 }
 
 /**
- * @brief Checks if a binary is found in a directory and is executable
+ * @brief Checks for a binary in a specific directory
  *
- * @param dir The path to search in
- * @param bin The binary to search for
- * @return char* Full path to binary if found and executable, NULL otherwise
+ * @param dir Directory to search in
+ * @param bin Binary name to search for
+ * @return char* Full path if found and executable, NULL otherwise
  */
 char	*bin_find_path(const char *dir, char *bin)
 {
@@ -45,17 +51,11 @@ char	*bin_find_path(const char *dir, char *bin)
 		return (NULL);
 	tmp = ft_strjoin(dir, "/");
 	if (!tmp)
-	{
-		(void)error(NULL, "bin_find_path", ERR_ALLOC);
 		return (NULL);
-	}
 	full_path = ft_strjoin(tmp, bin);
 	free(tmp);
 	if (!full_path)
-	{
-		(void)error(NULL, "bin_find_path", ERR_ALLOC);
 		return (NULL);
-	}
 	if (is_executable(full_path))
 		return (full_path);
 	free(full_path);
