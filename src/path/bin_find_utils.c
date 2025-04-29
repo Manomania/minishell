@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:34:50 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/08 18:14:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:47:17 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,32 @@ t_bool	is_directory(const char *path)
 	if (stat(path, &path_stat) != 0)
 		return (false);
 	return (S_ISDIR(path_stat.st_mode));
+}
+
+/**
+ * @brief Resolves a relative path to an absolute one using current directory
+ *
+ * @param bin The path to resolve
+ * @return char* New allocated absolute path or NULL on error
+ */
+static char	*resolve_relative_path(char *bin)
+{
+	char	*cwd;
+	char	*absolute_path;
+	char	*tmp;
+
+	if (bin[0] == '/')
+		return (ft_strdup(bin));
+	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		return (NULL);
+	tmp = ft_strjoin(cwd, "/");
+	free(cwd);
+	if (!tmp)
+		return (NULL);
+	absolute_path = ft_strjoin(tmp, bin);
+	free(tmp);
+	return (absolute_path);
 }
 
 /**

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 17:03:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:47:12 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,104 +15,113 @@
 #include <sys/stat.h>
 
 /**
- * @brief Determines if a string is a path rather than a simple command
+ * @brief Checks if a string contains path components
  *
- * Checks if the string contains path components like '/', './', '../', etc.
+ * Determines if the given string contains directory path components such as
+ * slashes or relative path indicators ('.' or '..').
  *
- * @param str The string to check
- * @return t_bool true if it's a path, false if it's a simple command
+ * @param str String to check for path components
+ * @return true if the string contains path components, false otherwise
  */
 t_bool	is_path(const char *str)
 {
+	int	i;
+
+	i = 0;
 	if (!str)
 		return (false);
-	if (str[0] == '/' || str[0] == '.')
+	if (str[0] == '/' || str[0] == '~' || str[0] == '.')
 		return (true);
-	while (*str)
+	while (str[i])
 	{
-		if (*str == '/')
+		if (str[i] == '/')
 			return (true);
-		str++;
+		i++;
 	}
 	return (false);
 }
 
 /**
- * @brief Resolves a relative path to an absolute one using current directory
+ * @brief Validates and resolves an absolute or relative path
  *
- * @param bin The path to resolve
- * @return char* New allocated absolute path or NULL on error
+ * Checks if the path exists, has proper permissions, and is not a directory.
+ * Returns appropriate error status if validation fails.
+ *
+ * @param bin Path to validate
+ * @param error_state Pointer to store error state
+ * @return Duplicated path if valid, NULL otherwise
  */
-char	*resolve_relative_path(char *bin)
+static char	*validate_path(char *bin, t_path_error *error_state)
 {
-	char	*cwd;
-	char	*absolute_path;
-	char	*tmp;
-
-	if (bin[0] == '/')
-		return (ft_strdup(bin));
-	cwd = getcwd(NULL, 0);
-	if (!cwd)
-		return (NULL);
-	tmp = ft_strjoin(cwd, "/");
-	free(cwd);
-	if (!tmp)
-		return (NULL);
-	absolute_path = ft_strjoin(tmp, bin);
-	free(tmp);
-	return (absolute_path);
-}
-
-/**
- * @brief Handles the case when a command is specified as a path
- *
- * Checks existence, permission, and whether it's a directory
- *
- * @param bin The command path to check
- * @return char* Path if valid and executable, NULL otherwise with error display
- */
-static char	*handle_command_path(char *bin)
-{
-	struct stat	file_stat;
-
 	if (access(bin, F_OK) != 0)
 	{
-		error(bin, NULL, ERR_NO_FILE);
+		*error_state = PATH_ERR_NOT_FOUND;
 		return (NULL);
 	}
-	if (stat(bin, &file_stat) == 0 && S_ISDIR(file_stat.st_mode))
+	if (is_directory(bin))
 	{
-		error(bin, NULL, ERR_IS_DIR);
+		*error_state = PATH_ERR_IS_DIR;
 		return (NULL);
 	}
 	if (access(bin, X_OK) != 0)
 	{
-		error(bin, NULL, ERR_NO_PERMS);
+		*error_state = PATH_ERR_NO_PERMISSION;
 		return (NULL);
 	}
 	return (ft_strdup(bin));
 }
 
 /**
- * @brief Finds a binary in the PATH or as a direct path
+ * @brief Handles path-specific error messages and returns appropriate code
  *
- * Tries to find the binary in PATH if it's a simple command,
- * or validates it as a direct path if specified as such.
+ * Processes path errors and displays appropriate error message based on
+ * the error type (file not found, permission denied, is directory).
  *
- * @param ctx Context
- * @param bin The binary name or path to find
- * @return char* Path to binary if found, NULL otherwise (with proper error)
+ * @param bin The path that caused the error
+ * @param error_type Type of error encountered
+ * @return Error code to be used as exit status
+ */
+static int	bf_handle_path_error(char *bin, t_path_error error_type)
+{
+	if (error_type == PATH_ERR_NOT_FOUND)
+		return (error(bin, NULL, ERR_NO_FILE));
+	else if (error_type == PATH_ERR_NO_PERMISSION)
+		return (error(bin, NULL, ERR_NO_PERMS));
+	else if (error_type == PATH_ERR_IS_DIR)
+		return (error(bin, NULL, ERR_IS_DIR));
+	return (1);
+}
+
+/**
+ * @brief Resolves a command path and handles errors appropriately
+ *
+ * Checks if the command is a path or a simple command and resolves it.
+ * For paths, validates directly; for simple commands, searches in PATH.
+ *
+ * @param ctx Shell context
+ * @param bin Command to resolve
+ * @return Resolved path or NULL (with appropriate error displayed)
  */
 char	*bin_find(t_ctx *ctx, char *bin)
 {
-	char	*path;
+	char			*path;
+	t_path_error	error_state;
 
+	error_state = PATH_ERR_NONE;
 	if (!bin)
 		return (NULL);
 	if (is_path(bin))
-		return (handle_command_path(bin));
+	{
+		path = validate_path(bin, &error_state);
+		if (!path)
+		{
+			bf_handle_path_error(bin, error_state);
+			return (NULL);
+		}
+		return (path);
+	}
 	path = env_find_bin(ctx, bin);
 	if (!path)
-		error(bin, NULL, ERR_CMD_NOT_FOUND);
+		(void)error(bin, NULL, ERR_CMD_NOT_FOUND);
 	return (path);
 }

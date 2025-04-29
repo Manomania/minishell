@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/29 17:02:41 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:47:21 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -482,7 +482,6 @@ void						advance_parse(t_parse *parse);
 
 // bin_find.c
 char						*bin_find(t_ctx *ctx, char *bin);
-char						*resolve_relative_path(char *bin);
 t_bool						is_directory(const char *path);
 t_bool						is_path(const char *str);
 
@@ -555,6 +554,11 @@ char						*create_prompt(int prev_status);
 
 // parser_command_utils.c
 int							add_argument(t_command *cmd, char *value);
+
+// cleanup_utils.c
+void						safe_free_str(char **str);
+void						cleanup_before_command(t_ctx *ctx);
+void						close_open_fds(t_ctx *ctx);
 
 // main.c
 // A REMPLIR

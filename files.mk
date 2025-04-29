@@ -62,9 +62,11 @@ SRC_F				= \
 						lexer/lexer_utils \
 						lexer/lexer_token_is \
 						memory/memory \
+						memory/cleanup_utils \
 						path/bin_find \
 						path/bin_find_utils \
 						path/bin_find_path \
+						path/path_error \
 						redir/heredoc \
 						redir/heredoc_expand \
 						redir/heredoc_expand_utils \

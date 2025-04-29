@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:40:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 16:59:48 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:35:04 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,14 @@
 #include "minishell.h"
 
 /**
- * @brief Gets PATH variable value from environment
+ * @brief Retrieves PATH environment variable
  *
- * @param ctx Context containing environment variables
- * @return char* PATH value or NULL if not found/unset
+ * Searches through environment list for the PATH variable.
+ *
+ * @param ctx Shell context containing environment variables
+ * @return PATH value or NULL if not found
  */
-static char	*get_path_from_env(t_ctx *ctx)
+static char	*get_path_var(t_ctx *ctx)
 {
 	t_env	*env;
 
@@ -34,52 +36,73 @@ static char	*get_path_from_env(t_ctx *ctx)
 }
 
 /**
- * @brief Normalizes path directories by removing trailing slashes
+ * @brief Removes trailing slash from directory path if present
  *
- * @param path_dir Path directory string
- * @return Normalized path with no trailing slash
+ * Ensures directory paths are properly formatted for path joining.
+ *
+ * @param dir Directory path to normalize
+ * @return Normalized path (modified in-place)
  */
-static char	*normalize_path_dir(char *path_dir)
+static char	*normalize_dir_path(char *dir)
 {
 	int	len;
 
-	len = ft_strlen(path_dir);
-	if (len > 0 && path_dir[len - 1] == '/')
-		path_dir[len - 1] = '\0';
-	return (path_dir);
+	len = ft_strlen(dir);
+	if (len > 0 && dir[len - 1] == '/')
+		dir[len - 1] = '\0';
+	return (dir);
 }
 
 /**
- * @brief Searches for a binary in the PATH environment directories
+ * @brief Tries to find a binary in all PATH directories
  *
- * @param ctx Context containing environment
+ * Searches for executable binary in each directory listed in PATH.
+ *
+ * @param path_dirs Array of directories from PATH
  * @param bin Binary name to search for
- * @return char* Full path to the binary if found, NULL otherwise
+ * @return Full path if found, NULL otherwise
+ */
+static char	*search_in_path_dirs(char **path_dirs, char *bin)
+{
+	char	*path;
+	int		i;
+
+	i = 0;
+	while (path_dirs[i])
+	{
+		path_dirs[i] = normalize_dir_path(path_dirs[i]);
+		path = bin_find_path(path_dirs[i], bin);
+		if (path)
+			return (path);
+		i++;
+	}
+	return (NULL);
+}
+
+/**
+ * @brief Finds a binary in the PATH environment variable
+ *
+ * Splits PATH into directories and searches each one for the binary.
+ *
+ * @param ctx Shell context
+ * @param bin Binary name to search for
+ * @return Full path to binary if found and executable, NULL otherwise
  */
 char	*env_find_bin(t_ctx *ctx, char *bin)
 {
 	char	*path_var;
 	char	**path_dirs;
-	char	**current_dir;
 	char	*bin_path;
 
 	if (!bin)
 		return (NULL);
-	path_var = get_path_from_env(ctx);
-	if (!path_var)
+	path_var = get_path_var(ctx);
+	if (!path_var || !*path_var)
 		return (NULL);
 	path_dirs = ft_split(path_var, ':');
 	if (!path_dirs)
 		return (NULL);
-	current_dir = path_dirs;
-	while (*current_dir)
-	{
-		*current_dir = normalize_path_dir(*current_dir);
-		bin_path = bin_find_path(*current_dir, bin);
-		if (bin_path)
-			return (free_2d_array((void **)path_dirs), bin_path);
-		current_dir++;
-	}
+	bin_path = search_in_path_dirs(path_dirs, bin);
 	free_2d_array((void **)path_dirs);
-	return (NULL);
+	return (bin_path);
 }

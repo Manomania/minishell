@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 17:00:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:36:02 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,11 +116,13 @@ void	cleanup_child_process(t_ctx *ctx)
 }
 
 /**
- * @brief Validates command and resolves binary path
+ * @brief Resolves command binary path
  *
- * @param ctx Context with environment
+ * Determines if command is a builtin or external command and resolves its path.
+ *
+ * @param ctx Shell context
  * @param cmd Command to validate
- * @return char* The resolved binary path or NULL
+ * @return Command path or NULL on error (with error displayed)
  */
 char	*validate_and_resolve_command(t_ctx *ctx, t_command *cmd)
 {
@@ -128,11 +130,13 @@ char	*validate_and_resolve_command(t_ctx *ctx, t_command *cmd)
 
 	if (!cmd->args || !cmd->args[0])
 		return (NULL);
+	if (is_builtin_command(cmd->args[0]))
+		return (ft_strdup(cmd->args[0]));
 	bin_path = bin_find(ctx, cmd->args[0]);
-	if (!bin_path)
+	if (!bin_path && is_path(cmd->args[0]))
+		return (NULL);
+	else if (!bin_path)
 	{
-		if (is_path(cmd->args[0]))
-			return (NULL);
 		ft_printf_fd(STDERR_FILENO, "minishell: %s: command not found\n",
 			cmd->args[0]);
 	}
