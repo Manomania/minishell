@@ -457,6 +457,7 @@ char						*handle_dollar_sign(char *result);
 char						*handle_word_part(t_lexer *lexer, char *result);
 char						*handle_quoted_part(t_lexer *lexer, char *result,
 								char quote_char);
+char						*handle_dollar_quotes(t_lexer *lexer);
 
 // lexer_read_utils2.c
 void						set_quote_flags(t_lexer *lexer, char quote_char);

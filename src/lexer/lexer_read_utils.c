@@ -89,3 +89,24 @@ char	*handle_quoted_part(t_lexer *lexer, char *result, char quote_char)
 	free(part);
 	return (new_result);
 }
+
+/**
+ * @brief Handles dollar sign followed by quotes pattern
+ *
+ * @param lexer Current lexer state
+ * @param result Current result string (can be NULL)
+ * @return char* Token string or NULL on error
+ */
+char	*handle_dollar_quotes(t_lexer *lexer)
+{
+	char	quote_char;
+
+	advance_lexer(lexer);
+	quote_char = get_lexer(lexer);
+	advance_lexer(lexer);
+	while (get_lexer(lexer) != '\0' && get_lexer(lexer) != quote_char)
+		advance_lexer(lexer);
+	if (get_lexer(lexer) == quote_char)
+		advance_lexer(lexer);
+	return (ft_strdup(""));
+}
