@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:15:06 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 15:18:42 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:32:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,11 @@ int	execute_builtin_command(t_ctx *ctx, int saved_stdin, int saved_stdout)
 }
 
 /**
- * @brief Handles parent process waiting and signal processing
+ * @brief Handles parent process waiting and signal processing more robustly.
  *
  * @param pid Child process ID to wait for
- * @param saved_stdin Saved standard input descriptor
- * @param saved_stdout Saved standard output descriptor
+ * @param saved_stdin Saved standard input descriptor (to close)
+ * @param saved_stdout Saved standard output descriptor (to close)
  * @return Exit status of the command
  */
 static int	handle_parent_process(pid_t pid, int saved_stdin, int saved_stdout)
@@ -66,19 +66,22 @@ static int	handle_parent_process(pid_t pid, int saved_stdin, int saved_stdout)
 		close(saved_stdin);
 	if (saved_stdout != -1)
 		close(saved_stdout);
-	waitpid(pid, &status, 0);
-	if (WIFEXITED(status))
-		exit_code = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-	{
-		exit_code = 128 + WTERMSIG(status);
-		if (WTERMSIG(status) == SIGQUIT)
-			ft_printf_fd(STDERR_FILENO, "Quit (core dumped)\n");
-		else if (WTERMSIG(status) == SIGINT && isatty(STDOUT_FILENO))
-			write(STDOUT_FILENO, "\n", 1);
-	}
+	exit_code = 1;
+	if (waitpid(pid, &status, 0) == -1)
+		perror("minishell: waitpid");
 	else
-		exit_code = 1;
+	{
+		if (WIFEXITED(status))
+			exit_code = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+		{
+			exit_code = 128 + WTERMSIG(status);
+			if (WTERMSIG(status) == SIGQUIT)
+				ft_printf_fd(STDERR_FILENO, "Quit (core dumped)\n");
+			else if (WTERMSIG(status) == SIGINT && isatty(STDOUT_FILENO))
+				write(STDOUT_FILENO, "\n", 1);
+		}
+	}
 	setup_signals();
 	return (exit_code);
 }
@@ -137,7 +140,7 @@ int	execute_single_command(t_ctx *ctx)
 		return (error(NULL, "dup", ERR_FD));
 	}
 	arg = NULL;
-	if (ctx->cmd->args)
+	if (ctx->cmd && ctx->cmd->args && ctx->cmd->args[0])
 		arg = ctx->cmd->args[0];
 	if (is_builtin_command(arg))
 		return (execute_builtin_command(ctx, saved_stdin, saved_stdout));

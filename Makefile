@@ -11,7 +11,7 @@ CFLAGS 				:= 	-Wall -Wextra -Werror
 # Debug dead code
 # CLFLAGS				:=	-ffunction-sections -Wl,--print-gc-sections -Wl,--gc-sections
 # Debug
-# CFLAGS				+=	-g3
+CFLAGS				+=	-g3
 # Compability checks
 # CFLAGS				+=	-pedantic
 # Dependency management

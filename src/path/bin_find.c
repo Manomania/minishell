@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 17:47:12 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:52:43 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ t_bool	is_path(const char *str)
 	i = 0;
 	if (!str)
 		return (false);
-	if (str[0] == '/' || str[0] == '~' || str[0] == '.')
+	if (str[0] == '/' || str[0] == '~' || str[0] == '.' || str[0] == '\0')
 		return (true);
 	while (str[i])
 	{
@@ -72,35 +72,29 @@ static char	*validate_path(char *bin, t_path_error *error_state)
 }
 
 /**
- * @brief Handles path-specific error messages and returns appropriate code
- *
- * Processes path errors and displays appropriate error message based on
- * the error type (file not found, permission denied, is directory).
- *
- * @param bin The path that caused the error
- * @param error_type Type of error encountered
- * @return Error code to be used as exit status
+ * @brief Maps t_path_error to t_error_type for the error function.
  */
-static int	bf_handle_path_error(char *bin, t_path_error error_type)
+static t_error_type	map_path_error_to_type(t_path_error error_state)
 {
-	if (error_type == PATH_ERR_NOT_FOUND)
-		return (error(bin, NULL, ERR_NO_FILE));
-	else if (error_type == PATH_ERR_NO_PERMISSION)
-		return (error(bin, NULL, ERR_NO_PERMS));
-	else if (error_type == PATH_ERR_IS_DIR)
-		return (error(bin, NULL, ERR_IS_DIR));
-	return (1);
+	if (error_state == PATH_ERR_NOT_FOUND)
+		return (ERR_NO_FILE);
+	if (error_state == PATH_ERR_NO_PERMISSION)
+		return (ERR_NO_PERMS);
+	if (error_state == PATH_ERR_IS_DIR)
+		return (ERR_IS_DIR);
+	return (ERR_CMD_NOT_FOUND);
 }
 
 /**
- * @brief Resolves a command path and handles errors appropriately
+ * @brief Resolves a command path, sets ctx->exit_status on error, returns NULL.
  *
  * Checks if the command is a path or a simple command and resolves it.
  * For paths, validates directly; for simple commands, searches in PATH.
+ * Prints error messages via error() which also returns the code.
  *
- * @param ctx Shell context
+ * @param ctx Shell context (used to store exit status on error)
  * @param bin Command to resolve
- * @return Resolved path or NULL (with appropriate error displayed)
+ * @return Resolved path (caller must free) or NULL on error.
  */
 char	*bin_find(t_ctx *ctx, char *bin)
 {
@@ -108,20 +102,27 @@ char	*bin_find(t_ctx *ctx, char *bin)
 	t_path_error	error_state;
 
 	error_state = PATH_ERR_NONE;
-	if (!bin)
+	if (!bin || bin[0] == '\0')
+	{
+		ctx->exit_status = error("", NULL, ERR_CMD_NOT_FOUND);
 		return (NULL);
+	}
 	if (is_path(bin))
 	{
 		path = validate_path(bin, &error_state);
 		if (!path)
 		{
-			bf_handle_path_error(bin, error_state);
+			ctx->exit_status = handle_path_error(bin,
+					map_path_error_to_type(error_state));
 			return (NULL);
 		}
 		return (path);
 	}
 	path = env_find_bin(ctx, bin);
 	if (!path)
-		(void)error(bin, NULL, ERR_CMD_NOT_FOUND);
+	{
+		ctx->exit_status = error(bin, NULL, ERR_CMD_NOT_FOUND);
+		return (NULL);
+	}
 	return (path);
 }

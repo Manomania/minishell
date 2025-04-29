@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:37:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 17:45:05 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:52:58 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	get_path_error_code(t_error_type err_type)
 }
 
 /**
- * @brief Handles path-related errors with consistent messages
+ * @brief Handles path-related errors: prints message and returns code.
  *
  * @param path Path that caused the error
  * @param err_type Type of error encountered
@@ -37,8 +37,5 @@ int	get_path_error_code(t_error_type err_type)
  */
 int	handle_path_error(char *path, t_error_type err_type)
 {
-	int	code;
-
-	code = error(path, NULL, err_type);
-	return (code);
+	return (error(path, NULL, err_type));
 }
