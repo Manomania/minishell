@@ -64,17 +64,19 @@ char	*append_text_part(int start, int i, char *result, char *str)
  * @param str Input string to process
  * @return Newly allocated string with processed content
  */
-char	*handle_quotes_and_vars(t_ctx *ctx, char *str)
+char	*handle_quotes_and_vars(t_ctx *ctx, t_token *token)
 {
 	char	*result;
 	char	*processed;
 
-	if (!str)
+	if (token->quote.in_single_quote)
+		return (ft_strdup(token->value));
+	if (!token->value)
 		return (ft_strdup(""));
 	result = ft_strdup("");
 	if (!result)
 		return (NULL);
-	processed = process_string(ctx, str, result);
+	processed = process_string(ctx, token->value, result);
 	if (!processed)
 	{
 		free(result);

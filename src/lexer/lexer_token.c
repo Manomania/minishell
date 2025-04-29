@@ -58,7 +58,15 @@ t_token	*next_token_lexer(t_lexer *lexer)
 		return (token);
 	token = handle_word_token(lexer);
 	if (token)
+	{
+		if (lexer->quote.in_single_quote)
+			token->quote.in_single_quote = true;
+		if (lexer->quote.in_double_quote)
+			token->quote.in_double_quote = true;
+		lexer->quote.in_single_quote = 0;
+		lexer->quote.in_double_quote = 0;
 		return (token);
+	}
 	return (NULL);
 }
 
