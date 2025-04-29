@@ -61,7 +61,7 @@ int	parse_redirection(t_parse *parse, t_command *cmd, t_ctx *ctx)
 		redirection = create_redirection(type, parse->current->value);
 	else
 	{
-		expanded = handle_quotes_and_vars(ctx, parse->current->value);
+		expanded = handle_quotes_and_vars(ctx, parse->current);
 		redirection = create_redirection(type, expanded);
 		free(expanded);
 	}
@@ -85,7 +85,7 @@ static int	handle_token_expansion(t_command *cmd, t_ctx *ctx, t_parse *parse)
 	char	*expanded;
 
 	if (parse->current->type == TOK_WORD)
-		expanded = handle_quotes_and_vars(ctx, parse->current->value);
+		expanded = handle_quotes_and_vars(ctx, parse->current);
 	else
 		expanded = expand_var(ctx, parse->current->value);
 	if (!add_argument(cmd, expanded))

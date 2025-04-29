@@ -54,8 +54,9 @@ char	*read_word_lexer(t_lexer *lexer)
  */
 char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 {
-	int	start;
-	int	end;
+	int		start;
+	int		end;
+	char	*content;
 
 	start = lexer->position + 1;
 	advance_lexer(lexer);
@@ -71,7 +72,8 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 	end = lexer->position;
 	set_quote_flags(lexer, quote_char);
 	advance_lexer(lexer);
-	return (create_quoted_content(lexer, start, end));
+	content = create_quoted_content(lexer, start, end);
+	return (content);
 }
 
 /**
@@ -102,12 +104,22 @@ static char	*handle_word_part_by_type(t_lexer *lexer, char *result,
 		char quote_char)
 {
 	char	*new_result;
+	char	*part;
 
 	if (quote_char != 0)
-		new_result = handle_quoted_part(lexer, result, quote_char);
+	{
+		part = read_quoted_string_lexer(lexer, quote_char);
+		if (!part)
+		{
+			free(result);
+			return (NULL);
+		}
+		new_result = join_and_free(result, part);
+		free(part);
+		return (new_result);
+	}
 	else
-		new_result = handle_word_part(lexer, result);
-	return (new_result);
+		return (handle_word_part(lexer, result));
 }
 
 /**

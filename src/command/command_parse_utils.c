@@ -113,7 +113,7 @@ t_bool	process_word_token(t_command *cmd, t_token *token, t_ctx *ctx)
 {
 	char	*expanded_value;
 
-	expanded_value = handle_quotes_and_vars(ctx, token->value);
+	expanded_value = handle_quotes_and_vars(ctx, token);
 	if (!expanded_value)
 		return (false);
 	if (!cmd->args)
