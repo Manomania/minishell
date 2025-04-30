@@ -65,6 +65,8 @@ static void	update_environment_vars(t_ctx *ctx, char *old_pwd)
 	char	*new_pwd;
 
 	new_pwd = getcwd(NULL, 0);
+	if (!new_pwd)
+		return ;
 	old_pwd_node = update_pwd_variable(ctx->env_list, new_pwd);
 	update_oldpwd_variable(old_pwd_node, old_pwd);
 }
