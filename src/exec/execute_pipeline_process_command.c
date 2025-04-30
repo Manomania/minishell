@@ -6,11 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 15:06:15 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 15:09:05 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/30 13:06:08 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
+#include "error.h"
 #include "minishell.h"
 
 /**
@@ -105,6 +106,14 @@ int	process_pipeline_command(t_ctx *ctx, t_ppca a)
 	output_fd = STDOUT_FILENO;
 	if (!is_last)
 		output_fd = a.pipe_fds[1];
+	if (is_path(a.cmd->args[0]) && is_directory(a.cmd->args[0]))
+	{
+		error(a.cmd->args[0], NULL, ERR_IS_DIR);
+		a.pids[a.cmd_index] = -2;
+		eppc_cleanup_pipeline_fds(a, is_last);
+		ctx->exit_status = 126;
+		return (0);
+	}
 	if (is_builtin_command(a.cmd->args[0]))
 		return (eppc_handle_pipeline_builtin(ctx, a, is_last, output_fd));
 	result = eppc_fork_pipeline_command(ctx, a, is_last, output_fd);

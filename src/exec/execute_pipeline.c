@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:37:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 15:03:05 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/30 13:05:32 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,7 +166,8 @@ int	execute_pipeline(t_ctx *ctx)
 		return (1);
 	}
 	status = wait_for_pipeline_processes(pids, cmd_count, ctx);
-	free(pids);
+	if (pids)
+		free(pids);
 	setup_signals();
 	return (status);
 }
