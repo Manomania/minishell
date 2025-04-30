@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 15:18:36 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 18:53:10 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:55:50 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,9 @@ static void	ecp_run_command_with_execve(t_ctx *ctx)
 	error(ctx->cmd->args[0], "execve", ERR_CMD_NOT_FOUND);
 	free_2d_array((void **)env_array);
 	cleanup_child_process(ctx);
-	exit(errno == EACCES ? 126 : 127);
+	if (errno == EACCES)
+		exit(126);
+	exit(127);
 }
 
 /**
