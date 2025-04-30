@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 15:18:36 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 18:55:50 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/30 12:39:55 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,23 @@ static int	ecp_prepare_command_io(t_ctx *ctx)
 }
 
 /**
+ * @brief Check if the command is a directory and handle appropriately
+ *
+ * @param ctx Context containing environment and command info
+ * @return int 0 if not a directory, 126 if it is
+ */
+static int	ecp_check_directory(t_ctx *ctx)
+{
+	if (is_path(ctx->cmd->args[0]) && is_directory(ctx->cmd->args[0]))
+	{
+		ctx->exit_status = error(ctx->cmd->args[0], NULL, ERR_IS_DIR);
+		cleanup_child_process(ctx);
+		exit(126);
+	}
+	return (0);
+}
+
+/**
  * @brief Handle command binary resolution and prepare for execve.
  * If command_bin fails, cleanup and exit with the status it set.
  *
@@ -59,6 +76,7 @@ static int	ecp_handle_command_binary(t_ctx *ctx)
 {
 	int	status;
 
+	ecp_check_directory(ctx);
 	if (!command_bin(ctx))
 	{
 		status = ctx->exit_status;

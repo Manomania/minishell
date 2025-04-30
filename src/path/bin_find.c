@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 18:56:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/30 12:41:28 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,14 +53,14 @@ t_bool	is_path(const char *str)
  */
 static char	*validate_path(char *bin, t_path_error *error_state)
 {
-	if (access(bin, F_OK) != 0)
-	{
-		*error_state = PATH_ERR_NOT_FOUND;
-		return (NULL);
-	}
 	if (is_directory(bin))
 	{
 		*error_state = PATH_ERR_IS_DIR;
+		return (NULL);
+	}
+	if (access(bin, F_OK) != 0)
+	{
+		*error_state = PATH_ERR_NOT_FOUND;
 		return (NULL);
 	}
 	if (access(bin, X_OK) != 0)
@@ -103,7 +103,10 @@ char	*bin_find(t_ctx *ctx, char *bin)
 
 	error_state = PATH_ERR_NONE;
 	if (!bin || bin[0] == '\0')
-		return (ctx->exit_status = error("", NULL, ERR_CMD_NOT_FOUND), NULL);
+	{
+		ctx->exit_status = error("", NULL, ERR_CMD_NOT_FOUND);
+		return (NULL);
+	}
 	if (is_path(bin))
 	{
 		path = validate_path(bin, &error_state);
@@ -117,6 +120,9 @@ char	*bin_find(t_ctx *ctx, char *bin)
 	}
 	path = env_find_bin(ctx, bin);
 	if (!path)
-		return (ctx->exit_status = error(bin, NULL, ERR_CMD_NOT_FOUND), NULL);
+	{
+		ctx->exit_status = error(bin, NULL, ERR_CMD_NOT_FOUND);
+		return (NULL);
+	}
 	return (path);
 }

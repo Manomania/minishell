@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:34:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 15:13:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/30 12:39:16 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,25 @@ void	epc_execute_builtin(t_ctx *ctx, t_command *cmd)
 }
 
 /**
+ * @brief Check if path is a directory and handle error
+ *
+ * @param ctx Context containing shell environment
+ * @param cmd Command to check
+ * @return t_bool true if directory and handled, false otherwise
+ */
+static t_bool	handle_directory_check(t_ctx *ctx, t_command *cmd)
+{
+	if (is_directory(cmd->args[0]))
+	{
+		error(cmd->args[0], NULL, ERR_IS_DIR);
+		cleanup_child_process(ctx);
+		exit(126);
+		return (true);
+	}
+	return (false);
+}
+
+/**
  * @brief Handle command not found errors
  *
  * @param ctx Context containing shell environment
@@ -67,10 +86,12 @@ void	epc_execute_builtin(t_ctx *ctx, t_command *cmd)
  */
 void	epc_handle_command_not_found(t_ctx *ctx, t_command *cmd)
 {
+	if (handle_directory_check(ctx, cmd))
+		return ;
 	if (cmd->args[0][0] == '.' && !ft_strchr(cmd->args[0], '/'))
 		exit(error(NULL, "exec", ERR_NO_FILE));
 	if (ft_strchr(cmd->args[0], '/'))
-		exit(error(cmd->args[0], NULL, ERR_IS_DIR));
+		exit(error(cmd->args[0], NULL, ERR_NO_FILE));
 	ft_printf_fd(STDERR_FILENO, "minishell: %s: command not found\n",
 		cmd->args[0]);
 	cleanup_child_process(ctx);
@@ -124,6 +145,8 @@ void	execute_pipeline_command(t_ctx *ctx, t_command *cmd, int input_fd,
 		exit(EXIT_FAILURE);
 	else if (error_code)
 		exit(EXIT_SUCCESS);
+	if (is_path(cmd->args[0]) && handle_directory_check(ctx, cmd))
+		return ;
 	if (is_builtin_command(cmd->args[0]))
 		epc_execute_builtin(ctx, cmd);
 	bin_path = bin_find(ctx, cmd->args[0]);
