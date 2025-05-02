@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/02 16:58:09 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 17:31:04 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,12 @@ typedef struct s_env
 	char					*key;
 	char					*value;
 }							t_env;
+
+typedef struct s_fds
+{
+	int						in;
+	int						out;
+}							t_fds;
 
 typedef enum e_error_type
 {

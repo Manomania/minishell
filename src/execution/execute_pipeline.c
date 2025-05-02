@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 16:55:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 17:33:22 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,30 +21,36 @@
  *
  * @param ctx Shell context
  * @param cmd Command to execute
- * @param in_fd Input file descriptor
- * @param out_fd Output file descriptor
+ * @param fds Input and output file descriptors
+ * @param pids Process ids pointer to free
  */
-static void	execute_command_in_child(t_ctx *ctx, t_command *cmd, int in_fd,
-		int out_fd)
+static void	execute_command_in_child(t_ctx *ctx, t_command *cmd, t_fds fds,
+		int *pids)
 {
 	char	*bin_path;
+	int		bruh;
 
-	if (in_fd != -1)
+	if (fds.in != -1)
 	{
-		if (dup2(in_fd, STDIN_FILENO) == -1)
+		if (dup2(fds.in, STDIN_FILENO) == -1)
 			exit(1);
-		close(in_fd);
+		close(fds.in);
 	}
-	if (out_fd != -1)
+	if (fds.out != -1)
 	{
-		if (dup2(out_fd, STDOUT_FILENO) == -1)
+		if (dup2(fds.out, STDOUT_FILENO) == -1)
 			exit(1);
-		close(out_fd);
+		close(fds.out);
 	}
 	if (!apply_redirections(cmd))
 		exit(1);
 	if (is_builtin_command(cmd->args[0]))
-		exit(execute_builtin(ctx, cmd));
+	{
+		bruh = execute_builtin(ctx, cmd);
+		ctx_clear(ctx);
+		free(pids);
+		exit(bruh);
+	}
 	else
 	{
 		reset_signals();
@@ -191,8 +197,8 @@ void	execute_pipeline(t_ctx *ctx, t_command *cmd)
 		{
 			if (current->next)
 				close(pipe_fds[0]);
-			execute_command_in_child(ctx, current, prev_pipe_read,
-				(current->next ? pipe_fds[1] : -1));
+			execute_command_in_child(ctx, current, (t_fds){prev_pipe_read,
+				(current->next ? pipe_fds[1] : -1)}, pids);
 		}
 		cleanup_pipes(prev_pipe_read, pipe_fds, current->next != NULL);
 		if (current->next)
