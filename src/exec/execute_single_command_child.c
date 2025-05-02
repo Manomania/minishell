@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 15:18:36 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/30 12:39:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/30 15:32:47 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,7 @@ static int	ecp_prepare_command_io(t_ctx *ctx)
 	reset_signals();
 	result = setup_command_redirections(ctx, ctx->cmd);
 	if (result != 0)
-	{
-		ctx->exit_status = 1;
-		cleanup_child_process(ctx);
 		return (ctx->exit_status);
-	}
 	return (0);
 }
 

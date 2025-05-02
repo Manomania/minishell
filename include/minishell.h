@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/29 17:47:21 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/30 14:58:03 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,7 +225,7 @@ typedef struct s_handle_token
 
 typedef struct s_pipeline_process_loop_args
 {
-	pid_t					*pids;
+	pid_t					pid;
 	int						*i;
 	int						*status;
 	int						cmd_count;

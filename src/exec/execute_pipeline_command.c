@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:34:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/30 12:39:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/30 14:24:14 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,8 +92,6 @@ void	epc_handle_command_not_found(t_ctx *ctx, t_command *cmd)
 		exit(error(NULL, "exec", ERR_NO_FILE));
 	if (ft_strchr(cmd->args[0], '/'))
 		exit(error(cmd->args[0], NULL, ERR_NO_FILE));
-	ft_printf_fd(STDERR_FILENO, "minishell: %s: command not found\n",
-		cmd->args[0]);
 	cleanup_child_process(ctx);
 	exit(127);
 }

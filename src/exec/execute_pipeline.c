@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:37:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/30 13:05:32 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/30 15:31:45 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,9 +91,9 @@ static t_bool	pipeline_process_loop(t_ctx *ctx,
 	int	was_signaled;
 
 	was_signaled = false;
-	if (a.pids[*a.i] > 0)
+	if (a.pid > 0)
 	{
-		waitpid(a.pids[*a.i], a.status, 0);
+		waitpid(a.pid, a.status, 0);
 		if (WIFSIGNALED(*a.status))
 		{
 			was_signaled = true;
@@ -103,7 +103,7 @@ static t_bool	pipeline_process_loop(t_ctx *ctx,
 		else if (WIFEXITED(*a.status) && *a.i == a.cmd_count - 1)
 			*a.last_status = WEXITSTATUS(*a.status);
 	}
-	else if (a.pids[*a.i] == -2 && *a.i == a.cmd_count - 1)
+	else if (a.pid == -2 && *a.i == a.cmd_count - 1)
 		*a.last_status = ctx->exit_status;
 	*a.i += 1;
 	return (was_signaled);
@@ -128,8 +128,8 @@ static int	wait_for_pipeline_processes(pid_t *pids, int cmd_count, t_ctx *ctx)
 	last_status = 0;
 	i = 0;
 	while (i < cmd_count)
-		if (pipeline_process_loop(ctx, (t_pipeline_process_loop_args){pids, &i,
-				&status, cmd_count, &last_status}))
+		if (pipeline_process_loop(ctx, (t_pipeline_process_loop_args){pids[i],
+				&i, &status, cmd_count, &last_status}))
 			was_signaled = true;
 	if (was_signaled)
 	{
