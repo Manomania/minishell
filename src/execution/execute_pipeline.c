@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 17:33:22 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 17:41:44 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ static void	execute_command_in_child(t_ctx *ctx, t_command *cmd, t_fds fds,
 {
 	char	*bin_path;
 	int		bruh;
+	int		status;
 
 	if (fds.in != -1)
 	{
@@ -43,7 +44,11 @@ static void	execute_command_in_child(t_ctx *ctx, t_command *cmd, t_fds fds,
 		close(fds.out);
 	}
 	if (!apply_redirections(cmd))
+	{
+		ctx_clear(ctx);
+		free(pids);
 		exit(1);
+	}
 	if (is_builtin_command(cmd->args[0]))
 	{
 		bruh = execute_builtin(ctx, cmd);
@@ -56,7 +61,12 @@ static void	execute_command_in_child(t_ctx *ctx, t_command *cmd, t_fds fds,
 		reset_signals();
 		bin_path = bin_find(ctx, cmd->args[0]);
 		if (!bin_path)
-			exit(ctx->exit_status);
+		{
+			status = ctx->exit_status;
+			ctx_clear(ctx);
+			free(pids);
+			exit(status);
+		}
 		execve(bin_path, cmd->args, ctx->envp);
 		free(bin_path);
 		exit(error(cmd->args[0], NULL, ERR_CMD_NOT_FOUND));
