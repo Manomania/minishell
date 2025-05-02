@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 11:43:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 18:09:00 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:07:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,16 @@ int	is_builtin(char *cmd_name, char *builtin_name)
 /**
  * @brief Sets up redirections for builtin command execution
  *
+ * @param ctx Context
  * @param cmd Command to set up redirections for
  * @param saved_fds Array of saved file descriptors
  * @return int 0 on success, -1 on failure
  */
-int	setup_builtin_redirections(t_command *cmd, int *saved_fds)
+int	setup_builtin_redirections(t_ctx *ctx, t_command *cmd, int *saved_fds)
 {
 	int	result;
 
-	result = builtin_setup_redirections(cmd, saved_fds);
+	result = builtin_setup_redirections(ctx, cmd, saved_fds);
 	if (result == -1)
 	{
 		if (saved_fds[0] >= 2)

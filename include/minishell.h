@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/30 14:58:03 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:02:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -368,11 +368,12 @@ void						execute_pipeline_command(t_ctx *ctx, t_command *cmd,
 int							count_commands(t_command *cmd);
 void						execute_command(t_ctx *ctx, t_command *cmd);
 int							setup_child_pipeline_redirections(t_command *cmd,
-								int input_fd, int output_fd);
+								int input_fd, int output_fd, t_ctx *ctx);
 void						cleanup_child_process(t_ctx *ctx);
 char						*validate_and_resolve_command(t_ctx *ctx,
 								t_command *cmd);
-int							apply_child_redirections(t_command *cmd);
+int							apply_child_redirections(t_command *cmd,
+								t_ctx *ctx);
 
 // execute_pipeline_proces_command.c
 int							process_pipeline_command(t_ctx *ctx, t_ppca a);
@@ -386,7 +387,7 @@ void						setup_child_process(t_ctx *ctx, t_command *cmd,
 								int input_fd, int output_fd);
 int							setup_pipe(int pipe_fds[2]);
 int							setup_pipeline_redirections(t_command *cmd,
-								int input_fd, int output_fd);
+								int input_fd, int output_fd, t_ctx *ctx);
 
 // execute_pipeline_builtin.c
 int							execute_pipeline_builtin(t_ctx *ctx, t_command *cmd,
@@ -396,7 +397,9 @@ int							execute_pipeline_builtin(t_ctx *ctx, t_command *cmd,
 int							read_all_heredocs(t_ctx *ctx);
 int							setup_command_redirections(t_ctx *ctx,
 								t_command *cmd);
-int							setup_redirections(t_redirection *redirections);
+int							setup_redirections(t_redirection *redirections,
+								t_ctx *ctx);
+int							apply_redirection(t_redirection *redir, t_ctx *ctx);
 int							open_redirection_file(t_redirection *redir);
 
 // execute_redirection_utils.c

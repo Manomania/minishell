@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:18:29 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 15:24:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:05:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,18 +44,25 @@ int	open_redirection_file(t_redirection *redir)
  * @brief Applies a specific redirection
  *
  * @param redir Redirection to apply
+ * @param ctx Context for exit status
  * @return int 0 on success, -1 on error
  */
-int	apply_redirection(t_redirection *redir)
+int	apply_redirection(t_redirection *redir, t_ctx *ctx)
 {
 	int	fd;
 	int	result;
+	int	error_val;
 
 	fd = open_redirection_file(redir);
 	if (fd == -1)
 	{
-		ft_printf_fd(STDERR_FILENO, "minishell: %s: %s\n", redir->filename,
-			strerror(errno));
+		error_val = errno;
+		if (error_val == EISDIR)
+			ctx->exit_status = error(redir->filename, NULL, ERR_IS_DIR);
+		else if (error_val == EACCES)
+			ctx->exit_status = error(redir->filename, NULL, ERR_NO_PERMS);
+		else
+			ctx->exit_status = error(redir->filename, NULL, ERR_NO_FILE);
 		return (-1);
 	}
 	if (redir->type == TOK_REDIR_FROM || redir->type == TOK_HERE_DOC_FROM)
@@ -65,8 +72,7 @@ int	apply_redirection(t_redirection *redir)
 	close(fd);
 	if (result == -1)
 	{
-		ft_printf_fd(STDERR_FILENO, "minishell: %s: %s\n", redir->filename,
-			strerror(errno));
+		ctx->exit_status = error(redir->filename, NULL, ERR_FD);
 		return (-1);
 	}
 	return (0);
@@ -76,9 +82,10 @@ int	apply_redirection(t_redirection *redir)
  * @brief Sets up redirections for a command
  *
  * @param redirections List of redirections to set up
+ * @param ctx Context for exit status
  * @return int 0 on success, -1 on error
  */
-int	setup_redirections(t_redirection *redirections)
+int	setup_redirections(t_redirection *redirections, t_ctx *ctx)
 {
 	t_redirection	*redir;
 
@@ -87,7 +94,7 @@ int	setup_redirections(t_redirection *redirections)
 	redir = redirections;
 	while (redir)
 	{
-		if (apply_redirection(redir) == -1)
+		if (apply_redirection(redir, ctx) == -1)
 			return (-1);
 		redir = redir->next;
 	}
@@ -105,7 +112,7 @@ int	setup_command_redirections(t_ctx *ctx, t_command *cmd)
 {
 	if (setup_heredocs(ctx, cmd) != 0)
 		return (1);
-	if (setup_redirections(cmd->redirection) != 0)
+	if (setup_redirections(cmd->redirection, ctx) != 0)
 		return (1);
 	return (0);
 }

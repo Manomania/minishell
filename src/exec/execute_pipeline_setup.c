@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:32:25 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 12:42:55 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 13:59:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
 	int	result;
 
 	reset_signals();
-	result = setup_child_pipeline_redirections(cmd, input_fd, output_fd);
+	result = setup_child_pipeline_redirections(cmd, input_fd, output_fd, ctx);
 	if (result != 0)
 	{
 		cleanup_child_process(ctx);
@@ -67,9 +67,11 @@ void	setup_child_process(t_ctx *ctx, t_command *cmd, int input_fd,
  * @param cmd Command with redirections
  * @param input_fd Input file descriptor
  * @param output_fd Output file descriptor
+ * @param ctx Context for exit status
  * @return int 0 on success, -1 on error
  */
-int	setup_pipeline_redirections(t_command *cmd, int input_fd, int output_fd)
+int	setup_pipeline_redirections(t_command *cmd, int input_fd, int output_fd,
+		t_ctx *ctx)
 {
 	if (input_fd != STDIN_FILENO)
 	{
@@ -93,5 +95,5 @@ int	setup_pipeline_redirections(t_command *cmd, int input_fd, int output_fd)
 		}
 		close(output_fd);
 	}
-	return (setup_redirections(cmd->redirection));
+	return (setup_redirections(cmd->redirection, ctx));
 }

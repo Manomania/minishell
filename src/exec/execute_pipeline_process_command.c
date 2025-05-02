@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 15:06:15 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/30 13:06:08 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 13:58:50 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,23 @@ static void	eppc_cleanup_pipeline_fds(t_ppca a, int is_last)
 }
 
 /**
+ * @brief Handle empty command error case
+ *
+ * @param ctx Context containing shell state
+ * @param a Arguments structure containing command details
+ * @param is_last Flag indicating if this is the last command
+ * @return int 0 on success
+ */
+static int	handle_empty_command(t_ctx *ctx, t_ppca a, int is_last)
+{
+	ft_printf_fd(STDERR_FILENO, "minishell: : command not found\n");
+	ctx->exit_status = 127;
+	a.pids[a.cmd_index] = -2;
+	eppc_cleanup_pipeline_fds(a, is_last);
+	return (0);
+}
+
+/**
  * @brief Process one command in the pipeline
  *
  * @param ctx Context containing shell state
@@ -106,6 +123,8 @@ int	process_pipeline_command(t_ctx *ctx, t_ppca a)
 	output_fd = STDOUT_FILENO;
 	if (!is_last)
 		output_fd = a.pipe_fds[1];
+	if (!a.cmd->args || !a.cmd->args[0] || a.cmd->args[0][0] == '\0')
+		return (handle_empty_command(ctx, a, is_last));
 	if (is_path(a.cmd->args[0]) && is_directory(a.cmd->args[0]))
 	{
 		error(a.cmd->args[0], NULL, ERR_IS_DIR);

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 15:16:06 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 15:21:33 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:03:28 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ static int	escev_fill_env_array(t_env *env_list, char **env_array)
 
 /**
  * @brief Creates environment array from environment list
+ * Uses execve compatible format with each process having its own env
  *
  * @param env_list Environment variable list
  * @return char** New environment array or NULL on error

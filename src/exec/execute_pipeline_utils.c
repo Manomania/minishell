@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/14 15:52:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 17:36:02 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:04:04 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ int	count_commands(t_command *cmd)
 
 /**
  * @brief Handles command execution after redirection setup
+ * Uses env_array to ensure each process has its own environment
  *
  * @param ctx Context with environment
  * @param cmd Command to execute
@@ -44,6 +45,7 @@ int	count_commands(t_command *cmd)
 void	execute_command(t_ctx *ctx, t_command *cmd)
 {
 	char	*bin_path;
+	char	**env_array;
 
 	if (builtins_try(ctx, cmd))
 	{
@@ -63,8 +65,14 @@ void	execute_command(t_ctx *ctx, t_command *cmd)
 	}
 	free(cmd->args[0]);
 	cmd->args[0] = bin_path;
-	if (execve(cmd->args[0], cmd->args, ctx->envp) == -1)
+	env_array = create_env_array(ctx->env_list);
+	if (!env_array)
+		ctx_error_exit(ctx, "env_array", "execute_command", ERR_ALLOC);
+	if (execve(cmd->args[0], cmd->args, env_array) == -1)
+	{
+		free_2d_array((void **)env_array);
 		ctx_error_exit(ctx, cmd->args[0], "exec", ERR_CHILD);
+	}
 }
 
 /**
@@ -73,10 +81,11 @@ void	execute_command(t_ctx *ctx, t_command *cmd)
  * @param cmd Command to process
  * @param input_fd Input file descriptor
  * @param output_fd Output file descriptor
+ * @param ctx Context for exit status
  * @return 0 on success, -1 on error
  */
 int	setup_child_pipeline_redirections(t_command *cmd, int input_fd,
-		int output_fd)
+		int output_fd, t_ctx *ctx)
 {
 	if (input_fd != STDIN_FILENO)
 	{
@@ -96,7 +105,7 @@ int	setup_child_pipeline_redirections(t_command *cmd, int input_fd,
 		}
 		close(output_fd);
 	}
-	return (apply_child_redirections(cmd));
+	return (apply_child_redirections(cmd, ctx));
 }
 
 /**

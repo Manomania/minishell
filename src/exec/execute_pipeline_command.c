@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:34:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/30 14:24:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:08:45 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 int	epc_setup_pipeline_io(t_ctx *ctx, t_command *cmd, int input_fd,
 		int output_fd)
 {
-	if (setup_pipeline_redirections(cmd, input_fd, output_fd) != 0)
+	if (setup_pipeline_redirections(cmd, input_fd, output_fd, ctx) != 0)
 	{
 		cleanup_child_process(ctx);
 		return (1);

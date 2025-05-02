@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:37:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/30 15:31:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 13:58:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
  * @param cmd_count Commands count
  * @param pipe_fds Pipes file descriptors
  * @param prev_pipe Previous pipe fd
+ * @return t_bool true if should exit function, false otherwise
  */
 static t_bool	execute_pipeline_commands_condition(int i, int cmd_count,
 		int *pipe_fds, int prev_pipe)
@@ -166,8 +167,7 @@ int	execute_pipeline(t_ctx *ctx)
 		return (1);
 	}
 	status = wait_for_pipeline_processes(pids, cmd_count, ctx);
-	if (pids)
-		free(pids);
+	free(pids);
 	setup_signals();
 	return (status);
 }

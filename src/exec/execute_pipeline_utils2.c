@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 15:26:43 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 15:27:54 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:00:32 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,10 @@ static int	apply_heredoc_redirection(t_redirection *redir)
  * Applies redirections for a specific command in a child process
  *
  * @param cmd Command containing redirections
+ * @param ctx Context for exit status
  * @return 0 on success, -1 on error
  */
-int	apply_child_redirections(t_command *cmd)
+int	apply_child_redirections(t_command *cmd, t_ctx *ctx)
 {
 	t_redirection	*redir;
 	int				result;
@@ -53,7 +54,7 @@ int	apply_child_redirections(t_command *cmd)
 		if (redir->type == TOK_HERE_DOC_FROM)
 			result = apply_heredoc_redirection(redir);
 		else
-			result = apply_redirection(redir);
+			result = apply_redirection(redir, ctx);
 		if (result == -1)
 			return (-1);
 		redir = redir->next;

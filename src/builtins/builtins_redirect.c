@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:52:58 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 13:21:25 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:06:43 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,13 @@
 /**
  * @brief Sets up redirections for a built-in command. Stops on first error.
  *
+ * @param ctx Context
  * @param cmd Command with redirections
  * @param saved_fds Array to store original file descriptors (may not be needed
  * here anymore)
  * @return int 0 on success, -1 on error
  */
-int	builtin_setup_redirections(t_command *cmd, int saved_fds[2])
+int	builtin_setup_redirections(t_ctx *ctx, t_command *cmd, int saved_fds[2])
 {
 	t_redirection	*redir;
 	int				result;
@@ -42,7 +43,7 @@ int	builtin_setup_redirections(t_command *cmd, int saved_fds[2])
 			redir = redir->next;
 			continue ;
 		}
-		result = apply_redirection(redir);
+		result = apply_redirection(redir, ctx);
 		if (result == -1)
 			return (-1);
 		redir = redir->next;

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:51:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 12:48:25 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:07:29 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,21 +79,21 @@ int		builtin_unset(t_ctx *ctx, t_command *cmd);
 
 // builtins_redirect.c
 int		open_redirection_file(t_redirection *redir);
-int		builtin_setup_redirections(t_command *cmd, int saved_fds[2]);
+int		builtin_setup_redirections(t_ctx *ctx, t_command *cmd,
+			int saved_fds[2]);
 void	builtin_restore_redirections(int saved_fds[2]);
 
 // builtin_redirect_utils.c
 t_bool	is_here_doc_input(t_redirection *redir);
 int		apply_input_redirection(int fd);
 int		apply_output_redirection(int fd);
-int		apply_redirection(t_redirection *redir);
 
 // builtin_try.c
 t_bool	builtins_try(t_ctx *ctx, t_command *cmd);
 
 // builtin_try_utils.c
 int		is_builtin(char *cmd_name, char *builtin_name);
-int		setup_builtin_redirections(t_command *cmd, int *saved_fds);
+int		setup_builtin_redirections(t_ctx *ctx, t_command *cmd, int *saved_fds);
 void	run_builtin_command(t_ctx *ctx, t_command *cmd, int *exit_status);
 
 // builtin_try_utils2.c

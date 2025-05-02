@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 15:22:36 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 15:24:36 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:04:33 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,19 @@
 static void	execute_redirection_child(t_ctx *ctx)
 {
 	reset_signals();
-	if (setup_heredocs(ctx, ctx->cmd) != 0
-		|| setup_redirections(ctx->cmd->redirection) != 0)
+	if (setup_heredocs(ctx, ctx->cmd) != 0)
+	{
+		ctx_clear(ctx);
+		exit(EXIT_FAILURE);
+	}
+	if (setup_redirections(ctx->cmd->redirection, ctx) != 0)
 	{
 		ctx_clear(ctx);
 		exit(EXIT_FAILURE);
 	}
 	ctx_clear(ctx);
+	if (ctx->exit_status != 0)
+		exit(ctx->exit_status);
 	exit(EXIT_SUCCESS);
 }
 
@@ -57,6 +63,7 @@ static int	handle_redirection_parent(pid_t pid)
 
 /**
  * @brief Handles redirect-only commands (like "> file")
+ * Preserves error status from redirection operations
  *
  * @param ctx Context containing environment info
  * @return int Exit status (0 for success, non-zero on error)

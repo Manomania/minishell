@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 15:55:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 18:01:11 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:07:55 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static t_bool	process_builtin(t_ctx *ctx, t_command *cmd, int *exit_status,
 {
 	int	redir_status;
 
-	redir_status = setup_builtin_redirections(cmd, saved_fds);
+	redir_status = setup_builtin_redirections(ctx, cmd, saved_fds);
 	if (redir_status == -1)
 	{
 		*exit_status = 1;

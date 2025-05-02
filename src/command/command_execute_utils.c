@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:54:30 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 12:55:38 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:08:23 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	setup_child_redirections(t_ctx *ctx, t_command *cmd)
 	result = setup_heredocs(ctx, cmd);
 	if (result != 0)
 		return (result);
-	result = setup_redirections(cmd->redirection);
+	result = setup_redirections(cmd->redirection, ctx);
 	return (result);
 }
 
