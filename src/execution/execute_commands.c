@@ -6,13 +6,30 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:44:19 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 16:55:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 18:54:52 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 #include "error.h"
 #include "execute.h"
+
+/**
+ * @brief Executes special cases of commands
+ *
+ * @param ctx Shell context
+ * @param cmd Command to execute
+ */
+static t_bool	special_cases(t_ctx *ctx, t_command *cmd)
+{
+	if (cmd->arg_count == 0 && cmd->next == NULL && cmd->args[0]
+		&& ft_strncmp(cmd->args[0], ":", 3) == 0)
+		return (ctx->exit_status = 0, true);
+	if (cmd->arg_count == 0 && cmd->next == NULL && cmd->args[0]
+		&& ft_strncmp(cmd->args[0], "!", 3) == 0)
+		return (ctx->exit_status = 1, true);
+	return (false);
+}
 
 /**
  * @brief Executes a command or pipeline
@@ -25,6 +42,8 @@
 void	execute_commands(t_ctx *ctx, t_command *cmd)
 {
 	if (!cmd || !cmd->args || !cmd->args[0])
+		return ;
+	if (special_cases(ctx, cmd))
 		return ;
 	// First handle all heredocs
 	if (!process_heredocs(ctx, cmd))
