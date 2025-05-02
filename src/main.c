@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 16:55:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 18:08:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ static int	command_loop(t_ctx *ctx)
 				if (ctx->cmd)
 					execute_commands(ctx, ctx->cmd);
 			}
+			else
+				ctx->exit_status = 2;
 		}
 		// Cleanup for this iteration
 		if (ctx->tokens)
