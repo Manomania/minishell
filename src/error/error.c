@@ -6,32 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:20:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 18:52:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 15:10:36 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
-
-/**
- * @brief Formats error message for commands not found
- *
- * @param proof Command name
- * @param msg Error message
- * @return int Error code (127 for command not found)
- */
-static int	handle_cmd_not_found(const char *proof, const char *msg)
-{
-	ft_printf_fd(STDERR_FILENO, "minishell: %s: %s\n", proof, msg);
-	if (ft_strncmp(msg, "command not found", 17) == 0)
-		return (127);
-	else if (ft_strncmp(msg, "No such file or directory", 25) == 0)
-		return (127);
-	else if (ft_strncmp(msg, "Permission denied", 17) == 0)
-		return (126);
-	else if (ft_strncmp(msg, "Is a directory", 14) == 0)
-		return (126);
-	return (1);
-}
 
 /**
  * @brief Get numeric error code from error type

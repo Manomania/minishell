@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:51:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 14:07:29 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 15:37:40 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,46 +57,11 @@ int		extract_export_data(char *arg, char **key_ptr, char **value_ptr,
 int		update_or_add_env_var(t_ctx *ctx, char *key, char *value,
 			t_bool has_equals);
 
-// builtin_pipeline.c
-t_bool	is_builtin_command(char *cmd_name);
-
-// builtin_pipeline_utils.c
-void	restore_pipeline_fds(int saved_in, int saved_out);
-
-// builtin_pipeline_utils2.c
-int		setup_builtin_pipeline_fds(int *fds, int saved_fds[2]);
-int		execute_builtin_command(t_ctx *ctx, int saved_stdin, int saved_stdout);
-int		run_builtin_with_redir(t_ctx *ctx, t_command *cmd);
-void	restore_all_fds(int saved_fds[2]);
-int		prepare_and_run_builtin(t_ctx *ctx, t_command *cmd, int *fds);
-
 // builtin_pwd.c
 int		builtin_pwd(t_ctx *ctx, t_command *cmd);
 
 // builtin_unset.c
 t_bool	remove_env_var(t_env **env_list, char *key);
 int		builtin_unset(t_ctx *ctx, t_command *cmd);
-
-// builtins_redirect.c
-int		open_redirection_file(t_redirection *redir);
-int		builtin_setup_redirections(t_ctx *ctx, t_command *cmd,
-			int saved_fds[2]);
-void	builtin_restore_redirections(int saved_fds[2]);
-
-// builtin_redirect_utils.c
-t_bool	is_here_doc_input(t_redirection *redir);
-int		apply_input_redirection(int fd);
-int		apply_output_redirection(int fd);
-
-// builtin_try.c
-t_bool	builtins_try(t_ctx *ctx, t_command *cmd);
-
-// builtin_try_utils.c
-int		is_builtin(char *cmd_name, char *builtin_name);
-int		setup_builtin_redirections(t_ctx *ctx, t_command *cmd, int *saved_fds);
-void	run_builtin_command(t_ctx *ctx, t_command *cmd, int *exit_status);
-
-// builtin_try_utils2.c
-t_bool	execute_builtin(t_ctx *ctx, t_command *cmd, int *exit_status);
 
 #endif
