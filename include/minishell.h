@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/02 15:36:47 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 16:24:31 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,19 +167,12 @@ typedef struct s_error_info
 typedef struct s_ctx
 {
 	t_quote_state			quote;
-	t_bool					status;
 	t_env					*env_list;
-	int						exit_status;
-	t_bool					exit_requested;
-	int						interactive;
 	int						argc;
 	char					**argv;
 	char					**envp;
 	t_token					*tokens;
 	t_command				*cmd;
-	int						fd_file_in;
-	int						fd_file_out;
-	t_bool					debug;
 }							t_ctx;
 
 /**
@@ -389,38 +382,6 @@ int							handle_path_error(char *path,
 								t_error_type err_type);
 int							get_path_error_code(t_error_type err_type);
 
-// heredoc.c
-int							setup_heredocs(t_ctx *ctx, t_command *cmd);
-int							create_heredoc(t_ctx *ctx, char *delimiter);
-
-// heredoc_expand.c
-char						*expand_variables_in_line(t_ctx *ctx, char *line);
-
-// heredoc_expand_utils.c
-char						*init_expansion(char *line);
-char						*extract_var_name(char *str, int start, int end);
-
-/* heredoc_signal.c */
-void						sig_heredoc_handler(int sig);
-void						reset_heredoc_state(void);
-void						setup_heredoc_signals(void);
-t_bool						is_heredoc_interrupted(void);
-int							interrupt_check_hook(void);
-
-/* heredoc_process.c */
-int							read_heredoc_content(int *pipe_fds, char *delimiter,
-								t_ctx *ctx);
-t_bool						has_heredoc_redirection(t_command *cmd);
-
-// heredoc_utils.c
-char						*replace_substring(char *str, int start, int end,
-								char *replacement);
-
-// heredoc_utils2.c
-int							read_heredoc_line(char *delimiter, char **line);
-int							setup_heredoc_pipes(int pipe_fds[2]);
-int							wait_heredoc_child(int pipe_fds[2], t_ctx *ctx);
-
 // signals.c
 void						setup_signals(void);
 void						reset_signals(void);
@@ -439,7 +400,5 @@ int							add_argument(t_command *cmd, char *value);
 
 // cleanup_utils.c
 void						safe_free_str(char **str);
-void						cleanup_before_command(t_ctx *ctx);
-void						close_open_fds(t_ctx *ctx);
 
 #endif
