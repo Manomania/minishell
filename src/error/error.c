@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:20:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 15:10:36 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 16:55:33 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,13 +47,8 @@ int	error(const char *proof, const char *module, t_error_type err)
 
 	error_table = get_error_table();
 	info = &error_table[err];
-	if (err == ERR_CMD_NOT_FOUND && proof)
-		code = handle_cmd_not_found(proof, info->message);
-	else
-	{
-		error_print(proof, module, info->message);
-		code = info->code;
-	}
+	error_print(proof, module, info->message);
+	code = info->code;
 	free(error_table);
 	return (code);
 }

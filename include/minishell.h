@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/02 16:24:31 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 16:58:09 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,10 @@ typedef struct s_ctx
 	char					**envp;
 	t_token					*tokens;
 	t_command				*cmd;
+	int						exit_status;
+	t_bool					exit_requested;
+	int						fd_file_in;
+	int						fd_file_out;
 }							t_ctx;
 
 /**

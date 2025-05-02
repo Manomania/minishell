@@ -6,10 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 10:56:03 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 15:33:09 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/02 16:58:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "error.h"
 #include "minishell.h"
 
 /**
@@ -53,7 +54,6 @@ t_ctx	*init_ctx(int argc, char **argv, char **envp)
 	init_ctx_envp(ctx, envp);
 	ctx->exit_requested = false;
 	ctx->exit_status = 0;
-	ctx->interactive = 1;
 	ctx->quote.in_double_quote = 0;
 	ctx->quote.in_single_quote = 0;
 	ctx->tokens = NULL;
@@ -63,7 +63,6 @@ t_ctx	*init_ctx(int argc, char **argv, char **envp)
 	ctx->envp = envp;
 	ctx->fd_file_in = -1;
 	ctx->fd_file_out = -1;
-	ctx->debug = false;
 	return (ctx);
 }
 
