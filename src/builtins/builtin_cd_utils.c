@@ -63,7 +63,7 @@ char	*get_home_dir(t_ctx *ctx)
  * @param new_pwd New PWD value
  * @return t_env* Pointer to OLDPWD node if found, NULL otherwise
  */
-t_env *update_pwd_variable(t_env *env_node, char *new_pwd)
+t_env	*update_pwd_variable(t_env *env_node, char *new_pwd)
 {
 	t_env	*old_pwd_node;
 	t_bool	pwd_found;
@@ -78,7 +78,8 @@ t_env *update_pwd_variable(t_env *env_node, char *new_pwd)
 			env_node->value = new_pwd;
 			pwd_found = true;
 		}
-		else if (ft_strncmp(env_node->key, "OLDPWD", ft_strlen("OLDPWD") + 1) == 0)
+		else if (ft_strncmp(env_node->key, "OLDPWD",
+				ft_strlen("OLDPWD") + 1) == 0)
 			old_pwd_node = env_node;
 		env_node = env_node->next;
 	}

@@ -463,6 +463,8 @@ char						*handle_dollar_quotes(t_lexer *lexer);
 void						set_quote_flags(t_lexer *lexer, char quote_char);
 char						*create_quoted_content(t_lexer *lexer, int start,
 								int end);
+char						*handle_word_part_by_type(t_lexer *lexer,
+								char *result, char quote_char);
 
 // lexer_token.c
 t_token						*next_token_lexer(t_lexer *lexer);
