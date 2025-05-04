@@ -47,3 +47,33 @@ char	*create_quoted_content(t_lexer *lexer, int start, int end)
 	content[end - start] = '\0';
 	return (content);
 }
+
+/**
+ * @brief Handles a single part of a complex word
+ *
+ * @param lexer Current lexer state
+ * @param result Current result string
+ * @param quote_char Quote character if in quoted mode, 0 otherwise
+ * @return char* Updated result string or NULL on error
+ */
+char	*handle_word_part_by_type(t_lexer *lexer, char *result,
+		char quote_char)
+{
+	char	*new_result;
+	char	*part;
+
+	if (quote_char != 0)
+	{
+		part = read_quoted_string_lexer(lexer, quote_char);
+		if (!part)
+		{
+			free(result);
+			return (NULL);
+		}
+		new_result = join_and_free(result, part);
+		free(part);
+		return (new_result);
+	}
+	else
+		return (handle_word_part(lexer, result));
+}
