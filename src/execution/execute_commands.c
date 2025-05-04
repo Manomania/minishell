@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:44:19 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 18:54:52 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/04 18:31:04 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,10 @@ void	execute_commands(t_ctx *ctx, t_command *cmd)
 		return ;
 	// First handle all heredocs
 	if (!process_heredocs(ctx, cmd))
+	{
+		ctx->exit_status = 130;
 		return ;
+	}
 	// Check if it's a simple builtin without pipeline
 	if (cmd && !cmd->next && is_builtin_command(cmd->args[0]))
 	{

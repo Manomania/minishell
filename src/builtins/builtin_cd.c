@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:01:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/15 11:03:48 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/04 18:53:26 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,7 @@ char	*get_target_directory(t_ctx *ctx, t_command *cmd)
 	if (cmd->arg_count == 0 || ft_strncmp(cmd->args[1], "~", 2) == 0)
 		target_dir = get_home_dir(ctx);
 	else if (ft_strncmp(cmd->args[1], "-", 2) == 0)
-	{
 		target_dir = get_old_pwd(ctx);
-		if (target_dir)
-			ft_printf("%s\n", target_dir);
-	}
 	else if (ft_strncmp(cmd->args[1], ".", 2) == 0)
 		target_dir = handle_dot_directory(ctx);
 	else

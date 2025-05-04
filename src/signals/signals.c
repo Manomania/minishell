@@ -6,11 +6,46 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:58:55 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/17 17:07:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/04 18:42:02 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+/**
+ * @brief Signal handler for heredoc mode (SIGINT)
+ * Handles SIGINT (CTRL+C) by closing pipes and setting signal status
+ *
+ * @param sig Signal number
+ */
+static void	sig_heredoc_handler(int sig)
+{
+	if (sig == SIGINT)
+	{
+		g_signal_status = 130;
+		exit(130);
+	}
+}
+
+/**
+ * @brief Sets up signal handlers for heredoc mode
+ * SIGINT (CTRL+C) exits the process
+ * SIGQUIT (CTRL+\) is ignored
+ */
+void	setup_heredoc_signals(void)
+{
+	struct sigaction	sa_int;
+	struct sigaction	sa_quit;
+
+	sigemptyset(&sa_int.sa_mask);
+	sigemptyset(&sa_quit.sa_mask);
+	sa_int.sa_flags = 0;
+	sa_quit.sa_flags = 0;
+	sa_int.sa_handler = sig_heredoc_handler;
+	sa_quit.sa_handler = SIG_IGN;
+	sigaction(SIGINT, &sa_int, NULL);
+	sigaction(SIGQUIT, &sa_quit, NULL);
+}
 
 /**
  * @brief Signal handler for interactive mode (shell prompt)
@@ -50,7 +85,6 @@ void	setup_signals(void)
 	sa_quit.sa_handler = SIG_IGN;
 	sigaction(SIGINT, &sa_int, NULL);
 	sigaction(SIGQUIT, &sa_quit, NULL);
-	g_signal_status = 0;
 }
 
 /**
@@ -62,7 +96,6 @@ void	reset_signals(void)
 	struct sigaction	sa_int;
 	struct sigaction	sa_quit;
 
-	g_signal_status = 0;
 	sigemptyset(&sa_int.sa_mask);
 	sigemptyset(&sa_quit.sa_mask);
 	sa_int.sa_flags = 0;
@@ -71,6 +104,26 @@ void	reset_signals(void)
 	sa_quit.sa_handler = SIG_DFL;
 	sigaction(SIGINT, &sa_int, NULL);
 	sigaction(SIGQUIT, &sa_quit, NULL);
+}
+
+/**
+ * @brief Signal handler for parent process during command execution
+ * Prints ^C or ^\ when received by foreground process
+ *
+ * @param sig Signal number
+ */
+static void	sig_parent_handler(int sig)
+{
+	if (sig == SIGINT)
+	{
+		write(STDOUT_FILENO, "\n", 1);
+		g_signal_status = 130;
+	}
+	else if (sig == SIGQUIT)
+	{
+		write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
+		g_signal_status = 131;
+	}
 }
 
 /**
@@ -87,8 +140,8 @@ void	setup_parent_signals(void)
 	sigemptyset(&sa_quit.sa_mask);
 	sa_int.sa_flags = 0;
 	sa_quit.sa_flags = 0;
-	sa_int.sa_handler = SIG_IGN;
-	sa_quit.sa_handler = SIG_IGN;
+	sa_int.sa_handler = sig_parent_handler;
+	sa_quit.sa_handler = sig_parent_handler;
 	sigaction(SIGINT, &sa_int, NULL);
 	sigaction(SIGQUIT, &sa_quit, NULL);
 }
@@ -104,6 +157,11 @@ void	update_signal_status(t_ctx *ctx)
 	if (g_signal_status == 130)
 	{
 		ctx->exit_status = 130;
+		g_signal_status = 0;
+	}
+	else if (g_signal_status == 131)
+	{
+		ctx->exit_status = 131;
 		g_signal_status = 0;
 	}
 }

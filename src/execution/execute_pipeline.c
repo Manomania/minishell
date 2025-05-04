@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 17:41:44 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/04 18:40:24 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ static void	execute_command_in_child(t_ctx *ctx, t_command *cmd, t_fds fds,
 		int *pids)
 {
 	char	*bin_path;
-	int		bruh;
 	int		status;
 
 	if (fds.in != -1)
@@ -51,10 +50,10 @@ static void	execute_command_in_child(t_ctx *ctx, t_command *cmd, t_fds fds,
 	}
 	if (is_builtin_command(cmd->args[0]))
 	{
-		bruh = execute_builtin(ctx, cmd);
+		status = execute_builtin(ctx, cmd);
 		ctx_clear(ctx);
 		free(pids);
-		exit(bruh);
+		exit(status);
 	}
 	else
 	{
@@ -125,6 +124,7 @@ static void	wait_for_children(t_ctx *ctx, pid_t *pids, int cmd_count)
 	int	status;
 
 	i = 0;
+	status = 0;
 	while (i < cmd_count)
 	{
 		waitpid(pids[i], &status, 0);
@@ -133,7 +133,11 @@ static void	wait_for_children(t_ctx *ctx, pid_t *pids, int cmd_count)
 			if (WIFEXITED(status))
 				ctx->exit_status = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
+			{
 				ctx->exit_status = 128 + WTERMSIG(status);
+				if (WTERMSIG(status) == SIGQUIT)
+					write(STDOUT_FILENO, "\n", 1);
+			}
 		}
 		i++;
 	}

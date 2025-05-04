@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/02 17:31:04 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/04 18:30:18 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -397,6 +397,7 @@ void						setup_signals(void);
 void						reset_signals(void);
 void						setup_parent_signals(void);
 void						update_signal_status(t_ctx *ctx);
+void						setup_heredoc_signals(void);
 
 // parser_command.c
 t_command					*parse_command(t_parse *parse, t_ctx *ctx);

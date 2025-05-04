@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:44:50 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 16:55:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/04 18:39:17 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,18 +28,6 @@ static t_bool	is_delimiter_quoted(char *delimiter)
 			|| (delimiter[0] == '"' && delimiter[len - 1] == '"')))
 		return (true);
 	return (false);
-}
-
-/**
- * @brief Setup signal handlers for heredoc input
- *
- * @param ctx Shell context
- */
-static void	setup_heredoc_signals(t_ctx *ctx)
-{
-	(void)ctx;
-	// TODO: Implement special signal handling for heredoc
-	// This could include handling SIGINT differently
 }
 
 /**
@@ -71,16 +59,19 @@ static t_bool	handle_heredoc(t_ctx *ctx, t_redirection *redir)
 		close(pipe_fd[1]);
 		return (false);
 	}
-	setup_heredoc_signals(ctx);
+	setup_heredoc_signals();
 	while (1)
 	{
 		line = readline("> ");
 		if (!line)
 		{
+			ft_printf_fd(STDERR_FILENO,
+				"minishell: warning: here-document delimited by end-of-file (wanted `%s')\n",
+				delimiter);
 			free(delimiter);
-			close(pipe_fd[0]);
 			close(pipe_fd[1]);
-			return (false);
+			redir->fd = pipe_fd[0];
+			return (true);
 		}
 		if (ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
 		{
@@ -110,6 +101,41 @@ static t_bool	handle_heredoc(t_ctx *ctx, t_redirection *redir)
 }
 
 /**
+ * @brief Executes heredoc in a child process with proper signal handling
+ *
+ * @param ctx Shell context
+ * @param redir Redirection structure
+ * @return t_bool true on success, false on error
+ */
+static t_bool	run_heredoc_child(t_ctx *ctx, t_redirection *redir)
+{
+	pid_t	pid;
+	int		status;
+	t_bool	result;
+
+	pid = fork();
+	if (pid == 0)
+	{
+		result = handle_heredoc(ctx, redir);
+		ctx_clear(ctx);
+		exit(result ? 0 : 1);
+	}
+	else if (pid > 0)
+	{
+		waitpid(pid, &status, 0);
+		if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+		{
+			ctx->exit_status = 130;
+			return (false);
+		}
+		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+			return (false);
+		return (true);
+	}
+	return (false);
+}
+
+/**
  * @brief Processes all heredocs in a command
  *
  * @param ctx Shell context
@@ -125,7 +151,7 @@ static t_bool	process_command_heredocs(t_ctx *ctx, t_redirection *redir)
 	{
 		if (current->type == TOK_HERE_DOC_FROM)
 		{
-			if (!handle_heredoc(ctx, current))
+			if (!run_heredoc_child(ctx, current))
 				return (false);
 		}
 		current = current->next;
