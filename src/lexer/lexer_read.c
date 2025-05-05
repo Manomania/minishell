@@ -118,6 +118,8 @@ char	*process_complex_word(t_lexer *lexer, int *has_quotes)
 		if (!result)
 			return (NULL);
 	}
+	if (!result)
+		result = ft_strdup("");
 	return (result);
 }
 
@@ -140,11 +142,11 @@ char	*read_complex_word(t_lexer *lexer)
 		has_quotes = 1;
 	result = process_complex_word(lexer, &has_quotes);
 	if (!result && has_quotes)
-		return (ft_strdup("''"));
+		return (ft_strdup(""));
 	if ((result && result[0] == '\0') && has_quotes)
 	{
 		free(result);
-		return (ft_strdup("''"));
+		return (ft_strdup("\1"));
 	}
 	if (!result)
 		return (ft_strdup(""));
