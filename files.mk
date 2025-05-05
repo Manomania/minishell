@@ -1,94 +1,64 @@
 SRC_F				= \
-						builtins/builtins_try \
-						builtins/builtins_try_utils \
-						builtins/builtins_try_utils2 \
-						builtins/builtins_redirect \
-						builtins/builtins_redirect_utils \
-						builtins/builtin_echo \
 						builtins/builtin_cd \
 						builtins/builtin_cd_utils \
-						builtins/builtin_pwd \
+						builtins/builtin_echo \
+						builtins/builtin_env \
+						builtins/builtin_exit \
 						builtins/builtin_export \
 						builtins/builtin_export_utils \
 						builtins/builtin_export_utils2 \
+						builtins/builtin_pwd \
 						builtins/builtin_unset \
-						builtins/builtin_env \
-						builtins/builtin_exit \
-						builtins/builtin_pipeline \
-						builtins/builtin_pipeline_utils \
-						builtins/builtin_pipeline_utils2 \
 						checker/token_checker \
 						checker/token_checker_utils \
-						command/command_execute \
-						command/command_execute_utils \
-						command/command_execute_utils2 \
-						command/command_execute_utils3 \
-						command/command_execute_utils4 \
-						command/command_execute_utils5 \
-						command/command_execute_utils6 \
+						command/command_add \
+						command/command_new \
 						command/command_parse \
 						command/command_parse_utils \
 						command/command_parse_utils2 \
-						command/command_add \
-						command/command_new \
-						command/command_redirections \
-						command/command_bin \
 						env/env \
-						env/env_utils \
-						env/env_dupe \
 						env/env_find \
 						env/env_find_bin \
 						env/env_quotes \
 						env/env_quotes_utils \
-						error/error \
+						env/env_utils \
 						error/ctx_error_exit \
+						error/error \
 						error/error_utils \
 						error/error_utils2 \
-						exec/exec_cmdas \
-						exec/exec_cmdas_utils \
-						exec/exec_cmdas_utils2 \
-						exec/exec_cmdas_utils3 \
-						exec/exec_cmdas_utils4 \
-						exec/exec_cmdas_utils5 \
-						exec/exec_cmdas_utils6 \
-						exec/exec_cmdas_utils7 \
-						free/free_env \
+						execution/execute_builtin \
+						execution/execute_commands \
+						execution/execute_pipeline \
+						execution/heredoc \
+						execution/heredoc_expand \
+						execution/heredoc_expand_utils \
+						execution/heredoc_process \
+						execution/heredoc_signals \
+						execution/heredoc_utils \
+						execution/heredoc_utils2 \
+						execution/redirection \
+						execution/redir_cleanup \
 						free/free_2d_array \
-						free/free_ctx \
-						free/ctx_exit \
-						free/pipes_utils \
 						free/free_command \
+						free/free_ctx \
+						free/free_env \
 						init/init_ctx \
 						init/init_parse \
 						lexer/lexer_read \
 						lexer/lexer_read_utils \
 						lexer/lexer_read_utils2 \
 						lexer/lexer_token \
-						lexer/lexer_tokenize \
-						lexer/lexer_token_utils \
-						lexer/lexer_utils \
 						lexer/lexer_token_is \
+						lexer/lexer_token_utils \
+						lexer/lexer_tokenize \
+						lexer/lexer_utils \
+						memory/cleanup_utils \
 						memory/memory \
-						parser/parser_command \
-						parser/parser_command_utils \
-						parser/parser_pipeline \
-						parser/parser_utils \
 						path/bin_find \
-						path/bin_find_utils \
 						path/bin_find_path \
-						redir/heredoc \
-						redir/heredoc_expand \
-						redir/heredoc_expand_utils \
-						redir/heredoc_process \
-						redir/heredoc_signals \
-						redir/heredoc_utils \
-						redir/heredoc_utils2 \
-						redir/redir_cleanup \
-						redir/redir \
-						redir/redir_utils \
+						path/bin_find_utils \
+						path/path_error \
 						signals/signals \
 						validation/validation \
-						main_utils \
-						main_utils2 \
 						main
 TSRC_F			=		$(subst main,test/main,$(SRC_F))

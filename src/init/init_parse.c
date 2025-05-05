@@ -72,6 +72,7 @@ t_redirection	*create_redirection(t_token_type type, char *filename)
 		return (NULL);
 	redirection->type = type;
 	redirection->next = NULL;
+	redirection->fd = -1;
 	redirection->filename = ft_strdup(filename);
 	if (!redirection->filename)
 	{

@@ -6,16 +6,20 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/28 13:03:40 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 13:15:04 by maximart         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
+#include "execute.h"
 #include "minishell.h"
 #include "validation.h"
 
 /**
  * @brief Main command loop for the shell
+ *
+ * Reads user input, parses it into tokens and commands,
+ * then executes the commands
  *
  * @param ctx Shell context
  * @return int Final exit status
@@ -23,26 +27,51 @@
 static int	command_loop(t_ctx *ctx)
 {
 	char	*input;
-	int		running;
 
-	ctx->exit_status = 0;
-	running = 1;
-	while (running)
+	while (!ctx->exit_requested)
 	{
-		g_signal_status = 0;
-		input = get_user_input(ctx, ctx->exit_status);
+		setup_signals();
+		input = readline("$ ");
 		if (!input)
-			return (ctx->exit_status);
-		handle_command_in_main_loop(ctx, input);
-		if (ctx->exit_requested)
-			running = 0;
-		g_signal_status = 0;
+		{
+			ft_printf("exit\n");
+			break ;
+		}
+		update_signal_status(ctx);
+		if (*input)
+			add_history(input);
+		if (validate_input_length(input, ctx))
+		{
+			ctx->tokens = tokenize(ctx, input);
+			if (ctx->tokens && validate_token_sequence(ctx->tokens))
+			{
+				ctx->cmd = command_parse(ctx, ctx->tokens);
+				if (ctx->cmd)
+					execute_commands(ctx, ctx->cmd);
+			}
+			else
+				ctx->exit_status = 2;
+		}
+		if (ctx->tokens)
+		{
+			free_all_token(ctx->tokens);
+			ctx->tokens = NULL;
+		}
+		if (ctx->cmd)
+		{
+			free_all_commands(ctx->cmd);
+			ctx->cmd = NULL;
+		}
+		free(input);
+		update_signal_status(ctx);
 	}
 	return (ctx->exit_status);
 }
 
 /**
  * @brief Main entrypoint for the minishell program
+ *
+ * Initializes context, sets up signals, runs command loop
  *
  * @param argc Argument count
  * @param argv Argument values
@@ -55,10 +84,8 @@ int	main(int argc, char **argv, char **envp)
 	int		final_status;
 
 	ctx = init_ctx(argc, argv, envp);
-	if (!ctx)
-		ctx_error_exit(ctx, NULL, "main", ERR_ALLOC);
 	setup_signals();
 	final_status = command_loop(ctx);
-	final_cleanup(ctx);
+	ctx_clear(ctx);
 	return (final_status);
 }

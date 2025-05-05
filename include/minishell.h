@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/28 13:27:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 14:36:51 by maximart         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,12 @@ typedef struct s_env
 	char					*value;
 }							t_env;
 
+typedef struct s_fds
+{
+	int						in;
+	int						out;
+}							t_fds;
+
 typedef enum e_error_type
 {
 	ERR_CMD_NOT_FOUND,
@@ -167,33 +173,17 @@ typedef struct s_error_info
 typedef struct s_ctx
 {
 	t_quote_state			quote;
-	t_bool					status;
 	t_env					*env_list;
-	int						exit_status;
-	t_bool					exit_requested;
-	int						interactive;
 	int						argc;
 	char					**argv;
 	char					**envp;
 	t_token					*tokens;
 	t_command				*cmd;
+	int						exit_status;
+	t_bool					exit_requested;
 	int						fd_file_in;
 	int						fd_file_out;
-	t_bool					debug;
 }							t_ctx;
-
-/**
- * @brief Structure to hold pipeline process data
- */
-typedef struct s_pipe_data
-{
-	t_command				*current;
-	int						cmd_count;
-	int						i;
-	int						prev_pipe;
-	pid_t					*pids;
-	int						pipe_fds[2];
-}							t_pipe_data;
 
 /**
  * @brief Simple enum proper error handling in bin_find.c
@@ -208,7 +198,8 @@ typedef enum e_path_error
 }							t_path_error;
 
 /**
- * @brief Helper struct to track position data during processing
+ * @brief Helper struct to track position data during processing.
+ * @note Used in env management
  */
 typedef struct s_pos
 {
@@ -243,48 +234,6 @@ int							command_add_argument(t_command *cmd, char *arg);
 int							command_add_redirection(t_command *cmd,
 								t_token_type type, char *filename);
 
-// command_bin.c
-t_bool						command_bin(t_ctx *ctx);
-
-// command_execute.c
-int							command_execute(t_ctx *ctx);
-int							setup_command_redirections(t_ctx *ctx,
-								t_command *cmd);
-int							validate_cmd_in_child(t_ctx *ctx);
-
-// command_execute_utils.c
-int							get_exit_status(int status);
-int							handle_child_redirections(t_ctx *ctx);
-
-// command_execute_utils2.c
-t_bool						has_only_redirections(t_command *cmd);
-int							execute_redirections_only(t_ctx *ctx);
-void						cleanup_child_process(t_ctx *ctx);
-int							read_all_heredocs(t_ctx *ctx);
-
-// command_execute_utils3.c
-void						execute_child(t_ctx *ctx);
-
-// command_execute_utils4.c
-char						**create_env_array(t_env *env_list);
-
-// command_execute_utils5.c
-int							execute_single_command(t_ctx *ctx);
-int							process_signal_exit(int status);
-void						close_standard_io(int saved_stdin,
-								int saved_stdout);
-void						handle_standard_io(int saved_stdin,
-								int saved_stdout);
-void						execute_child_process(t_ctx *ctx, int saved_stdin,
-								int saved_stdout);
-
-// command_execute_utils6.c
-int							handle_parent_process(pid_t pid, int saved_stdin,
-								int saved_stdout);
-int							execute_external_command(t_ctx *ctx,
-								int saved_stdin, int saved_stdout);
-int							process_command_type(t_ctx *ctx);
-
 // command_new.c
 t_command					*command_new(void);
 
@@ -308,9 +257,6 @@ int							handle_redirection_token(t_command *cmd,
 								t_ctx *ctx);
 t_bool						handle_empty_first_arg(t_command *cmd,
 								t_token **current, t_ctx *ctx);
-
-// command_redirection.c
-int							handle_redirections(t_redirection *redirections);
 
 // debug_utils.c
 void						print_tokens(t_token *tokens);
@@ -355,79 +301,14 @@ char						*handle_var_expansion(t_ctx *ctx, char *str, int *i,
 char						*process_string(t_ctx *ctx, char *str,
 								char *result);
 
-// exec_cmdas.c
-int							handle_descriptors(int prev_pipe, int pipe_fds[2],
-								int i, int cmd_count);
-int							handle_pipe_setup(int pipe_fds[2], int i,
-								int cmd_count);
-void						cleanup_pipe_fds(int pipe_fds[2]);
-pid_t						execute_pipeline_cmd_with_redir(t_ctx *ctx,
-								t_pipe_data *data, int input_fd, int output_fd);
-
-// exec_cmdas_utils.c
-int							setup_pipe(int pipe_fds[2]);
-int							wait_for_pids(pid_t *pids, int count);
-t_bool						init_pipe_data(t_pipe_data *data, t_ctx *ctx);
-int							wait_for_pipeline_processes(pid_t *pids, int count,
-								t_ctx *ctx);
-
-// exec_cmdas_utils2.c
-int							count_commands(t_command *cmd);
-void						setup_child_process(t_ctx *ctx, t_command *cmd,
-								int input_fd, int output_fd);
-pid_t						execute_redirections_only_pipeline(t_ctx *ctx,
-								t_pipe_data *data);
-void						execute_command(t_ctx *ctx, t_command *cmd);
-void						report_cmd_not_found_pipe(char *cmd_name);
-
-// exec_cmdas_utils3.c
-t_bool						check_command_binary(t_ctx *ctx, t_pipe_data *data);
-t_bool						validate_pipeline_command(t_pipe_data *data);
-int							handle_non_builtin(t_ctx *ctx, t_pipe_data *data);
-t_bool						has_only_redirections_pipeline(t_command *command);
-
-// exec_cmdas_utils4.c
-int							prepare_all_pipeline_files(t_command *cmd);
-int							setup_child_pipeline_redirections(t_command *cmd,
-								int input_fd, int output_fd);
-
-// exec_cmdas_utils5.c
-void						handle_signal_output(int status);
-int							process_last_command_status(int status,
-								int *was_signaled);
-void						setup_pipe_redirections(t_pipe_data *data);
-char						*validate_and_resolve_command(t_ctx *ctx,
-								t_command *cmd);
-int							handle_last_process_status(pid_t *pids, int status,
-								int i);
-
-// exec_cmdas_utils6.c
-int							exec_cmdas(t_ctx *ctx);
-
-// exec_cmdas_utils7.c
-int							setup_child_redirections_bruh(t_ctx *ctx,
-								t_command *current, int prev_pipe,
-								int next_write);
-void						handle_child_process(t_ctx *ctx, t_command *current,
-								int pipe_read_end);
-int							update_parent_pipes(int prev_pipe, int *pipe_fds,
-								int i, int cmd_count);
-int							setup_and_validate_pipes(int *pipe_fds, int i,
-								int cmd_count, int prev_pipe);
-
 // ctx_exit.c
 void						ctx_exit(t_ctx *ctx);
 
 // free_2d_array.c
 void						free_2d_array(void **ptrs);
 
-// free_commands.c
-void						free_command(t_command *cmd);
-void						free_all_commands(t_command *cmd);
-
 // free_ctx.c
 void						ctx_clear(t_ctx *ctx);
-void						final_cleanup(t_ctx *ctx);
 
 // free_env.c
 void						free_env_list(t_env *env_list);
@@ -497,8 +378,8 @@ void						advance_parse(t_parse *parse);
 
 // bin_find.c
 char						*bin_find(t_ctx *ctx, char *bin);
-char						*resolve_relative_path(char *bin);
 t_bool						is_directory(const char *path);
+t_bool						is_path(const char *str);
 
 // bin_find_utils.c
 char						*check_relative_path(char *bin,
@@ -509,53 +390,17 @@ void						display_path_error(char *bin,
 // bin_find_path.c
 char						*bin_find_path(const char *dir, char *bin);
 
-// heredoc.c
-int							setup_heredocs(t_ctx *ctx, t_command *cmd);
-int							create_heredoc(t_ctx *ctx, char *delimiter);
-
-// heredoc_expand.c
-char						*expand_variables_in_line(t_ctx *ctx, char *line);
-
-// heredoc_expand_utils.c
-char						*init_expansion(char *line);
-char						*extract_var_name(char *str, int start, int end);
-
-/* heredoc_signal.c */
-void						sig_heredoc_handler(int sig);
-void						reset_heredoc_state(void);
-void						setup_heredoc_signals(void);
-t_bool						is_heredoc_interrupted(void);
-int							interrupt_check_hook(void);
-
-/* heredoc_process.c */
-int							read_heredoc_content(int *pipe_fds, char *delimiter,
-								t_ctx *ctx);
-t_bool						has_heredoc_redirection(t_command *cmd);
-
-// heredoc_utils.c
-char						*replace_substring(char *str, int start, int end,
-								char *replacement);
-
-// heredoc_utils2.c
-int							read_heredoc_line(char *delimiter, char **line);
-int							setup_heredoc_pipes(int pipe_fds[2]);
-int							wait_heredoc_child(int pipe_fds[2], t_ctx *ctx);
-
-// redir_cleanup.c
-void						cleanup_heredoc_resources(t_ctx *ctx);
-
-// redir.c
-int							setup_redirections(t_redirection *redirections);
-
-// redir_utils.c
-int							handle_redirection_error(char *filename,
-								int last_input_fd, int last_output_fd);
+// path_error.c
+int							handle_path_error(char *path,
+								t_error_type err_type);
+int							get_path_error_code(t_error_type err_type);
 
 // signals.c
 void						setup_signals(void);
 void						reset_signals(void);
 void						setup_parent_signals(void);
 void						update_signal_status(t_ctx *ctx);
+void						setup_heredoc_signals(void);
 
 // parser_command.c
 t_command					*parse_command(t_parse *parse, t_ctx *ctx);
@@ -563,21 +408,11 @@ int							parse_redirection(t_parse *parse, t_command *cmd,
 								t_ctx *ctx);
 void						add_redirection(t_command *cmd,
 								t_redirection *redirection);
-char						*create_prompt(int prev_status);
 
 // parser_command_utils.c
 int							add_argument(t_command *cmd, char *value);
 
-// main.c
-// A REMPLIR
-
-// main_utils.c
-t_bool						parse_user_input(t_ctx *ctx, char *input);
-void						process_command(t_ctx *ctx);
-
-// main_utils2.c
-char						*get_user_input(t_ctx *ctx, int prev_status);
-void						handle_command_in_main_loop(t_ctx *ctx,
-								char *input);
+// cleanup_utils.c
+void						safe_free_str(char **str);
 
 #endif

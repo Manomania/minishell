@@ -5,43 +5,56 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 13:49:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/25 12:40:52 by elagouch         ###   ########.fr       */
+/*   Created: 2025/05/02 16:44:34 by elagouch          #+#    #+#             */
+/*   Updated: 2025/05/02 16:44:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Frees memory allocated for all redirections in a linked list
+ * @brief Frees a redirection structure
  *
- * This function traverses a linked list of redirections and frees each one,
- * including the filename string within each redirection.
+ * Frees memory and closes open file descriptors
  *
- * @param redirection First redirection in the linked list
+ * @param redir Redirection to free
  */
-static void	free_all_redirections(t_redirection *redirection)
+static void	free_redirection(t_redirection *redir)
+{
+	if (!redir)
+		return ;
+	if (redir->filename)
+		free(redir->filename);
+	if (redir->fd != -1)
+		close(redir->fd);
+	free(redir);
+}
+
+/**
+ * @brief Frees all redirections in a list
+ *
+ * @param redir First redirection in the list
+ */
+static void	free_all_redirections(t_redirection *redir)
 {
 	t_redirection	*current;
 	t_redirection	*next;
 
-	current = redirection;
+	current = redir;
 	while (current)
 	{
 		next = current->next;
-		if (current->filename)
-			free(current->filename);
-		free(current);
+		free_redirection(current);
 		current = next;
 	}
 }
 
 /**
- * @brief Frees memory allocated for a command structure
- * Frees the arguments array, individual arguments, redirections, and the
- * command struct itself.
+ * @brief Frees a command structure
  *
- * @param cmd Command structure to free
+ * Frees arguments, redirections, and command structure
+ *
+ * @param cmd Command to free
  */
 void	free_command(t_command *cmd)
 {
@@ -59,17 +72,16 @@ void	free_command(t_command *cmd)
 			i++;
 		}
 		free(cmd->args);
-		cmd->args = NULL;
 	}
-	free_all_redirections(cmd->redirection);
-	cmd->redirection = NULL;
+	if (cmd->redirection)
+		free_all_redirections(cmd->redirection);
 	free(cmd);
 }
 
 /**
- * @brief Frees memory allocated for all commands in a pipeline
+ * @brief Frees all commands in a list
  *
- * @param cmd First command in the linked list
+ * @param cmd First command in the list
  */
 void	free_all_commands(t_command *cmd)
 {

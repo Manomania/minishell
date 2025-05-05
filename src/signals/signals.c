@@ -6,17 +6,16 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:58:55 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/17 17:07:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 14:37:26 by maximart         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Signal handler for interactive mode (shell prompt)
- * Handles SIGINT (CTRL+C) by setting signal status
+ * @brief Signal handler for interactive mode
  *
- * @param sig Signal number
+ * @param sig Signal number received
  */
 static void	sig_interactive_handler(int sig)
 {
@@ -32,78 +31,78 @@ static void	sig_interactive_handler(int sig)
 
 /**
  * @brief Sets up signal handlers for interactive mode
- * SIGINT (CTRL+C) is handled for status update
- * SIGQUIT (CTRL+\) is ignored
  */
 void	setup_signals(void)
 {
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
+	struct sigaction	sa;
 
 	rl_catch_signals = 0;
-	rl_catch_sigwinch = 1;
-	sigemptyset(&sa_int.sa_mask);
-	sigemptyset(&sa_quit.sa_mask);
-	sa_int.sa_flags = SA_RESTART;
-	sa_quit.sa_flags = 0;
-	sa_int.sa_handler = sig_interactive_handler;
-	sa_quit.sa_handler = SIG_IGN;
-	sigaction(SIGINT, &sa_int, NULL);
-	sigaction(SIGQUIT, &sa_quit, NULL);
-	g_signal_status = 0;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sa.sa_handler = sig_interactive_handler;
+	sigaction(SIGINT, &sa, NULL);
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGQUIT, &sa, NULL);
 }
 
 /**
- * @brief Resets signal handlers for child processes
- * SIGINT and SIGQUIT are set to their default behavior
+ * @brief Signal handler for parent process during command execution
+ *
+ * @param sig Signal number received
  */
-void	reset_signals(void)
+static void	sig_parent_handler(int sig)
 {
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
-
-	g_signal_status = 0;
-	sigemptyset(&sa_int.sa_mask);
-	sigemptyset(&sa_quit.sa_mask);
-	sa_int.sa_flags = 0;
-	sa_quit.sa_flags = 0;
-	sa_int.sa_handler = SIG_DFL;
-	sa_quit.sa_handler = SIG_DFL;
-	sigaction(SIGINT, &sa_int, NULL);
-	sigaction(SIGQUIT, &sa_quit, NULL);
+	if (sig == SIGINT)
+	{
+		ft_printf("\n");
+		g_signal_status = 130;
+	}
+	else if (sig == SIGQUIT)
+	{
+		ft_printf("Quit (core dumped)\n");
+		g_signal_status = 131;
+	}
 }
 
 /**
- * @brief Special signal handler setup for parent process execution
- * Temporarily disables interactive handlers for parent process
+ * @brief Sets up signal handlers for parent process during command execution
  */
 void	setup_parent_signals(void)
 {
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
+	struct sigaction	sa;
 
 	g_signal_status = 0;
-	sigemptyset(&sa_int.sa_mask);
-	sigemptyset(&sa_quit.sa_mask);
-	sa_int.sa_flags = 0;
-	sa_quit.sa_flags = 0;
-	sa_int.sa_handler = SIG_IGN;
-	sa_quit.sa_handler = SIG_IGN;
-	sigaction(SIGINT, &sa_int, NULL);
-	sigaction(SIGQUIT, &sa_quit, NULL);
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sa.sa_handler = sig_parent_handler;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
 }
 
 /**
- * @brief Checks and updates exit status based on signal status
- * Allows main loop to capture SIGINT without directly checking global
+ * @brief Resets signal handlers to default behavior
+ */
+void	reset_signals(void)
+{
+	struct sigaction	sa;
+
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sa.sa_handler = 0;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
+}
+
+/**
+ * @brief Updates context exit status based on signal status
  *
- * @param ctx Current shell context to update
+ * @param ctx Context to update
  */
 void	update_signal_status(t_ctx *ctx)
 {
-	if (g_signal_status == 130)
+	if (g_signal_status != 0)
 	{
-		ctx->exit_status = 130;
+		ctx->exit_status = g_signal_status;
 		g_signal_status = 0;
 	}
 }

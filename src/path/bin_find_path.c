@@ -6,57 +6,79 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:59:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:22:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:35:16 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
 #include "minishell.h"
+#include <sys/stat.h>
 
 /**
- * @brief Checks if a file exists and is executable
+ * @brief Checks if a file is executable
+ *
+ * Verifies that a file exists, is not a directory, and has execute permissions.
  *
  * @param path Path to the file to check
- * @return int 1 if file exists and is executable, 0 otherwise
+ * @return true if file is executable, false otherwise
  */
-static int	is_executable(const char *path)
+static t_bool	is_executable_file(const char *path)
 {
-	if (access(path, F_OK) == 0)
-	{
-		if (access(path, X_OK) == 0)
-			return (1);
-	}
-	return (0);
+	struct stat	path_stat;
+
+	if (access(path, F_OK) != 0)
+		return (false);
+	if (stat(path, &path_stat) != 0)
+		return (false);
+	if (S_ISDIR(path_stat.st_mode))
+		return (false);
+	if (access(path, X_OK) != 0)
+		return (false);
+	return (true);
 }
 
 /**
- * @brief Checks if a binary is found in a directory and is executable
+ * @brief Creates a full path by joining directory and filename
  *
- * @param dir The path to search in
- * @param bin The binary to search for
- * @return char* Full path to binary if found and executable, NULL otherwise
+ * Allocates and constructs a path in the format "dir/bin".
+ *
+ * @param dir Directory path
+ * @param bin Binary name
+ * @return Newly allocated full path or NULL on allocation failure
  */
-char	*bin_find_path(const char *dir, char *bin)
+static char	*join_path(const char *dir, char *bin)
 {
 	char	*tmp;
 	char	*full_path;
 
-	if (!dir || !bin)
-		return (NULL);
 	tmp = ft_strjoin(dir, "/");
 	if (!tmp)
-	{
-		(void)error(NULL, "bin_find_path", ERR_ALLOC);
 		return (NULL);
-	}
 	full_path = ft_strjoin(tmp, bin);
 	free(tmp);
-	if (!full_path)
-	{
-		(void)error(NULL, "bin_find_path", ERR_ALLOC);
+	return (full_path);
+}
+
+/**
+ * @brief Searches for a binary in a specific directory
+ *
+ * Checks if the specified binary exists and is executable in the given
+ * directory.
+ *
+ * @param dir Directory to search in
+ * @param bin Binary name to look for
+ * @return Full path if executable binary found, NULL otherwise
+ */
+char	*bin_find_path(const char *dir, char *bin)
+{
+	char	*full_path;
+
+	if (!dir || !bin)
 		return (NULL);
-	}
-	if (is_executable(full_path))
+	full_path = join_path(dir, bin);
+	if (!full_path)
+		return (NULL);
+	if (is_executable_file(full_path))
 		return (full_path);
 	free(full_path);
 	return (NULL);
