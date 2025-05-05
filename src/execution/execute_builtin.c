@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 16:56:39 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 18:57:28 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int	execute_builtin(t_ctx *ctx, t_command *cmd)
 	else if (ft_strncmp(cmd->args[0], "export", __INT_MAX__) == 0)
 		status = builtin_export(ctx, cmd);
 	else if (ft_strncmp(cmd->args[0], "pwd", __INT_MAX__) == 0)
-		status = builtin_pwd(ctx, cmd);
+		status = builtin_pwd();
 	else if (ft_strncmp(cmd->args[0], "unset", __INT_MAX__) == 0)
 		status = builtin_unset(ctx, cmd);
 	else
