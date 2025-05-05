@@ -6,24 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 18:24:28 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 16:57:48 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 18:11:43 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "execute.h"
 #include "minishell.h"
-
-/**
- * @brief Clears readline history and resets the readline state
- *
- * This function cleans up readline resources to prevent memory leaks.
- */
-static void	cleanup_readline(void)
-{
-	clear_history();
-	rl_free_line_state();
-	rl_cleanup_after_signal();
-}
 
 /**
  * @brief Closes any open file descriptors in the context
@@ -78,7 +66,7 @@ void	ctx_clear(t_ctx *ctx)
 	if (!ctx)
 		return ;
 	free_structures(ctx);
-	cleanup_readline();
+	rl_clear_history();
 	close_file_descriptors(ctx);
 	free(ctx);
 }
