@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 16:55:53 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 19:02:12 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
  * @param cmd Command structure
  * @return t_bool true on success, false on error
  */
-static t_bool apply_input_redirection(t_command *cmd)
+static t_bool	apply_input_redirection(t_command *cmd)
 {
 	t_redirection	*redir;
 	int				fd;
@@ -37,7 +37,8 @@ static t_bool apply_input_redirection(t_command *cmd)
 			else
 				fd = open(redir->filename, O_RDONLY);
 			if (!is_heredoc && fd == -1)
-				return (error(redir->filename, "redirection", ERR_NO_FILE), false);
+				return (error(redir->filename, "redirection", ERR_NO_FILE),
+					false);
 			if (dup2(fd, STDIN_FILENO) == -1)
 			{
 				close(fd);

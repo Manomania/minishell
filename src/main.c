@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 13:15:04 by maximart         ###   ########.fr       */
+/*   Updated: 2025/05/05 19:04:07 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,53 @@
 #include "validation.h"
 
 /**
+ * @brief Processes user input and executes commands
+ *
+ * Handles tokenization, parsing, and execution of user input
+ *
+ * @param ctx Shell context
+ * @param input User input string
+ */
+static void	process_user_input(t_ctx *ctx, char *input)
+{
+	ctx->tokens = tokenize(ctx, input);
+	if (ctx->tokens && validate_token_sequence(ctx->tokens))
+	{
+		ctx->cmd = command_parse(ctx, ctx->tokens);
+		if (ctx->cmd)
+			execute_commands(ctx, ctx->cmd);
+	}
+	else
+		ctx->exit_status = 2;
+}
+
+/**
+ * @brief Cleans up resources after command execution
+ *
+ * Frees tokens and commands, updates signal status
+ *
+ * @param ctx Shell context
+ */
+static void	cleanup_resources(t_ctx *ctx)
+{
+	if (ctx->tokens)
+	{
+		free_all_token(ctx->tokens);
+		ctx->tokens = NULL;
+	}
+	if (ctx->cmd)
+	{
+		free_all_commands(ctx->cmd);
+		ctx->cmd = NULL;
+	}
+	update_signal_status(ctx);
+}
+
+/**
  * @brief Main command loop for the shell
  *
- * Reads user input, parses it into tokens and commands,
- * then executes the commands
+ * Reads user input, processes commands in a loop,
+ * and manages the shell's main control flow
  *
  * @param ctx Shell context
  * @return int Final exit status
@@ -41,29 +84,9 @@ static int	command_loop(t_ctx *ctx)
 		if (*input)
 			add_history(input);
 		if (validate_input_length(input, ctx))
-		{
-			ctx->tokens = tokenize(ctx, input);
-			if (ctx->tokens && validate_token_sequence(ctx->tokens))
-			{
-				ctx->cmd = command_parse(ctx, ctx->tokens);
-				if (ctx->cmd)
-					execute_commands(ctx, ctx->cmd);
-			}
-			else
-				ctx->exit_status = 2;
-		}
-		if (ctx->tokens)
-		{
-			free_all_token(ctx->tokens);
-			ctx->tokens = NULL;
-		}
-		if (ctx->cmd)
-		{
-			free_all_commands(ctx->cmd);
-			ctx->cmd = NULL;
-		}
+			process_user_input(ctx, input);
+		cleanup_resources(ctx);
 		free(input);
-		update_signal_status(ctx);
 	}
 	return (ctx->exit_status);
 }

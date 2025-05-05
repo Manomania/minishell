@@ -114,7 +114,7 @@ static t_bool	create_pipeline(t_command **cmd, t_token **current, t_ctx *ctx)
 	if (!new_cmd)
 		return (false);
 	prev_cmd->next = new_cmd;
-	prev_cmd->operator= TOK_PIPE;
+	prev_cmd->operator = TOK_PIPE;
 	*cmd = new_cmd;
 	*current = (*current)->next;
 	if (!process_command_tokens(current, *cmd, ctx))
