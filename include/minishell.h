@@ -399,19 +399,6 @@ void						setup_parent_signals(void);
 void						update_signal_status(t_ctx *ctx);
 void						setup_heredoc_signals(void);
 
-// heredoc.c
-int	read_all_heredocs(t_ctx *ctx);
-void	reset_heredoc_state(void);
-int	read_heredoc_content(int *pipe_fds, char *delimiter, t_ctx *ctx);
-t_bool	is_heredoc_interrupted(void);
-char	*extract_var_name(char *str, int start, int end);
-char	*replace_substring(char *str, int start, int end, char *replacement);
-char	*init_expansion(char *line);
-char	*expand_variables_in_line(t_ctx *ctx, char *line);
-int	interrupt_check_hook(void);
-int	read_heredoc_line(char *delimiter, char **line);
-void	cleanup_heredoc_resources(t_ctx *ctx);
-
 // parser_command.c
 t_command					*parse_command(t_parse *parse, t_ctx *ctx);
 int							parse_redirection(t_parse *parse, t_command *cmd,

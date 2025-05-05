@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "execute.h"
 
 /**
  * @brief Finds the end of a variable name

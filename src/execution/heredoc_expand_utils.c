@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "execute.h"
 
 /**
  * @brief Initializes the variable expansion process

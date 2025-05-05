@@ -12,6 +12,7 @@
 
 #include "error.h"
 #include "minishell.h"
+#include "execute.h"
 
 static int	process_heredoc_line(int fd, char *line, t_ctx *ctx)
 {
@@ -54,20 +55,4 @@ int	read_heredoc_content(int *pipe_fds, char *delimiter, t_ctx *ctx)
 		if (process_heredoc_line(pipe_fds[1], line, ctx) == -1)
 			return (-1);
 	}
-}
-
-t_bool	has_heredoc_redirection(t_command *cmd)
-{
-	t_redirection	*redir;
-
-	if (!cmd || !cmd->redirection)
-		return (false);
-	redir = cmd->redirection;
-	while (redir)
-	{
-		if (redir->type == TOK_HERE_DOC_FROM)
-			return (true);
-		redir = redir->next;
-	}
-	return (false);
 }

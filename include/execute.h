@@ -26,7 +26,31 @@ t_bool	is_builtin_command(char *cmd_name);
 void	execute_pipeline(t_ctx *ctx, t_command *cmd);
 
 // heredoc.c
-t_bool	process_heredocs(t_ctx *ctx, t_command *cmd);
+int			read_all_heredocs(t_ctx *ctx);
+
+// heredoc_expand.c
+char		*expand_variables_in_line(t_ctx *ctx, char *line);
+
+// heredoc_expand_utils.c
+char		*init_expansion(char *line);
+char		*extract_var_name(char *str, int start, int end);
+
+// heredoc_process.c
+int			read_heredoc_content(int *pipe_fds, char *delimiter, t_ctx *ctx);
+
+// heredoc_signals
+void		reset_heredoc_state(void);
+t_bool		is_heredoc_interrupted(void);
+int			interrupt_check_hook(void);
+
+// heredoc_utils.c
+char		*replace_substring(char *str, int start, int end, char *replacement);
+
+// heredoc_utils2.c
+int			read_heredoc_line(char *delimiter, char **line);
+
+// redir_cleanup.c
+void		cleanup_heredoc_resources(t_ctx *ctx);
 
 // redirection.c
 t_bool	apply_redirections(t_command *cmd);

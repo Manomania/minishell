@@ -12,6 +12,7 @@
 
 #include "error.h"
 #include "minishell.h"
+#include "execute.h"
 
 static void	restore_shell_state(void)
 {
@@ -21,7 +22,7 @@ static void	restore_shell_state(void)
 	g_signal_status = 0;
 }
 
-int	create_heredoc(t_ctx *ctx, char *delimiter)
+static int	create_heredoc(t_ctx *ctx, char *delimiter)
 {
 	int		pipe_fds[2];
 	int		read_fd;
@@ -47,31 +48,6 @@ int	create_heredoc(t_ctx *ctx, char *delimiter)
 	read_fd = pipe_fds[0];
 	restore_shell_state();
 	return (read_fd);
-}
-
-int	setup_heredocs(t_ctx *ctx, t_command *cmd)
-{
-	t_redirection	*redir;
-	int				dup_result;
-
-	(void)ctx;
-	redir = cmd->redirection;
-	while (redir)
-	{
-		if (redir->type == TOK_HERE_DOC_FROM && redir->fd >= 0)
-		{
-			dup_result = dup2(redir->fd, STDIN_FILENO);
-			close(redir->fd);
-			redir->fd = -1;
-			if (dup_result == -1)
-			{
-				perror("dup2");
-				return (-1);
-			}
-		}
-		redir = redir->next;
-	}
-	return (0);
 }
 
 /**

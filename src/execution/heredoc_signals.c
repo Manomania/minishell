@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "execute.h"
 
 void	sig_heredoc_handler(int sig)
 {
