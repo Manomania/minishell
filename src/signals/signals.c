@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:58:55 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/04 19:44:18 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 14:37:26 by maximart         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static void	sig_interactive_handler(int sig)
 	if (sig == SIGINT)
 	{
 		g_signal_status = 130;
-		ft_printf("^C\n");
+		write(STDOUT_FILENO, "^C\n", 3);
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
@@ -38,7 +38,7 @@ void	setup_signals(void)
 
 	rl_catch_signals = 0;
 	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
+	sa.sa_flags = 0;
 	sa.sa_handler = sig_interactive_handler;
 	sigaction(SIGINT, &sa, NULL);
 	sa.sa_handler = SIG_IGN;
@@ -88,38 +88,8 @@ void	reset_signals(void)
 
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
-	sa.sa_handler = SIG_DFL;
+	sa.sa_handler = 0;
 	sigaction(SIGINT, &sa, NULL);
-	sigaction(SIGQUIT, &sa, NULL);
-}
-
-/**
- * @brief Signal handler for heredoc mode
- *
- * @param sig Signal number received
- */
-static void	sig_heredoc_handler(int sig)
-{
-	if (sig == SIGINT)
-	{
-		g_signal_status = 130;
-		ft_printf("^C\n");
-		exit(130);
-	}
-}
-
-/**
- * @brief Sets up signal handlers for heredoc mode
- */
-void	setup_heredoc_signals(void)
-{
-	struct sigaction	sa;
-
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sa.sa_handler = sig_heredoc_handler;
-	sigaction(SIGINT, &sa, NULL);
-	sa.sa_handler = SIG_IGN;
 	sigaction(SIGQUIT, &sa, NULL);
 }
 

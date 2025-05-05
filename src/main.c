@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 18:08:35 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 13:15:04 by maximart         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,11 @@ static int	command_loop(t_ctx *ctx)
 		setup_signals();
 		input = readline("$ ");
 		if (!input)
+		{
+			ft_printf("exit\n");
 			break ;
+		}
+		update_signal_status(ctx);
 		if (*input)
 			add_history(input);
 		if (validate_input_length(input, ctx))
@@ -48,7 +52,6 @@ static int	command_loop(t_ctx *ctx)
 			else
 				ctx->exit_status = 2;
 		}
-		// Cleanup for this iteration
 		if (ctx->tokens)
 		{
 			free_all_token(ctx->tokens);

@@ -30,7 +30,14 @@ SRC_F				= \
 						execution/execute_commands \
 						execution/execute_pipeline \
 						execution/heredoc \
+						execution/heredoc_expand \
+						execution/heredoc_expand_utils \
+						execution/heredoc_process \
+						execution/heredoc_signals \
+						execution/heredoc_utils \
+						execution/heredoc_utils2 \
 						execution/redirection \
+						execution/redir_cleanup \
 						free/free_2d_array \
 						free/free_command \
 						free/free_ctx \

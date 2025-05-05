@@ -20,33 +20,32 @@
  * @param cmd Command structure
  * @return t_bool true on success, false on error
  */
-static t_bool	apply_input_redirection(t_command *cmd)
+static t_bool apply_input_redirection(t_command *cmd)
 {
 	t_redirection	*redir;
 	int				fd;
+	t_bool			is_heredoc;
 
 	redir = cmd->redirection;
 	while (redir)
 	{
 		if (redir->type == TOK_REDIR_FROM || redir->type == TOK_HERE_DOC_FROM)
 		{
-			if (redir->type == TOK_HERE_DOC_FROM)
+			is_heredoc = (redir->type == TOK_HERE_DOC_FROM);
+			if (is_heredoc)
 				fd = redir->fd;
 			else
-			{
 				fd = open(redir->filename, O_RDONLY);
-				if (fd == -1)
-					return (error(redir->filename, "redirection", ERR_NO_FILE),
-						false);
-			}
+			if (!is_heredoc && fd == -1)
+				return (error(redir->filename, "redirection", ERR_NO_FILE), false);
 			if (dup2(fd, STDIN_FILENO) == -1)
 			{
-				if (redir->type != TOK_HERE_DOC_FROM)
-					close(fd);
+				close(fd);
 				return (error("dup2", "redirection", ERR_FD), false);
 			}
-			if (redir->type != TOK_HERE_DOC_FROM)
-				close(fd);
+			close(fd);
+			if (is_heredoc)
+				redir->fd = -1;
 		}
 		redir = redir->next;
 	}
