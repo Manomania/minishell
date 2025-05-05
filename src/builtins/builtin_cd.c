@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:01:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/04 18:53:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:54:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,11 @@ char	*get_target_directory(t_ctx *ctx, t_command *cmd)
 static char	*get_current_pwd(t_ctx *ctx)
 {
 	char	*pwd;
-	char	*env_pwd;
 
+	(void)ctx;
 	pwd = getcwd(NULL, 0);
 	if (pwd)
 		return (pwd);
-	env_pwd = env_find(ctx, (char *)"PWD=");
-	if (env_pwd)
-		return (env_pwd);
 	return (ft_strdup(""));
 }
 
@@ -62,7 +59,10 @@ static void	update_environment_vars(t_ctx *ctx, char *old_pwd)
 
 	new_pwd = getcwd(NULL, 0);
 	if (!new_pwd)
+	{
+		free(old_pwd);
 		return ;
+	}
 	old_pwd_node = update_pwd_variable(ctx->env_list, new_pwd);
 	update_oldpwd_variable(old_pwd_node, old_pwd);
 }

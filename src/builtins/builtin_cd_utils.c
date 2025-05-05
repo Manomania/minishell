@@ -6,13 +6,13 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 16:47:07 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/30 17:53:43 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:44:15 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "builtins.h"
 #include "error.h"
 #include "minishell.h"
-#include "builtins.h"
 
 /**
  * @brief Gets the old PWD directory from environment
@@ -78,8 +78,8 @@ t_env	*update_pwd_variable(t_env *env_node, char *new_pwd)
 			env_node->value = new_pwd;
 			pwd_found = true;
 		}
-		else if (ft_strncmp(env_node->key, "OLDPWD",
-				ft_strlen("OLDPWD") + 1) == 0)
+		else if (ft_strncmp(env_node->key, "OLDPWD", ft_strlen("OLDPWD")
+				+ 1) == 0)
 			old_pwd_node = env_node;
 		env_node = env_node->next;
 	}
@@ -115,20 +115,10 @@ void	update_oldpwd_variable(t_env *old_pwd_node, char *old_pwd)
 char	*handle_dot_directory(t_ctx *ctx)
 {
 	char	*pwd;
-	char	*target_dir;
 
+	(void)ctx;
 	pwd = getcwd(NULL, 0);
-	if (pwd)
-	{
-		free(pwd);
+	if (!pwd)
 		return (ft_strdup("."));
-	}
-	pwd = env_find(ctx, (char *)"PWD=");
-	if (pwd)
-	{
-		target_dir = ft_strdup(pwd);
-		free(pwd);
-		return (target_dir);
-	}
-	return (ft_strdup("."));
+	return (pwd);
 }
