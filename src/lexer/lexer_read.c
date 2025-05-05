@@ -54,8 +54,9 @@ char	*read_word_lexer(t_lexer *lexer)
  */
 char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 {
-	int	start;
-	int	end;
+	int		start;
+	int		end;
+	char	*content;
 
 	start = lexer->position + 1;
 	advance_lexer(lexer);
@@ -71,7 +72,8 @@ char	*read_quoted_string_lexer(t_lexer *lexer, char quote_char)
 	end = lexer->position;
 	set_quote_flags(lexer, quote_char);
 	advance_lexer(lexer);
-	return (create_quoted_content(lexer, start, end));
+	content = create_quoted_content(lexer, start, end);
+	return (content);
 }
 
 /**
@@ -91,23 +93,32 @@ static int	peek_lexer(t_lexer *lexer)
 }
 
 /**
- * @brief Handles a single part of a complex word
+ * @brief Processes a complex word with potential quote handling
  *
- * @param lexer Current lexer state
- * @param result Current result string
- * @param quote_char Quote character if in quoted mode, 0 otherwise
- * @return char* Updated result string or NULL on error
+ * @param lexer Pointer to lexer structure
+ * @param has_quotes Pointer to flag indicating if quotes were encountered
+ * @return Processed word as a newly allocated string, or NULL on error
  */
-static char	*handle_word_part_by_type(t_lexer *lexer, char *result,
-		char quote_char)
+char	*process_complex_word(t_lexer *lexer, int *has_quotes)
 {
-	char	*new_result;
+	char	*result;
+	char	quote_char;
 
-	if (quote_char != 0)
-		new_result = handle_quoted_part(lexer, result, quote_char);
-	else
-		new_result = handle_word_part(lexer, result);
-	return (new_result);
+	result = NULL;
+	while (peek_lexer(lexer))
+	{
+		if (get_lexer(lexer) == '"' || get_lexer(lexer) == '\'')
+		{
+			*has_quotes = 1;
+			quote_char = get_lexer(lexer);
+		}
+		else
+			quote_char = 0;
+		result = handle_word_part_by_type(lexer, result, quote_char);
+		if (!result)
+			return (NULL);
+	}
+	return (result);
 }
 
 /**
@@ -119,17 +130,21 @@ static char	*handle_word_part_by_type(t_lexer *lexer, char *result,
 char	*read_complex_word(t_lexer *lexer)
 {
 	char	*result;
-	char	quote_char;
+	int		start_pos;
+	int		has_quotes;
 
-	result = NULL;
-	while (peek_lexer(lexer))
+	start_pos = lexer->position;
+	has_quotes = 0;
+	if (lexer->input[start_pos] == '"' && start_pos + 1 < lexer->length
+		&& lexer->input[start_pos + 1] == '"')
+		has_quotes = 1;
+	result = process_complex_word(lexer, &has_quotes);
+	if (!result && has_quotes)
+		return (ft_strdup("''"));
+	if ((result && result[0] == '\0') && has_quotes)
 	{
-		quote_char = 0;
-		if (get_lexer(lexer) == '"' || get_lexer(lexer) == '\'')
-			quote_char = get_lexer(lexer);
-		result = handle_word_part_by_type(lexer, result, quote_char);
-		if (!result)
-			return (NULL);
+		free(result);
+		return (ft_strdup("''"));
 	}
 	if (!result)
 		return (ft_strdup(""));

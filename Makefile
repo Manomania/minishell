@@ -5,13 +5,11 @@
 AUTHOR				:=	maximart && elagouch
 NAME				:=	minishell
 HEADER				=	$(INC_DIR)minishell.h
-CC 					?= 	cc
+CC 					?=	cc
 # Standard compilation checks
 CFLAGS 				:= 	-Wall -Wextra -Werror
-# Debug dead code
-# CLFLAGS				:=	-ffunction-sections -Wl,--print-gc-sections -Wl,--gc-sections
 # Debug
-CFLAGS				+=	-g3
+# CFLAGS				+=	-g3
 # Compability checks
 # CFLAGS				+=	-pedantic
 # Dependency management
@@ -102,7 +100,7 @@ re: 					.print_header fclean all
 ########################################################################################################################
 
 $(NAME):				$(LIBFT) $(OBJ)
-							@$(CC) $(CFLAGS) $(CLFLAGS) $(OBJ) $(LIBFT) -o $@ -lreadline
+							@$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $@ -lreadline
 
 $(LIBFT):				make_libft
 

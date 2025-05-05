@@ -30,6 +30,8 @@ t_token	*create_token(t_token_type type, char *value)
 	token->type = type;
 	token->next = NULL;
 	token->value = value;
+	token->quote.in_double_quote = false;
+	token->quote.in_single_quote = false;
 	return (token);
 }
 

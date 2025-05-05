@@ -31,11 +31,16 @@ int	handle_redirection_token(t_command *cmd, t_token *token,
 		return (-1);
 	if (next_token->type != TOK_WORD)
 		return (-1);
-	expanded_filename = handle_quotes_and_vars(ctx, next_token->value);
-	if (!expanded_filename)
-		return (-1);
-	result = command_add_redirection(cmd, token->type, expanded_filename);
-	free(expanded_filename);
+	if (token->type == TOK_HERE_DOC_FROM)
+		result = command_add_redirection(cmd, token->type, next_token->value);
+	else
+	{
+		expanded_filename = handle_quotes_and_vars(ctx, next_token);
+		if (!expanded_filename)
+			return (-1);
+		result = command_add_redirection(cmd, token->type, expanded_filename);
+		free(expanded_filename);
+	}
 	return (result);
 }
 
@@ -72,7 +77,7 @@ t_bool	process_word_token_case(t_command *cmd, t_token **current, t_ctx *ctx,
 {
 	char	*expanded_value;
 
-	expanded_value = handle_quotes_and_vars(ctx, (*current)->value);
+	expanded_value = handle_quotes_and_vars(ctx, (*current));
 	if (!expanded_value)
 		return (false);
 	if (!(*first_arg_processed) && expanded_value[0] == '\0')

@@ -63,8 +63,8 @@ typedef enum e_token_type
 
 typedef struct s_quote_state
 {
-	int						in_single_quote;
-	int						in_double_quote;
+	t_bool						in_single_quote;
+	t_bool						in_double_quote;
 }							t_quote_state;
 
 typedef struct s_token
@@ -291,7 +291,7 @@ char						*env_find(t_ctx *ctx, char *var);
 char						*env_find_bin(t_ctx *ctx, char *bin);
 
 // env_quotes.c
-char						*handle_quotes_and_vars(t_ctx *ctx, char *str);
+char						*handle_quotes_and_vars(t_ctx *ctx, t_token *token);
 char						*append_text_part(int start, int i, char *result,
 								char *str);
 char						*handle_var_expansion(t_ctx *ctx, char *str, int *i,
@@ -338,11 +338,14 @@ char						*handle_dollar_sign(char *result);
 char						*handle_word_part(t_lexer *lexer, char *result);
 char						*handle_quoted_part(t_lexer *lexer, char *result,
 								char quote_char);
+char						*handle_dollar_quotes(t_lexer *lexer);
 
 // lexer_read_utils2.c
 void						set_quote_flags(t_lexer *lexer, char quote_char);
 char						*create_quoted_content(t_lexer *lexer, int start,
 								int end);
+char						*handle_word_part_by_type(t_lexer *lexer,
+								char *result, char quote_char);
 
 // lexer_token.c
 t_token						*next_token_lexer(t_lexer *lexer);
