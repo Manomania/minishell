@@ -32,16 +32,53 @@ static t_bool	special_cases(t_ctx *ctx, t_command *cmd)
 }
 
 /**
- * @brief Executes a command or pipeline
+ * @brief Handles redirections without any command
  *
- * Processes heredocs, detects builtins, and executes commands accordingly
+ * @param ctx Shell context
+ * @param cmd Command structure with redirections
+ * @return t_bool true if redirections were processed, false on error
+ */
+static t_bool	handle_redirections_only(t_ctx *ctx, t_command *cmd)
+{
+	int	stdin_copy;
+	int	stdout_copy;
+
+	if (!save_original_fds(&stdin_copy, &stdout_copy))
+		return (false);
+	if (read_all_heredocs(ctx) != 0)
+	{
+		cleanup_heredoc_resources(ctx);
+		restore_original_fds(stdin_copy, stdout_copy);
+		return (false);
+	}
+	if (!apply_redirections(cmd))
+	{
+		cleanup_heredoc_resources(ctx);
+		restore_original_fds(stdin_copy, stdout_copy);
+		return (false);
+	}
+	restore_original_fds(stdin_copy, stdout_copy);
+	cleanup_heredoc_resources(ctx);
+	return (true);
+}
+
+/**
+ * @brief Executes a command or pipeline
  *
  * @param ctx Shell context
  * @param cmd Command to execute
  */
 void	execute_commands(t_ctx *ctx, t_command *cmd)
 {
-	if (!cmd || !cmd->args || !cmd->args[0])
+
+	if (!cmd)
+		return ;
+	if ((!cmd->args || !cmd->args[0]) && cmd->redirection)
+	{
+		handle_redirections_only(ctx, cmd);
+		return ;
+	}
+	if (!cmd->args || !cmd->args[0])
 		return ;
 	if (special_cases(ctx, cmd))
 		return ;
