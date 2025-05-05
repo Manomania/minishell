@@ -1,25 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lexer_token_is.c                                   :+:      :+:    :+:   */
+/*   signals_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 13:58:39 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/12 18:00:00 by elagouch         ###   ########.fr       */
+/*   Created: 2025/05/05 15:34:26 by elagouch          #+#    #+#             */
+/*   Updated: 2025/05/05 15:39:23 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Checks if a token is a redirection token
+ * @brief Updates context exit status based on signal status
  *
- * @param tok Token type to check
- * @return t_bool true if token is a redirection, false otherwise
+ * @param ctx Context to update
  */
-t_bool	token_is_redirection(t_token_type type)
+void	update_signal_status(t_ctx *ctx)
 {
-	return (type == TOK_REDIR_FROM || type == TOK_REDIR_TO
-		|| type == TOK_HERE_DOC_FROM || type == TOK_HERE_DOC_TO);
+	if (g_signal_status != 0)
+	{
+		ctx->exit_status = g_signal_status;
+		g_signal_status = 0;
+	}
 }

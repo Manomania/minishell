@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/05 14:36:51 by maximart         ###   ########.fr       */
+/*   Updated: 2025/05/05 15:35:20 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,8 @@ typedef enum e_token_type
 
 typedef struct s_quote_state
 {
-	t_bool						in_single_quote;
-	t_bool						in_double_quote;
+	t_bool					in_single_quote;
+	t_bool					in_double_quote;
 }							t_quote_state;
 
 typedef struct s_token
@@ -399,8 +399,10 @@ int							get_path_error_code(t_error_type err_type);
 void						setup_signals(void);
 void						reset_signals(void);
 void						setup_parent_signals(void);
-void						update_signal_status(t_ctx *ctx);
 void						setup_heredoc_signals(void);
+
+// signals_utils.c
+void						update_signal_status(t_ctx *ctx);
 
 // parser_command.c
 t_command					*parse_command(t_parse *parse, t_ctx *ctx);

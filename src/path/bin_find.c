@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/30 12:41:28 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 15:32:56 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,9 +120,6 @@ char	*bin_find(t_ctx *ctx, char *bin)
 	}
 	path = env_find_bin(ctx, bin);
 	if (!path)
-	{
-		ctx->exit_status = error(bin, NULL, ERR_CMD_NOT_FOUND);
-		return (NULL);
-	}
+		return (ctx->exit_status = error(bin, NULL, ERR_CMD_NOT_FOUND), NULL);
 	return (path);
 }

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 16:56:39 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/05 15:36:07 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,8 @@ int	execute_builtin(t_ctx *ctx, t_command *cmd)
 	if (!save_original_fds(&stdin_copy, &stdout_copy))
 		return (1);
 	if (!apply_redirections(cmd))
-	{
-		restore_original_fds(stdin_copy, stdout_copy);
-		return (1);
-	}
+		return (restore_original_fds(stdin_copy, stdout_copy), 1);
+	status = 1;
 	if (ft_strncmp(cmd->args[0], "cd", __INT_MAX__) == 0)
 		status = builtin_cd(ctx, cmd);
 	else if (ft_strncmp(cmd->args[0], "echo", __INT_MAX__) == 0)
@@ -50,8 +48,6 @@ int	execute_builtin(t_ctx *ctx, t_command *cmd)
 		status = builtin_pwd(ctx, cmd);
 	else if (ft_strncmp(cmd->args[0], "unset", __INT_MAX__) == 0)
 		status = builtin_unset(ctx, cmd);
-	else
-		status = 1; // Unknown builtin
 	restore_original_fds(stdin_copy, stdout_copy);
 	return (status);
 }

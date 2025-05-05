@@ -1,25 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lexer_token_is.c                                   :+:      :+:    :+:   */
+/*   execute_pipeline_redirs.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 13:58:39 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/12 18:00:00 by elagouch         ###   ########.fr       */
+/*   Created: 2025/05/05 15:44:33 by elagouch          #+#    #+#             */
+/*   Updated: 2025/05/05 15:45:29 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Checks if a token is a redirection token
+ * @brief Handle file descriptor duplications
  *
- * @param tok Token type to check
- * @return t_bool true if token is a redirection, false otherwise
+ * Duplicates input and output file descriptors
+ *
+ * @param fds File descriptors to duplicate
  */
-t_bool	token_is_redirection(t_token_type type)
+void	handle_fd_redirection(t_fds fds)
 {
-	return (type == TOK_REDIR_FROM || type == TOK_REDIR_TO
-		|| type == TOK_HERE_DOC_FROM || type == TOK_HERE_DOC_TO);
+	if (fds.in != -1)
+	{
+		if (dup2(fds.in, STDIN_FILENO) == -1)
+			exit(1);
+		close(fds.in);
+	}
+	if (fds.out != -1)
+	{
+		if (dup2(fds.out, STDOUT_FILENO) == -1)
+			exit(1);
+		close(fds.out);
+	}
 }
