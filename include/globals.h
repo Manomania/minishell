@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 13:24:26 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 13:55:01 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:10:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,6 @@
 //                              Global variables                               #
 // *************************************************************************** #
 
-extern int	g_signal_status;
+static int	g_signal_status;
 
 #endif

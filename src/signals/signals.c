@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:58:55 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:27:42 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:12:54 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
  *
  * @param sig Signal number received
  */
-static void	sig_interactive_handler(int sig)
+void	sig_interactive_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
@@ -28,22 +28,6 @@ static void	sig_interactive_handler(int sig)
 		rl_replace_line("", 0);
 		rl_redisplay();
 	}
-}
-
-/**
- * @brief Sets up signal handlers for interactive mode
- */
-void	setup_signals(void)
-{
-	struct sigaction	sa;
-
-	rl_catch_signals = 0;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sa.sa_handler = sig_interactive_handler;
-	sigaction(SIGINT, &sa, NULL);
-	sa.sa_handler = SIG_IGN;
-	sigaction(SIGQUIT, &sa, NULL);
 }
 
 /**
@@ -92,4 +76,18 @@ void	reset_signals(void)
 	sa.sa_handler = 0;
 	sigaction(SIGINT, &sa, NULL);
 	sigaction(SIGQUIT, &sa, NULL);
+}
+
+/**
+ * @brief Updates context exit status based on signal status
+ *
+ * @param ctx Context to update
+ */
+void	update_signal_status(t_ctx *ctx)
+{
+	if (g_signal_status != 0)
+	{
+		ctx->exit_status = g_signal_status;
+		g_signal_status = 0;
+	}
 }

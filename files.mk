@@ -29,6 +29,8 @@ SRC_F				= \
 						execution/execute_builtin \
 						execution/execute_commands \
 						execution/execute_pipeline \
+						execution/execute_pipeline_child \
+						execution/execute_pipeline_utils \
 						execution/heredoc \
 						execution/heredoc_expand \
 						execution/heredoc_expand_utils \
@@ -37,6 +39,8 @@ SRC_F				= \
 						execution/heredoc_utils \
 						execution/heredoc_utils2 \
 						execution/redirection \
+						execution/redirection_input \
+						execution/redirection_output \
 						execution/redir_cleanup \
 						free/free_2d_array \
 						free/free_command \
