@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 17:34:25 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 17:56:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,6 @@ static bool	execute_pipeline_step(t_ctx *ctx, t_command *current,
 {
 	int	pipe_fds[2];
 
-	signal(SIGINT, SIG_IGN);
 	if (!setup_pipeline_step(current, pipe_fds, pipeline->pids))
 		return (false);
 	pipeline->pids[pipeline->i] = fork();
@@ -141,6 +140,7 @@ void	execute_pipeline(t_ctx *ctx, t_command *cmd)
 	init = init_pipeline(cmd, &pipeline.pids);
 	if (!pipeline.pids)
 		return ;
+	signal(SIGINT, SIG_IGN);
 	current = init.current;
 	pipeline.prev_pipe_read = init.prev_pipe_read;
 	pipeline.i = init.i;
@@ -153,5 +153,5 @@ void	execute_pipeline(t_ctx *ctx, t_command *cmd)
 	}
 	wait_for_children(ctx, pipeline.pids, init.cmd_count);
 	free(pipeline.pids);
-	setup_signals();
+	setup_interactive_signals();
 }

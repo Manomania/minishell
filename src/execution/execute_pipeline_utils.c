@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 15:24:15 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 15:39:03 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 18:18:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,8 @@ void	cleanup_pipes(int prev_pipe_read, int pipe_fds[2], int has_next)
 }
 
 /**
- * @brief Waits for child processes to finish
+ * @brief Waits for child processes to finish and handles exit status
+ * Sets appropriate exit status and displays message for terminated children
  *
  * @param ctx Shell context
  * @param pids Array of process IDs
@@ -63,6 +64,7 @@ void	wait_for_children(t_ctx *ctx, pid_t *pids, int cmd_count)
 {
 	int	i;
 	int	status;
+	int	sig;
 
 	i = 0;
 	status = 0;
@@ -75,9 +77,10 @@ void	wait_for_children(t_ctx *ctx, pid_t *pids, int cmd_count)
 				ctx->exit_status = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
 			{
-				ctx->exit_status = 128 + WTERMSIG(status);
-				if (WTERMSIG(status) == SIGQUIT)
-					write(STDOUT_FILENO, "\n", 1);
+				sig = WTERMSIG(status);
+				ctx->exit_status = 128 + sig;
+				if (sig == SIGQUIT)
+					write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 			}
 		}
 		i++;

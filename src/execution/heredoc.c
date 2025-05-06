@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:38:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 17:56:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 static void	restore_shell_state(void)
 {
 	reset_heredoc_state();
-	setup_signals();
+	setup_interactive_signals();
 	rl_event_hook = NULL;
 	g_signal_status = 0;
 }

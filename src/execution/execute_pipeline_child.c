@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 15:26:04 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 15:37:01 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 17:52:37 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void	execute_command_in_child(t_ctx *ctx, t_command *cmd, t_fds fds,
 	}
 	if (is_builtin_command(cmd->args[0]))
 		execute_builtin_and_exit(ctx, cmd, pids);
-	reset_signals();
+	setup_child_signals();
 	bin_path = bin_find(ctx, cmd->args[0]);
 	if (!bin_path)
 	{

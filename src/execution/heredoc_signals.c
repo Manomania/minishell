@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 12:09:37 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 17:56:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	reset_heredoc_state(void)
 {
 	rl_event_hook = NULL;
 	g_signal_status = 0;
-	setup_signals();
+	setup_interactive_signals();
 }
 
 void	setup_heredoc_signals(void)

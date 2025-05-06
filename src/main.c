@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:29:59 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 17:56:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ static int	command_loop(t_ctx *ctx)
 
 	while (!ctx->exit_requested)
 	{
-		setup_signals();
+		setup_interactive_signals();
 		input = readline("$ ");
 		if (!input)
 		{
@@ -111,7 +111,7 @@ int	main(int argc, char **argv, char **envp)
 	int		final_status;
 
 	ctx = init_ctx(argc, argv, envp);
-	setup_signals();
+	setup_interactive_signals();
 	final_status = command_loop(ctx);
 	ctx_clear(ctx);
 	return (final_status);
