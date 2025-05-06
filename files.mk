@@ -64,7 +64,6 @@ SRC_F				= \
 						path/bin_find_utils \
 						path/path_error \
 						signals/signals \
-						signals/signals_update \
 						validation/validation \
 						main
 TSRC_F			=		$(subst main,test/main,$(SRC_F))
