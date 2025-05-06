@@ -6,11 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 16:07:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/21 16:12:28 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:08:29 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "env.h"
 
 /**
  * @brief Handles context when in single quotes

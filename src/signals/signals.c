@@ -6,11 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 17:58:55 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 14:37:26 by maximart         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:27:42 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "globals.h"
+#include "minishell.h" // required bc globals.h does not include minishell.h
 
 /**
  * @brief Signal handler for interactive mode
@@ -91,18 +92,4 @@ void	reset_signals(void)
 	sa.sa_handler = 0;
 	sigaction(SIGINT, &sa, NULL);
 	sigaction(SIGQUIT, &sa, NULL);
-}
-
-/**
- * @brief Updates context exit status based on signal status
- *
- * @param ctx Context to update
- */
-void	update_signal_status(t_ctx *ctx)
-{
-	if (g_signal_status != 0)
-	{
-		ctx->exit_status = g_signal_status;
-		g_signal_status = 0;
-	}
 }

@@ -6,13 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:56:32 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 11:17:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:00:42 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "builtins.h"
 #include "error.h"
-#include "minishell.h"
 
 /**
  * @brief Checks if a string is a valid environment variable name

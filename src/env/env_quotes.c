@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "env.h"
+#include "lexer.h"
 
 /**
  * @brief Handles expanding variables during string processing

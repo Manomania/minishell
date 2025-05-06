@@ -6,12 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 12:09:37 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/05 18:09:17 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:21:07 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "execute.h"
-#include "minishell.h"
+#include "globals.h"
+#include "signals.h"
 
 void	sig_heredoc_handler(int sig)
 {

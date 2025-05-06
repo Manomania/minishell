@@ -6,13 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:34:50 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 17:47:17 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:27:11 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
-#include "minishell.h"
-#include <sys/stat.h>
 
 /**
  * @brief Checks if a path is a directory

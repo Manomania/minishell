@@ -6,13 +6,17 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 19:04:07 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:29:59 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "error.h"
+#include "checker.h"
+#include "commands.h"
 #include "execute.h"
-#include "minishell.h"
+#include "free.h"
+#include "init.h"
+#include "lexer.h"
+#include "signals.h"
 #include "validation.h"
 
 /**

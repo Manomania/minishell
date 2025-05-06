@@ -6,11 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 16:04:32 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/21 16:05:44 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:09:00 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "env.h"
 
 /**
  * @brief Handles standard environment variable expansion
@@ -72,9 +72,8 @@ static char	*handle_special_var(t_ctx *ctx, char *str, int *i)
  */
 static char	*handle_positional_var(char *str, int *i)
 {
-	if ((str[*i] >= '1' && str[*i] <= '9') || str[*i] == '@'
-		|| str[*i] == '*' || str[*i] == '!' || str[*i] == '$'
-		|| str[*i] == '^' || str[*i] == '%' )
+	if ((str[*i] >= '1' && str[*i] <= '9') || str[*i] == '@' || str[*i] == '*'
+		|| str[*i] == '!' || str[*i] == '$' || str[*i] == '^' || str[*i] == '%')
 	{
 		(*i)++;
 		return (ft_strdup(""));

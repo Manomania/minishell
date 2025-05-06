@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:32:19 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:13:39 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 13:48:23 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,8 @@ int				error(const char *proof, const char *module, t_error_type err);
 // error_utils2.c
 void			error_print(const char *proof, const char *module,
 					const char *msg);
+
+// ctx_exit.c
+void			ctx_exit(t_ctx *ctx);
 
 #endif

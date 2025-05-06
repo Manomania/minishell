@@ -6,12 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 18:24:28 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 18:11:43 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:22:57 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "execute.h"
-#include "minishell.h"
+#include "free.h"
+#include "lexer.h" // for free_all_token
 
 /**
  * @brief Closes any open file descriptors in the context

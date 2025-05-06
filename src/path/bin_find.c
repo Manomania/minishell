@@ -6,13 +6,13 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/30 12:41:28 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:27:01 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "env.h"
 #include "error.h"
-#include "minishell.h"
-#include <sys/stat.h>
+#include "path.h"
 
 /**
  * @brief Checks if a string contains path components

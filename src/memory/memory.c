@@ -6,12 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:34:04 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:19:42 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:26:41 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
-#include "memory.h"
 
 /**
  * @brief Safely allocates memory with error handling

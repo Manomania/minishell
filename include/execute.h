@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:43:21 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 19:02:23 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:04:29 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 # define EXECUTE_H
 
 # include "minishell.h"
+
+// *************************************************************************** #
+//                            Function Prototypes                              #
+// *************************************************************************** #
 
 // execute_commands.c
 void	execute_commands(t_ctx *ctx, t_command *cmd);
@@ -56,9 +60,5 @@ void	cleanup_heredoc_resources(t_ctx *ctx);
 t_bool	apply_redirections(t_command *cmd);
 t_bool	save_original_fds(int *stdin_fd, int *stdout_fd);
 void	restore_original_fds(int stdin_fd, int stdout_fd);
-
-// free_command.c
-void	free_command(t_command *cmd);
-void	free_all_commands(t_command *cmd);
 
 #endif

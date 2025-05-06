@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_process.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 12:10:14 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/05 14:24:56 by maximart         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:19:06 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "error.h"
-#include "minishell.h"
+#include "env.h"
 #include "execute.h"
+#include "globals.h"
 
 static int	process_heredoc_line(int fd, char *line, t_ctx *ctx)
 {

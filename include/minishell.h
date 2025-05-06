@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/04 17:15:54 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/05 19:07:50 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 13:52:14 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,14 @@
 
 # include "libft.h"
 # include <errno.h>
+# include <fcntl.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
+# include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 
@@ -218,191 +220,12 @@ typedef struct s_handle_token
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
-static int					g_signal_status = 0;
-
-// token_checker.c
-t_bool						validate_token_sequence(t_token *tokens);
-void						print_token_error(const char *s);
-
-// token_checker_utils.c
-t_bool						check_pipe_tokens(t_token *current);
-t_bool						check_redir_combinations(t_token *current);
-t_bool						check_logical_tokens(t_token *token);
-
-// command_add.c
-int							command_add_argument(t_command *cmd, char *arg);
-int							command_add_redirection(t_command *cmd,
-								t_token_type type, char *filename);
-
-// command_new.c
-t_command					*command_new(void);
-
-// command_parse.c
-t_command					*command_parse(t_ctx *ctx, t_token *tokens);
-
-// command_parse_utils.c
-t_bool						handle_first_arg(t_command *cmd,
-								char *expanded_value);
-t_bool						add_to_existing_args(t_command *cmd,
-								char *expanded_value);
-t_bool						process_word_token(t_command *cmd, t_token *token,
-								t_ctx *ctx);
-t_bool						process_word_token_case(t_command *cmd,
-								t_token **current, t_ctx *ctx,
-								t_bool *first_arg_processed);
-
-// command_parse_utils2.c
-int							handle_redirection_token(t_command *cmd,
-								t_token *token, t_token *next_token,
-								t_ctx *ctx);
-t_bool						handle_empty_first_arg(t_command *cmd,
-								t_token **current, t_ctx *ctx);
-
-// debug_utils.c
-void						print_tokens(t_token *tokens);
-
-// debug_utils2.c
-char						*get_token_type_str(t_token_type type);
-void						debug_exit_status(t_ctx *ctx);
-void						print_token(t_token *current, int token_count);
-void						print_tokens_list(t_token *tokens);
-void						print_redirection_type(t_token_type type);
-
-// env.c
-char						*expand_var(t_ctx *ctx, char *var_name);
-char						*append_part(char *result, char *str, int start,
-								int end);
-char						*get_env_value(t_env *env_list, char *key);
-char						*get_var_name(char *str, int *pos);
-char						*expand_special_var(t_ctx *ctx, char *str, int *i);
-
-// env_utils.c
-char						*expand_positional_param(char *str, int *i);
-char						*expand_env_var(t_ctx *ctx, char *str, int *i);
-char						*expand_variable(t_ctx *ctx, char *str, int *i);
-
-// env_dupe.c
-t_env						*duplicate_env_list(t_env *original_list);
-
-// env_find.c
-char						*env_find(t_ctx *ctx, char *var);
-
-// env_find_bin.c
-char						*env_find_bin(t_ctx *ctx, char *bin);
-
-// env_quotes.c
-char						*handle_quotes_and_vars(t_ctx *ctx, t_token *token);
-char						*append_text_part(int start, int i, char *result,
-								char *str);
-char						*handle_var_expansion(t_ctx *ctx, char *str, int *i,
-								char *result);
-
-// env_quotes_utils.c
-char						*process_string(t_ctx *ctx, char *str,
-								char *result);
-
-// ctx_exit.c
-void						ctx_exit(t_ctx *ctx);
-
-// free_2d_array.c
-void						free_2d_array(void **ptrs);
-
-// free_ctx.c
-void						ctx_clear(t_ctx *ctx);
-
-// free_env.c
-void						free_env_list(t_env *env_list);
-int							parse_env_var(char *env_str, t_env **env_list);
-
-// init_ctx.c
-t_ctx						*init_ctx(int argc, char **argv, char **envp);
-int							add_env_var(t_env **env_list, char *key,
-								char *value);
-
-// init_parse.c
-t_command					*create_command(void);
-t_token						*create_token(t_token_type type, char *value);
-t_redirection				*create_redirection(t_token_type type,
-								char *filename);
-void						init_parse_context(t_parse *parse, t_token *token);
-
-// lexer_read.c
-char						*read_word_lexer(t_lexer *lexer);
-char						*read_complex_word(t_lexer *lexer);
-char						*read_quoted_string_lexer(t_lexer *lexer,
-								char quote_char);
-
-// lexer_read_utils.c
-char						*join_and_free(char *s1, char *s2);
-char						*handle_dollar_sign(char *result);
-char						*handle_word_part(t_lexer *lexer, char *result);
-char						*handle_quoted_part(t_lexer *lexer, char *result,
-								char quote_char);
-char						*handle_dollar_quotes(t_lexer *lexer);
-
-// lexer_read_utils2.c
-void						set_quote_flags(t_lexer *lexer, char quote_char);
-char						*create_quoted_content(t_lexer *lexer, int start,
-								int end);
-char						*handle_word_part_by_type(t_lexer *lexer,
-								char *result, char quote_char);
-
-// lexer_token.c
-t_token						*next_token_lexer(t_lexer *lexer);
-void						free_all_token(t_token *token);
-
-// lexer_token_is.c
-t_bool						token_is_redirection(t_token_type type);
-
-// lexer_token_utils.c
-t_token						*handle_basics_token(t_lexer *lexer);
-t_token						*handle_pipe_and_token(t_lexer *lexer);
-t_token						*handle_redir_from_and_to_token(t_lexer *lexer);
-// t_token						*handle_env_token(t_lexer *lexer);
-
-// lexer_tokenize.c
-t_token						*tokenize(t_ctx *ctx, char *input);
-
-// lexer_utils.c
-char						get_lexer(t_lexer *lexer);
-void						advance_lexer(t_lexer *lexer);
-void						skip_whitespace_lexer(t_lexer *lexer);
-void						sync_quote_state(t_ctx *ctx, t_lexer *lexer);
-
 // parser_utils.c
 char						*get_token_value(t_parse *parse);
 int							check_parse(t_parse *parse, t_token_type type);
 int							consume_parse(t_parse *parse, t_token_type type);
 int							check_token_type(t_parse *parse, t_token_type type);
 void						advance_parse(t_parse *parse);
-
-// bin_find.c
-char						*bin_find(t_ctx *ctx, char *bin);
-t_bool						is_directory(const char *path);
-t_bool						is_path(const char *str);
-
-// bin_find_utils.c
-char						*check_relative_path(char *bin,
-								t_path_error *error_state);
-void						display_path_error(char *bin,
-								t_path_error error_state);
-
-// bin_find_path.c
-char						*bin_find_path(const char *dir, char *bin);
-
-// path_error.c
-int							handle_path_error(char *path,
-								t_error_type err_type);
-int							get_path_error_code(t_error_type err_type);
-
-// signals.c
-void						setup_signals(void);
-void						reset_signals(void);
-void						setup_parent_signals(void);
-void						setup_heredoc_signals(void);
-
-// signals_utils.c
-void						update_signal_status(t_ctx *ctx);
 
 // parser_command.c
 t_command					*parse_command(t_parse *parse, t_ctx *ctx);
@@ -413,8 +236,5 @@ void						add_redirection(t_command *cmd,
 
 // parser_command_utils.c
 int							add_argument(t_command *cmd, char *value);
-
-// cleanup_utils.c
-void						safe_free_str(char **str);
 
 #endif

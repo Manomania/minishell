@@ -6,13 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:53:27 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 11:17:04 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 13:58:22 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "builtins.h"
 #include "error.h"
-#include "minishell.h"
 
 /**
  * @brief Checks if a string is a valid number

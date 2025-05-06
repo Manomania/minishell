@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_export_utils2.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maximart <maximart@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:05:56 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 17:06:01 by maximart         ###   ########.fr       */
+/*   Updated: 2025/05/06 13:59:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "builtins.h"
 #include "error.h"
+#include "init.h" // for add_env_var
 
 /**
  * @brief Extracts and validates the key and value from an export argument

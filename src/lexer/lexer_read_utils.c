@@ -6,11 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/19 10:43:47 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/07 19:17:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:24:40 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "lexer.h"
 
 /**
  * @brief Joins two strings and frees the first one

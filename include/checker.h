@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   memory.h                                           :+:      :+:    :+:   */
+/*   checker.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/17 15:33:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 13:51:27 by elagouch         ###   ########.fr       */
+/*   Created: 2025/05/06 13:41:01 by elagouch          #+#    #+#             */
+/*   Updated: 2025/05/06 13:54:18 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MEMORY_H
-# define MEMORY_H
+#ifndef CHECKER_H
+# define CHECKER_H
 
 # include "minishell.h"
 
@@ -19,14 +19,13 @@
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
-// memory.c
-char	*safe_strdup(t_ctx *ctx, const char *str, const char *module);
-char	*safe_strjoin(t_ctx *ctx, const char *s1, const char *s2,
-			const char *module);
-void	*safe_malloc(t_ctx *ctx, size_t size, const char *module);
-void	*safe_calloc(t_ctx *ctx, size_t nmemb, size_t size, const char *module);
+// token_checker.c
+t_bool						validate_token_sequence(t_token *tokens);
+void						print_token_error(const char *s);
 
-// cleanup_utils.c
-void	safe_free_str(char **str);
+// token_checker_utils.c
+t_bool						check_pipe_tokens(t_token *current);
+t_bool						check_redir_combinations(t_token *current);
+t_bool						check_logical_tokens(t_token *token);
 
 #endif

@@ -6,12 +6,13 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 16:55:12 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:34:15 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "execute.h"
-#include "minishell.h"
+#include "commands.h"
+#include "free.h"
+#include "lexer.h"
 
 /**
  * @brief Processes redirection token

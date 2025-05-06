@@ -6,13 +6,15 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/04 18:40:24 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:13:34 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "builtins.h"
 #include "error.h"
 #include "execute.h"
+#include "free.h"
+#include "path.h"
+#include "signals.h"
 
 /**
  * @brief Executes a command in a child process

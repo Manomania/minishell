@@ -6,12 +6,10 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:44:19 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 14:34:36 by maximart         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:10:25 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "builtins.h"
-#include "error.h"
 #include "execute.h"
 
 /**
@@ -70,7 +68,6 @@ static t_bool	handle_redirections_only(t_ctx *ctx, t_command *cmd)
  */
 void	execute_commands(t_ctx *ctx, t_command *cmd)
 {
-
 	if (!cmd)
 		return ;
 	if ((!cmd->args || !cmd->args[0]) && cmd->redirection)

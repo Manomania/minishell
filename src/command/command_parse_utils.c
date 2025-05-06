@@ -6,11 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:27:42 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:30:36 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:05:11 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "env.h"
 
 /**
  * @brief Creates a new arguments array for the first command argument

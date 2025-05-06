@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   memory.h                                           :+:      :+:    :+:   */
+/*   path.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/17 15:33:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 13:51:27 by elagouch         ###   ########.fr       */
+/*   Created: 2025/05/06 13:52:22 by elagouch          #+#    #+#             */
+/*   Updated: 2025/05/06 13:55:16 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MEMORY_H
-# define MEMORY_H
+#ifndef PATH_H
+# define PATH_H
 
 # include "minishell.h"
 
@@ -19,14 +19,23 @@
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
-// memory.c
-char	*safe_strdup(t_ctx *ctx, const char *str, const char *module);
-char	*safe_strjoin(t_ctx *ctx, const char *s1, const char *s2,
-			const char *module);
-void	*safe_malloc(t_ctx *ctx, size_t size, const char *module);
-void	*safe_calloc(t_ctx *ctx, size_t nmemb, size_t size, const char *module);
+// bin_find.c
+char						*bin_find(t_ctx *ctx, char *bin);
+t_bool						is_directory(const char *path);
+t_bool						is_path(const char *str);
 
-// cleanup_utils.c
-void	safe_free_str(char **str);
+// bin_find_utils.c
+char						*check_relative_path(char *bin,
+								t_path_error *error_state);
+void						display_path_error(char *bin,
+								t_path_error error_state);
+
+// bin_find_path.c
+char						*bin_find_path(const char *dir, char *bin);
+
+// path_error.c
+int							handle_path_error(char *path,
+								t_error_type err_type);
+int							get_path_error_code(t_error_type err_type);
 
 #endif

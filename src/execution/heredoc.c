@@ -6,13 +6,14 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 14:23:59 by maximart         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:17:51 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
-#include "minishell.h"
 #include "execute.h"
+#include "globals.h"
+#include "signals.h"
 
 static void	restore_shell_state(void)
 {
@@ -24,9 +25,9 @@ static void	restore_shell_state(void)
 
 static int	create_heredoc(t_ctx *ctx, char *delimiter)
 {
-	int		pipe_fds[2];
-	int		read_fd;
-	int		result;
+	int	pipe_fds[2];
+	int	read_fd;
+	int	result;
 
 	g_signal_status = 0;
 	if (pipe(pipe_fds) == -1)

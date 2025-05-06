@@ -6,12 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:52:57 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/25 13:17:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:02:22 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "error.h"
-#include "minishell.h"
+#include "checker.h"
+#include "lexer.h"
 
 /**
  * @brief Checks for errors with &, ||, and && tokens

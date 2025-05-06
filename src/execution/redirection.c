@@ -6,13 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 19:02:12 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:21:54 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
-#include "execute.h"
-#include <fcntl.h>
 
 /**
  * @brief Applies input redirection for a command

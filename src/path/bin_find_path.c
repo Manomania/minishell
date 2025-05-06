@@ -6,13 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:59:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 17:35:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 13:36:05 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "error.h"
 #include "minishell.h"
-#include <sys/stat.h>
 
 /**
  * @brief Checks if a file is executable

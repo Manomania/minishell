@@ -6,12 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 18:57:28 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:10:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
-#include "error.h"
 #include "execute.h"
 
 /**

@@ -6,13 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:01:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 18:56:43 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 13:58:24 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 #include "error.h"
-#include "minishell.h"
 
 char	*get_target_directory(t_ctx *ctx, t_command *cmd)
 {

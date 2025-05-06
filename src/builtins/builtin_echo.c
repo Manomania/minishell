@@ -6,11 +6,10 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:54:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/16 15:43:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 13:33:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "builtins.h"
 #include "minishell.h"
 
 /**

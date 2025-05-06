@@ -6,12 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 08:32:58 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/29 12:11:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:01:19 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "error.h"
-#include "minishell.h"
+#include "checker.h"
+#include "lexer.h"
 
 void	print_token_error(const char *s)
 {

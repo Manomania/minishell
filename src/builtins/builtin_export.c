@@ -6,13 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:55:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 11:12:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 13:58:58 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 #include "error.h"
-#include "minishell.h"
 #include "validation.h"
 
 /**
