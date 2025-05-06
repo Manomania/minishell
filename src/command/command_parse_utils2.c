@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 18:07:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:06:32 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,9 @@ int	handle_redirection_token(t_command *cmd, t_token *token,
  * @param cmd Command being processed
  * @param current Token list being processed
  * @param ctx Context containing environment information
- * @return t_bool true if successfully updated command
+ * @return bool true if successfully updated command
  */
-t_bool	handle_empty_first_arg(t_command *cmd, t_token **current, t_ctx *ctx)
+bool	handle_empty_first_arg(t_command *cmd, t_token **current, t_ctx *ctx)
 {
 	while (*current && (*current)->type == TOK_WORD)
 	{
@@ -71,10 +71,10 @@ t_bool	handle_empty_first_arg(t_command *cmd, t_token **current, t_ctx *ctx)
  * @param current Current token
  * @param ctx Context containing environment information
  * @param first_arg_processed Flag indicating if first arg was processed
- * @return t_bool true on success, false on failure
+ * @return bool true on success, false on failure
  */
-t_bool	process_word_token_case(t_command *cmd, t_token **current, t_ctx *ctx,
-		t_bool *first_arg_processed)
+bool	process_word_token_case(t_command *cmd, t_token **current, t_ctx *ctx,
+		bool *first_arg_processed)
 {
 	char	*expanded_value;
 

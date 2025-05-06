@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:30:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:17:51 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:38:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,9 @@ static int	create_heredoc(t_ctx *ctx, char *delimiter)
  */
 int	read_all_heredocs(t_ctx *ctx)
 {
-	t_command		*current;
-	t_redirection	*redir;
-	int				heredoc_fd;
+	t_command	*current;
+	t_redir		*redir;
+	int			heredoc_fd;
 
 	current = ctx->cmd;
 	while (current)

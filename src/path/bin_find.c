@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:27:01 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
  * @param str String to check for path components
  * @return true if the string contains path components, false otherwise
  */
-t_bool	is_path(const char *str)
+bool	is_path(const char *str)
 {
 	int	i;
 

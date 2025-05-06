@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 08:32:58 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/06 14:01:19 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@ void	print_token_error(const char *s)
  * @brief Checks for duplicate redirection tokens
  *
  * @param current Current token
- * @return t_bool false if duplicated redirection found, true otherwise
+ * @return bool false if duplicated redirection found, true otherwise
  */
-static t_bool	check_duplicate_redirs(t_token *current)
+static bool	check_duplicate_redirs(t_token *current)
 {
 	if (current->type == TOK_REDIR_FROM
 		&& current->next->type == TOK_REDIR_FROM)
@@ -59,9 +59,9 @@ static t_bool	check_duplicate_redirs(t_token *current)
  *
  * @param ctx Context
  * @param current Current token
- * @return t_bool false if missing target found, true otherwise
+ * @return bool false if missing target found, true otherwise
  */
-static t_bool	check_missing_target(t_token *current)
+static bool	check_missing_target(t_token *current)
 {
 	if (token_is_redirection(current->type)
 		&& (token_is_redirection(current->next->type)
@@ -78,9 +78,9 @@ static t_bool	check_missing_target(t_token *current)
  * @brief Checks for invalid redirection sequences
  *
  * @param tokens Token list to validate
- * @return t_bool false if invalid redirection found, true otherwise
+ * @return bool false if invalid redirection found, true otherwise
  */
-static t_bool	check_invalid_tokens(t_token *tokens)
+static bool	check_invalid_tokens(t_token *tokens)
 {
 	t_token	*current;
 
@@ -106,9 +106,9 @@ static t_bool	check_invalid_tokens(t_token *tokens)
  * @brief Validates token sequence and prints error if invalid
  *
  * @param tokens Token list to validate
- * @return t_bool true if valid sequence, false if invalid
+ * @return bool true if valid sequence, false if invalid
  */
-t_bool	validate_token_sequence(t_token *tokens)
+bool	validate_token_sequence(t_token *tokens)
 {
 	if (!tokens)
 		return (false);

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:21:54 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,13 @@
  * @brief Applies input redirection for a command
  *
  * @param cmd Command structure
- * @return t_bool true on success, false on error
+ * @return bool true on success, false on error
  */
-static t_bool	apply_input_redirection(t_command *cmd)
+static bool	apply_input_redirection(t_command *cmd)
 {
-	t_redirection	*redir;
-	int				fd;
-	t_bool			is_heredoc;
+	t_redir	*redir;
+	int		fd;
+	bool	is_heredoc;
 
 	redir = cmd->redirection;
 	while (redir)
@@ -55,13 +55,13 @@ static t_bool	apply_input_redirection(t_command *cmd)
  * @brief Applies output redirection for a command
  *
  * @param cmd Command structure
- * @return t_bool true on success, false on error
+ * @return bool true on success, false on error
  */
-static t_bool	apply_output_redirection(t_command *cmd)
+static bool	apply_output_redirection(t_command *cmd)
 {
-	t_redirection	*redir;
-	int				fd;
-	int				flags;
+	t_redir	*redir;
+	int		fd;
+	int		flags;
 
 	redir = cmd->redirection;
 	while (redir)
@@ -92,9 +92,9 @@ static t_bool	apply_output_redirection(t_command *cmd)
  * @brief Applies all redirections for a command
  *
  * @param cmd Command structure
- * @return t_bool true on success, false on error
+ * @return bool true on success, false on error
  */
-t_bool	apply_redirections(t_command *cmd)
+bool	apply_redirections(t_command *cmd)
 {
 	if (!cmd || !cmd->redirection)
 		return (true);
@@ -110,9 +110,9 @@ t_bool	apply_redirections(t_command *cmd)
  *
  * @param stdin_fd Pointer to store original stdin fd
  * @param stdout_fd Pointer to store original stdout fd
- * @return t_bool true on success, false on error
+ * @return bool true on success, false on error
  */
-t_bool	save_original_fds(int *stdin_fd, int *stdout_fd)
+bool	save_original_fds(int *stdin_fd, int *stdout_fd)
 {
 	*stdin_fd = dup(STDIN_FILENO);
 	if (*stdin_fd == -1)

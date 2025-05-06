@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:34:50 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:27:11 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
  * @brief Checks if a path is a directory
  *
  * @param path Path to check
- * @return t_bool true if it's a directory, false otherwise
+ * @return bool true if it's a directory, false otherwise
  */
-t_bool	is_directory(const char *path)
+bool	is_directory(const char *path)
 {
 	struct stat	path_stat;
 

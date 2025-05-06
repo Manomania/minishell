@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:51:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 13:37:39 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,28 +40,28 @@ int		builtin_env(t_ctx *ctx, t_command *cmd);
 int		builtin_exit(t_ctx *ctx, t_command *cmd);
 
 // builtin_export.c
-t_bool	validate_env_key(char *key);
+bool	validate_env_key(char *key);
 char	*get_env_value_from_export(char *arg);
 int		builtin_export(t_ctx *ctx, t_command *cmd);
 
 // builtin_export_utils.c
-t_bool	is_valid_env_char(char c);
+bool	is_valid_env_char(char c);
 char	*get_env_key_from_export(char *arg);
 void	print_export_env(t_ctx *ctx);
-t_bool	update_env_var(t_env **env_list, char *key, char *value,
-			t_bool has_equals);
+bool	update_env_var(t_env **env_list, char *key, char *value,
+			bool has_equals);
 
 // builtin_export_utils2.c
 int		extract_export_data(char *arg, char **key_ptr, char **value_ptr,
-			t_bool *has_equals_ptr);
+			bool *has_equals_ptr);
 int		update_or_add_env_var(t_ctx *ctx, char *key, char *value,
-			t_bool has_equals);
+			bool has_equals);
 
 // builtin_pwd.c
 int		builtin_pwd(void);
 
 // builtin_unset.c
-t_bool	remove_env_var(t_env **env_list, char *key);
+bool	remove_env_var(t_env **env_list, char *key);
 int		builtin_unset(t_ctx *ctx, t_command *cmd);
 
 #endif

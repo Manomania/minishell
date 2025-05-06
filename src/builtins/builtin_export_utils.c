@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 12:37:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 13:33:29 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
  * @brief Checks if a character is valid for env variable name
  *
  * @param c Character to check
- * @return t_bool true if valid, false otherwise
+ * @return bool true if valid, false otherwise
  */
-t_bool	is_valid_env_char(char c)
+bool	is_valid_env_char(char c)
 {
 	return (ft_isalnum(c) || c == '_');
 }
@@ -74,10 +74,10 @@ void	print_export_env(t_ctx *ctx)
  * @param key Key to update
  * @param value New value
  * @param has_equals Whether the variable has an equals sign
- * @return t_bool true if updated, false if not found
+ * @return bool true if updated, false if not found
  */
-t_bool	update_env_var(t_env **env_list, char *key, char *value,
-		t_bool has_equals)
+bool	update_env_var(t_env **env_list, char *key, char *value,
+		bool has_equals)
 {
 	t_env	*current;
 

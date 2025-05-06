@@ -6,13 +6,14 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 17:05:56 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/06 13:59:49 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:05:07 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 #include "error.h"
-#include "init.h" // for add_env_var
+#include "init.h"  // for add_env_var
+#include "lexer.h" // for t_parse
 
 /**
  * @brief Extracts and validates the key and value from an export argument
@@ -24,7 +25,7 @@
  * @return int 0 on success, 1 on error
  */
 int	extract_export_data(char *arg, char **key_ptr, char **value_ptr,
-		t_bool *has_equals_ptr)
+		bool *has_equals_ptr)
 {
 	*key_ptr = get_env_key_from_export(arg);
 	if (!*key_ptr)
@@ -52,7 +53,7 @@ int	extract_export_data(char *arg, char **key_ptr, char **value_ptr,
  * @param has_equals Indicates if the argument contained an equals sign
  * @return int 1 on success, 0 on failure
  */
-int	update_or_add_env_var(t_ctx *ctx, char *key, char *value, t_bool has_equals)
+int	update_or_add_env_var(t_ctx *ctx, char *key, char *value, bool has_equals)
 {
 	int	result;
 

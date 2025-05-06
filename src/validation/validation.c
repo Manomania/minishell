@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:39:38 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:28:37 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@
  *
  * @param input The input string to validate
  * @param ctx Context for error handling
- * @return t_bool true if valid, false if invalid
+ * @return bool true if valid, false if invalid
  */
-t_bool	validate_input_length(char *input, t_ctx *ctx)
+bool	validate_input_length(char *input, t_ctx *ctx)
 {
 	size_t	len;
 
@@ -36,7 +36,7 @@ t_bool	validate_input_length(char *input, t_ctx *ctx)
 	return (true);
 }
 
-static t_bool	is_valid_env_name(const char *name)
+static bool	is_valid_env_name(const char *name)
 {
 	if (!name || !name[0])
 	{
@@ -56,9 +56,9 @@ static t_bool	is_valid_env_name(const char *name)
  *
  * @param name The variable name to validate
  * @param ctx Context for error handling
- * @return t_bool true if valid, false if invalid
+ * @return bool true if valid, false if invalid
  */
-t_bool	validate_env_var_name(char *name, t_ctx *ctx)
+bool	validate_env_var_name(char *name, t_ctx *ctx)
 {
 	int	i;
 
@@ -88,9 +88,9 @@ t_bool	validate_env_var_name(char *name, t_ctx *ctx)
  *
  * @param filename The filename to validate
  * @param ctx Context for error handling
- * @return t_bool true if valid, false if invalid
+ * @return bool true if valid, false if invalid
  */
-t_bool	validate_filename(char *filename, t_ctx *ctx)
+bool	validate_filename(char *filename, t_ctx *ctx)
 {
 	(void)ctx;
 	if (!filename || !filename[0])
@@ -111,11 +111,11 @@ t_bool	validate_filename(char *filename, t_ctx *ctx)
  *
  * @param cmd The command to validate
  * @param ctx Context for error handling
- * @return t_bool true if valid, false if invalid
+ * @return bool true if valid, false if invalid
  */
-t_bool	validate_command(t_command *cmd, t_ctx *ctx)
+bool	validate_command(t_command *cmd, t_ctx *ctx)
 {
-	t_redirection	*redir;
+	t_redir	*redir;
 
 	if (!cmd)
 		return (false);

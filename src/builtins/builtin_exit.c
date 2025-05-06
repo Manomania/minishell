@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:53:27 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 13:58:22 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
  * @brief Checks if a string is a valid number
  *
  * @param str String to check
- * @return t_bool true if valid number, false otherwise
+ * @return bool true if valid number, false otherwise
  */
-static t_bool	is_valid_number(char *str)
+static bool	is_valid_number(char *str)
 {
 	int	i;
 
@@ -43,9 +43,9 @@ static t_bool	is_valid_number(char *str)
  *
  * @param arg Argument to check
  * @param exit_code Pointer to store exit code
- * @return t_bool true if valid, false if error
+ * @return bool true if valid, false if error
  */
-static t_bool	validate_exit_arg(char *arg, int *exit_code)
+static bool	validate_exit_arg(char *arg, int *exit_code)
 {
 	if (!is_valid_number(arg))
 	{

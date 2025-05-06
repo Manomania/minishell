@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:39:18 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 13:55:25 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,17 @@
 //                                   Macros                                    #
 // *************************************************************************** #
 
-# define MAX_INPUT_LEN		4096
-# define MAX_VAR_NAME_LEN	255
+# define MAX_INPUT_LEN 4096
+# define MAX_VAR_NAME_LEN 255
 
 // *************************************************************************** #
 //                            Function Prototypes                              #
 // *************************************************************************** #
 
 // validation.c
-t_bool	validate_command(t_command *cmd, t_ctx *ctx);
-t_bool	validate_env_var_name(char *name, t_ctx *ctx);
-t_bool	validate_filename(char *filename, t_ctx *ctx);
-t_bool	validate_input_length(char *input, t_ctx *ctx);
+bool	validate_command(t_command *cmd, t_ctx *ctx);
+bool	validate_env_var_name(char *name, t_ctx *ctx);
+bool	validate_filename(char *filename, t_ctx *ctx);
+bool	validate_input_length(char *input, t_ctx *ctx);
 
 #endif

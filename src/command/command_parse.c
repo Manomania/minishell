@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:46:45 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:34:15 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@
  * @param current Current token
  * @param has_redirections Flag to track if redirections exist
  * @param ctx Context containing environment information
- * @return t_bool true on success, false on failure
+ * @return bool true on success, false on failure
  */
-static t_bool	process_redirection_token_case(t_command *cmd,
-		t_token **current, t_bool *has_redirections, t_ctx *ctx)
+static bool	process_redirection_token_case(t_command *cmd,
+		t_token **current, bool *has_redirections, t_ctx *ctx)
 {
 	if ((*current)->next && handle_redirection_token(cmd, *current,
 			(*current)->next, ctx) == -1)
@@ -41,12 +41,12 @@ static t_bool	process_redirection_token_case(t_command *cmd,
  * @param cmd Current command being built
  * @param ctx Context containing environment information
  * @param args Arguments for this function
- * @return t_bool true on success, false on failure
+ * @return bool true on success, false on failure
  */
-static t_bool	handle_token_by_type(t_command *cmd, t_ctx *ctx,
+static bool	handle_token_by_type(t_command *cmd, t_ctx *ctx,
 		t_handle_token args)
 {
-	t_bool	result;
+	bool	result;
 
 	if ((*args.current)->type == TOK_WORD)
 	{
@@ -72,14 +72,14 @@ static t_bool	handle_token_by_type(t_command *cmd, t_ctx *ctx,
  * @param current Current token pointer reference
  * @param cmd Current command being built
  * @param ctx Context containing environment information
- * @return t_bool true on success, false on failure
+ * @return bool true on success, false on failure
  */
-static t_bool	process_command_tokens(t_token **current, t_command *cmd,
+static bool	process_command_tokens(t_token **current, t_command *cmd,
 		t_ctx *ctx)
 {
-	t_bool			first_arg_processed;
-	t_bool			has_redirections;
-	t_bool			result;
+	bool			first_arg_processed;
+	bool			has_redirections;
+	bool			result;
 	t_handle_token	args;
 
 	first_arg_processed = false;
@@ -103,9 +103,9 @@ static t_bool	process_command_tokens(t_token **current, t_command *cmd,
  * @param cmd Current command pointer reference
  * @param current Current token pointer reference
  * @param ctx Context containing environment information
- * @return t_bool true on success, false on failure
+ * @return bool true on success, false on failure
  */
-static t_bool	create_pipeline(t_command **cmd, t_token **current, t_ctx *ctx)
+static bool	create_pipeline(t_command **cmd, t_token **current, t_ctx *ctx)
 {
 	t_command	*new_cmd;
 	t_command	*prev_cmd;

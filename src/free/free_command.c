@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:44:34 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/02 16:44:35 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:38:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
  *
  * @param redir Redirection to free
  */
-static void	free_redirection(t_redirection *redir)
+static void	free_redirection(t_redir *redir)
 {
 	if (!redir)
 		return ;
@@ -35,10 +35,10 @@ static void	free_redirection(t_redirection *redir)
  *
  * @param redir First redirection in the list
  */
-static void	free_all_redirections(t_redirection *redir)
+static void	free_all_redirections(t_redir *redir)
 {
-	t_redirection	*current;
-	t_redirection	*next;
+	t_redir	*current;
+	t_redir	*next;
 
 	current = redir;
 	while (current)

@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 13:48:41 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:32:49 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:38:27 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,12 @@
  */
 int	command_add_redirection(t_command *cmd, t_token_type type, char *filename)
 {
-	t_redirection	*redir;
-	t_redirection	*current;
+	t_redir	*redir;
+	t_redir	*current;
 
 	if (!cmd || !filename)
 		return (-1);
-	redir = malloc(sizeof(t_redirection));
+	redir = malloc(sizeof(t_redir));
 	if (!redir)
 		return (-1);
 	redir->type = type;

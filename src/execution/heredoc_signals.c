@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 12:09:37 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/06 14:21:07 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	setup_heredoc_signals(void)
 	sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
-t_bool	is_heredoc_interrupted(void)
+bool	is_heredoc_interrupted(void)
 {
 	return (g_signal_status == 130);
 }

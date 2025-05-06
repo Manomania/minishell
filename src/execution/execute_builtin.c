@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:10:13 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,9 @@ int	execute_builtin(t_ctx *ctx, t_command *cmd)
  * @brief Checks if a command is a built-in
  *
  * @param cmd_name Command name to check
- * @return t_bool true if built-in, false otherwise
+ * @return bool true if built-in, false otherwise
  */
-t_bool	is_builtin_command(char *cmd_name)
+bool	is_builtin_command(char *cmd_name)
 {
 	if (!cmd_name)
 		return (false);

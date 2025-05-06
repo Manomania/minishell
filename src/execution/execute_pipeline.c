@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:13:34 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,9 +149,9 @@ static void	wait_for_children(t_ctx *ctx, pid_t *pids, int cmd_count)
  * @brief Creates a pipe
  *
  * @param pipe_fds Array to store pipe file descriptors
- * @return t_bool true on success, false on error
+ * @return bool true on success, false on error
  */
-static t_bool	create_pipe(int pipe_fds[2])
+static bool	create_pipe(int pipe_fds[2])
 {
 	if (pipe(pipe_fds) == -1)
 		return (error("pipe", NULL, ERR_PIPE), false);

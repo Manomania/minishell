@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:44:19 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 14:10:25 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
  * @param ctx Shell context
  * @param cmd Command to execute
  */
-static t_bool	special_cases(t_ctx *ctx, t_command *cmd)
+static bool	special_cases(t_ctx *ctx, t_command *cmd)
 {
 	if (cmd->arg_count == 0 && cmd->next == NULL && cmd->args[0]
 		&& ft_strncmp(cmd->args[0], ":", 3) == 0)
@@ -34,9 +34,9 @@ static t_bool	special_cases(t_ctx *ctx, t_command *cmd)
  *
  * @param ctx Shell context
  * @param cmd Command structure with redirections
- * @return t_bool true if redirections were processed, false on error
+ * @return bool true if redirections were processed, false on error
  */
-static t_bool	handle_redirections_only(t_ctx *ctx, t_command *cmd)
+static bool	handle_redirections_only(t_ctx *ctx, t_command *cmd)
 {
 	int	stdin_copy;
 	int	stdout_copy;
