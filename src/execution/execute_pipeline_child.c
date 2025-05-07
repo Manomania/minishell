@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 15:26:04 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 17:52:37 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/07 11:46:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,8 @@ void	execute_command_in_child(t_ctx *ctx, t_command *cmd, t_fds fds,
 		free(pids);
 		exit(1);
 	}
+	if (!cmd->args)
+		return ;
 	if (is_builtin_command(cmd->args[0]))
 		execute_builtin_and_exit(ctx, cmd, pids);
 	setup_child_signals();

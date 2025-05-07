@@ -6,7 +6,7 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 18:10:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/06 17:56:38 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/07 11:44:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,11 +110,11 @@ int	main(int argc, char **argv, char **envp)
 	t_ctx	*ctx;
 	int		final_status;
 
-	if (!isatty(STDOUT_FILENO) || !isatty(STDIN_FILENO))
-	{
-		ft_printf_fd(2, "not a tty\n");
-		exit(EXIT_FAILURE);
-	}
+	// if (!isatty(STDOUT_FILENO) || !isatty(STDIN_FILENO))
+	// {
+	// 	ft_printf_fd(2, "not a tty\n");
+	// 	exit(EXIT_FAILURE);
+	// }
 	ctx = init_ctx(argc, argv, envp);
 	setup_interactive_signals();
 	final_status = command_loop(ctx);
