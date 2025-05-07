@@ -110,6 +110,11 @@ int	main(int argc, char **argv, char **envp)
 	t_ctx	*ctx;
 	int		final_status;
 
+	if (!isatty(STDOUT_FILENO) || !isatty(STDIN_FILENO))
+	{
+		ft_printf_fd(2, "not a tty\n");
+		exit(EXIT_FAILURE);
+	}
 	ctx = init_ctx(argc, argv, envp);
 	setup_interactive_signals();
 	final_status = command_loop(ctx);
