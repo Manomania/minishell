@@ -6,13 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 13:59:38 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 14:25:58 by maximart         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:21:42 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "builtins.h"
-#include "error.h"
-#include "minishell.h"
+#include "globals.h"
+#include "minishell.h" // required bc globals.h does not include minishell.h
 
 /**
  * @brief Displays a warning message when heredoc is terminated by EOF

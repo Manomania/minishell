@@ -6,12 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:40:56 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 17:35:04 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:07:48 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "error.h"
-#include "minishell.h"
+#include "free.h"
+#include "path.h"
 
 /**
  * @brief Retrieves PATH environment variable

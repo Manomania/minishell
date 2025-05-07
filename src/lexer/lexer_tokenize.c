@@ -5,14 +5,13 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/14 15:28:06 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/25 13:25:36 by elagouch         ###   ########.fr       */
+/*   Created: 2025/03/14 15:28:06 by elagouch          #+#    #+#             */
+/*   Updated: 2025/05/06 14:26:23 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "error.h"
+#include "lexer.h"
 #include "memory.h"
-#include "minishell.h"
 
 /**
  * @brief Adds a token to the linked list, updating head/current pointers

@@ -6,10 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 19:14:26 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/18 11:36:12 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:06:10 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "lexer.h" // for t_parse
 #include "minishell.h"
 
 /**
@@ -63,11 +64,11 @@ t_command	*create_command(void)
  * @return New command pointer or NULL if allocation fails
  * @note Caller must free the returned token
  */
-t_redirection	*create_redirection(t_token_type type, char *filename)
+t_redir	*create_redirection(t_token_type type, char *filename)
 {
-	t_redirection	*redirection;
+	t_redir	*redirection;
 
-	redirection = malloc(sizeof(t_redirection));
+	redirection = malloc(sizeof(t_redir));
 	if (!redirection)
 		return (NULL);
 	redirection->type = type;

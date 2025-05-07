@@ -5,21 +5,21 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/21 16:07:40 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 16:12:28 by elagouch         ###   ########.fr       */
+/*   Created: 2025/04/21 16:07:40 by elagouch          #+#    #+#             */
+/*   Updated: 2025/05/06 15:07:35 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "env.h"
 
 /**
  * @brief Handles context when in single quotes
  *
  * @param ctx Context containing quote information
  * @param i Current position (will be updated)
- * @return t_bool true to continue, false otherwise
+ * @return bool true to continue, false otherwise
  */
-static t_bool	handle_single_quotes(t_ctx *ctx, int *i)
+static bool	handle_single_quotes(t_ctx *ctx, int *i)
 {
 	if (ctx->quote.in_single_quote == 1 && ctx->quote.in_double_quote == 0)
 	{

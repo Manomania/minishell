@@ -6,102 +6,121 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:37 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 16:15:39 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 17:56:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "builtins.h"
-#include "error.h"
 #include "execute.h"
+#include "signals.h"
 
 /**
- * @brief Waits for child processes to finish
+ * @brief Handles fork failures and resource cleanup
  *
- * @param ctx Shell context
- * @param pids Array of process IDs
- * @param cmd_count Number of commands
+ * @param current Current command
+ * @param pipe_fds Pipe file descriptors
+ * @param prev_pipe_read Previous pipe read end
+ * @param pids Process IDs array
+ * @return bool true if successful, false on error
  */
-static void	wait_for_children(t_ctx *ctx, pid_t *pids, int cmd_count)
+static bool	handle_fork_error(t_command *current, int pipe_fds[2],
+		int prev_pipe_read, pid_t *pids)
 {
 	int	i;
-	int	status;
-
-	i = 0;
-	status = 0;
-	while (i < cmd_count)
-	{
-		waitpid(pids[i], &status, 0);
-		if (i == cmd_count - 1)
-		{
-			if (WIFEXITED(status))
-				ctx->exit_status = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status))
-			{
-				ctx->exit_status = 128 + WTERMSIG(status);
-				if (WTERMSIG(status) == SIGQUIT)
-					write(STDOUT_FILENO, "\n", 1);
-			}
-		}
-		i++;
-	}
-}
-
-/**
- * @brief Initialize pipeline execution
- *
- * Sets up initial variables and allocates memory for pids
- *
- * @param cmd Command list
- * @param pids Pointer to store allocated pid array
- * @return int Number of commands, or -1 if allocation failed
- */
-static int	initialize_pipeline(t_command *cmd, pid_t **pids)
-{
 	int	cmd_count;
 
-	cmd_count = count_commands(cmd);
-	*pids = (pid_t *)malloc(sizeof(pid_t) * cmd_count);
-	if (!*pids)
-		return (-1);
-	setup_parent_signals();
-	return (cmd_count);
-}
-
-/**
- * @brief Process single command in pipeline
- *
- * Handles pipe creation, forking, and execution for one command
- *
- * @param current Current command to process
- * @param prev_read Previous pipe read fd
- * @param pipe_fds Current pipe fds array
- * @return int Returns updated prev_read, or -2 on error
- */
-static int	process_command(t_command *current, int prev_read, int pipe_fds[2])
-{
-	if (!setup_command_pipe(pipe_fds, current->next != NULL))
-		return (-2);
 	if (current->next)
-		return (pipe_fds[0]);
-	return (prev_read);
+	{
+		close(pipe_fds[0]);
+		close(pipe_fds[1]);
+	}
+	if (prev_pipe_read != -1)
+		close(prev_pipe_read);
+	i = 0;
+	cmd_count = count_commands(current);
+	while (i < cmd_count && pids[i] > 0)
+		kill(pids[i++], SIGKILL);
+	return (false);
 }
 
 /**
- * @brief Execute and clean up command
+ * @brief Initializes pipeline execution resources
  *
- * Forks and executes a command, then cleans up pipes
+ * Allocates memory for process IDs and sets up initial values
+ *
+ * @param cmd Command list
+ * @param pids Pointer to store process IDs array
+ * @return t_pipeline_init Pipeline initialization data
+ */
+static t_pipeline_init	init_pipeline(t_command *cmd, pid_t **pids)
+{
+	t_pipeline_init	init;
+
+	init.cmd_count = count_commands(cmd);
+	*pids = (pid_t *)malloc(sizeof(pid_t) * init.cmd_count);
+	if (!*pids)
+		return ((t_pipeline_init){NULL, -1, 0, 0});
+	init.current = cmd;
+	init.prev_pipe_read = -1;
+	init.i = 0;
+	setup_parent_signals();
+	return (init);
+}
+
+/**
+ * @brief Handles child process execution in pipeline
+ *
+ * Configures file descriptors and executes the command
  *
  * @param ctx Shell context
- * @param args Execution arguments
- * @return int 1 on success, 0 on error
+ * @param current Current command
+ * @param pipe_fds Pipe file descriptors
+ * @param pipeline Pipeline execution data
  */
-static int	execute_and_cleanup(t_ctx *ctx, t_eac_args args)
+static void	handle_child_process(t_ctx *ctx, t_command *current,
+		int pipe_fds[2], t_pipeline *pipeline)
 {
-	if (!handle_command_fork(ctx, (t_hcf_args){args.current, args.prev_read,
-			args.pipe_fds, args.pids, args.i}))
-		return (0);
-	cleanup_pipes(args.prev_read, args.pipe_fds, args.current->next != NULL);
-	return (1);
+	int	my_fd;
+
+	my_fd = -1;
+	if (current->next)
+	{
+		my_fd = pipe_fds[1];
+		close(pipe_fds[0]);
+	}
+	execute_command_in_child(ctx, current, (t_fds){pipeline->prev_pipe_read,
+		my_fd}, pipeline->pids);
+}
+
+/**
+ * @brief Executes a single pipeline step
+ *
+ * Creates pipes, forks a process and handles execution
+ *
+ * @param ctx Shell context
+ * @param current Current command
+ * @param pipeline Pipeline execution data
+ * @return bool true if successful, false on error
+ */
+static bool	execute_pipeline_step(t_ctx *ctx, t_command *current,
+		t_pipeline *pipeline)
+{
+	int	pipe_fds[2];
+
+	if (!setup_pipeline_step(current, pipe_fds, pipeline->pids))
+		return (false);
+	pipeline->pids[pipeline->i] = fork();
+	if (pipeline->pids[pipeline->i] == -1)
+	{
+		handle_fork_error(current, pipe_fds, pipeline->prev_pipe_read,
+			pipeline->pids);
+		return (false);
+	}
+	if (pipeline->pids[pipeline->i] == 0)
+		handle_child_process(ctx, current, pipe_fds, pipeline);
+	cleanup_pipes(pipeline->prev_pipe_read, pipe_fds, current->next != NULL);
+	if (current->next)
+		pipeline->prev_pipe_read = pipe_fds[0];
+	return (true);
 }
 
 /**
@@ -114,29 +133,25 @@ static int	execute_and_cleanup(t_ctx *ctx, t_eac_args args)
  */
 void	execute_pipeline(t_ctx *ctx, t_command *cmd)
 {
-	t_eac_args	args;
-	int			cmd_count;
-	int			result;
+	t_command		*current;
+	t_pipeline		pipeline;
+	t_pipeline_init	init;
 
-	cmd_count = initialize_pipeline(cmd, &args.pids);
-	if (cmd_count == -1)
+	init = init_pipeline(cmd, &pipeline.pids);
+	if (!pipeline.pids)
 		return ;
-	args.current = cmd;
-	args.prev_read = -1;
-	args.i = 0;
-	while (args.current)
+	signal(SIGINT, SIG_IGN);
+	current = init.current;
+	pipeline.prev_pipe_read = init.prev_pipe_read;
+	pipeline.i = init.i;
+	while (current)
 	{
-		result = process_command(args.current, args.prev_read, args.pipe_fds);
-		if (result == -2)
-			return (handle_fork_error(args.pids, cmd_count, args.pipe_fds,
-					args.prev_read));
-		if (!execute_and_cleanup(ctx, args))
-			return ;
-		args.prev_read = result;
-		args.current = args.current->next;
-		args.i++;
+		if (!execute_pipeline_step(ctx, current, &pipeline))
+			return (free(pipeline.pids));
+		current = current->next;
+		pipeline.i++;
 	}
-	wait_for_children(ctx, args.pids, cmd_count);
-	free(args.pids);
-	setup_signals();
+	wait_for_children(ctx, pipeline.pids, init.cmd_count);
+	free(pipeline.pids);
+	setup_interactive_signals();
 }

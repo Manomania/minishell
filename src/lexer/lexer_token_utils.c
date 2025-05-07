@@ -6,11 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 15:53:31 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/25 13:05:46 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:25:46 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "init.h" // for create_token
+#include "lexer.h"
 
 t_token	*handle_basics_token(t_lexer *lexer)
 {

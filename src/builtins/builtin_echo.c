@@ -6,20 +6,19 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:54:10 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/16 15:43:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "builtins.h"
 #include "minishell.h"
 
 /**
  * @brief Checks if an argument is the -n option for echo
  *
  * @param arg Argument to check
- * @return t_bool true if it's the -n option, false otherwise
+ * @return bool true if it's the -n option, false otherwise
  */
-static t_bool	is_n_option(char *arg)
+static bool	is_n_option(char *arg)
 {
 	int	i;
 
@@ -45,7 +44,7 @@ static t_bool	is_n_option(char *arg)
 int	builtin_echo(t_ctx *ctx, t_command *cmd)
 {
 	int		i;
-	t_bool	new_line;
+	bool	new_line;
 
 	(void)ctx;
 	new_line = true;

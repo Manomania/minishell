@@ -6,13 +6,13 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 12:10:14 by maximart          #+#    #+#             */
-/*   Updated: 2025/05/05 16:16:37 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:19:06 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "error.h"
+#include "env.h"
 #include "execute.h"
-#include "minishell.h"
+#include "globals.h"
 
 static int	process_heredoc_line(int fd, char *line, t_ctx *ctx)
 {

@@ -6,11 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:42:24 by maximart          #+#    #+#             */
-/*   Updated: 2025/03/18 11:35:12 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:23:38 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "init.h"
 
 /**
  * @brief Frees environment variable list

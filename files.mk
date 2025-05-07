@@ -29,10 +29,7 @@ SRC_F				= \
 						execution/execute_builtin \
 						execution/execute_commands \
 						execution/execute_pipeline \
-						execution/execute_pipeline_clean \
-						execution/execute_pipeline_command \
-						execution/execute_pipeline_fork \
-						execution/execute_pipeline_redirs \
+						execution/execute_pipeline_child \
 						execution/execute_pipeline_utils \
 						execution/heredoc \
 						execution/heredoc_expand \
@@ -42,13 +39,14 @@ SRC_F				= \
 						execution/heredoc_utils \
 						execution/heredoc_utils2 \
 						execution/redirection \
-						execution/redirection_apply_input \
-						execution/redirection_apply_output \
+						execution/redirection_input \
+						execution/redirection_output \
 						execution/redir_cleanup \
 						free/free_2d_array \
 						free/free_command \
 						free/free_ctx \
 						free/free_env \
+						globals/globals \
 						init/init_ctx \
 						init/init_parse \
 						lexer/lexer_read \
@@ -66,7 +64,6 @@ SRC_F				= \
 						path/bin_find_utils \
 						path/path_error \
 						signals/signals \
-						signals/signals_utils \
 						validation/validation \
 						main
 TSRC_F			=		$(subst main,test/main,$(SRC_F))

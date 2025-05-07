@@ -6,11 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:31:33 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/07 19:52:31 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:25:24 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "init.h" // for create_token
+#include "lexer.h"
 
 /**
  * @brief Handles a word token in the lexer

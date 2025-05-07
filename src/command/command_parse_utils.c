@@ -6,11 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:27:42 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/24 15:30:36 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "env.h"
 
 /**
  * @brief Creates a new arguments array for the first command argument
@@ -61,9 +61,9 @@ static char	**create_extended_args(t_command *cmd, char *expanded_value)
  *
  * @param cmd Command structure being built
  * @param expanded_value Expanded token value to add
- * @return t_bool true on success, false on failure
+ * @return bool true on success, false on failure
  */
-t_bool	handle_first_arg(t_command *cmd, char *expanded_value)
+bool	handle_first_arg(t_command *cmd, char *expanded_value)
 {
 	char	**new_args;
 
@@ -83,9 +83,9 @@ t_bool	handle_first_arg(t_command *cmd, char *expanded_value)
  *
  * @param cmd Command structure being built
  * @param expanded_value Expanded token value to add
- * @return t_bool true on success, false on failure
+ * @return bool true on success, false on failure
  */
-t_bool	add_to_existing_args(t_command *cmd, char *expanded_value)
+bool	add_to_existing_args(t_command *cmd, char *expanded_value)
 {
 	char	**new_args;
 
@@ -107,9 +107,9 @@ t_bool	add_to_existing_args(t_command *cmd, char *expanded_value)
  * @param cmd Command structure being built
  * @param token Current token being processed
  * @param ctx Context containing environment information
- * @return t_bool true on success, false on failure
+ * @return bool true on success, false on failure
  */
-t_bool	process_word_token(t_command *cmd, t_token *token, t_ctx *ctx)
+bool	process_word_token(t_command *cmd, t_token *token, t_ctx *ctx)
 {
 	char	*expanded_value;
 

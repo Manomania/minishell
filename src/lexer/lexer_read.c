@@ -6,12 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/10 14:27:07 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/25 13:27:14 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:24:30 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "error.h"
-#include "minishell.h"
+#include "lexer.h"
 
 /**
  * @brief Extract a word from lexer input

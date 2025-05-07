@@ -6,12 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 17:07:35 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 10:18:29 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 14:09:19 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "error.h"
-#include "minishell.h"
+#include "free.h"
 
 /**
  * @brief Frees context, displays an error and quits with the corresponding

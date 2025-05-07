@@ -6,12 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/02 16:45:23 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 15:36:07 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:08:24 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
-#include "error.h"
 #include "execute.h"
 
 /**
@@ -45,7 +44,7 @@ int	execute_builtin(t_ctx *ctx, t_command *cmd)
 	else if (ft_strncmp(cmd->args[0], "export", __INT_MAX__) == 0)
 		status = builtin_export(ctx, cmd);
 	else if (ft_strncmp(cmd->args[0], "pwd", __INT_MAX__) == 0)
-		status = builtin_pwd(ctx, cmd);
+		status = builtin_pwd();
 	else if (ft_strncmp(cmd->args[0], "unset", __INT_MAX__) == 0)
 		status = builtin_unset(ctx, cmd);
 	restore_original_fds(stdin_copy, stdout_copy);
@@ -56,9 +55,9 @@ int	execute_builtin(t_ctx *ctx, t_command *cmd)
  * @brief Checks if a command is a built-in
  *
  * @param cmd_name Command name to check
- * @return t_bool true if built-in, false otherwise
+ * @return bool true if built-in, false otherwise
  */
-t_bool	is_builtin_command(char *cmd_name)
+bool	is_builtin_command(char *cmd_name)
 {
 	if (!cmd_name)
 		return (false);

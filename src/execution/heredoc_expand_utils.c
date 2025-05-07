@@ -6,12 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 15:10:15 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 14:24:39 by maximart         ###   ########.fr       */
+/*   Updated: 2025/05/06 13:34:44 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "execute.h"
 
 /**
  * @brief Initializes the variable expansion process

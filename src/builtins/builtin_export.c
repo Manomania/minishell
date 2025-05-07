@@ -6,22 +6,21 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:55:00 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 11:12:26 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:07:42 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 #include "error.h"
-#include "minishell.h"
 #include "validation.h"
 
 /**
  * @brief Validates environment variable name
  *
  * @param key Key to validate
- * @return t_bool true if valid, false otherwise
+ * @return bool true if valid, false otherwise
  */
-t_bool	validate_env_key(char *key)
+bool	validate_env_key(char *key)
 {
 	int	i;
 
@@ -66,7 +65,7 @@ static int	process_export_arg(t_ctx *ctx, char *arg)
 {
 	char	*key;
 	char	*value;
-	t_bool	has_equals;
+	bool	has_equals;
 	int		result;
 
 	key = NULL;

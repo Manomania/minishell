@@ -6,13 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 10:01:40 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 16:54:27 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 13:58:24 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 #include "error.h"
-#include "minishell.h"
 
 char	*get_target_directory(t_ctx *ctx, t_command *cmd)
 {
@@ -23,7 +22,7 @@ char	*get_target_directory(t_ctx *ctx, t_command *cmd)
 	else if (ft_strncmp(cmd->args[1], "-", 2) == 0)
 		target_dir = get_old_pwd(ctx);
 	else if (ft_strncmp(cmd->args[1], ".", 2) == 0)
-		target_dir = handle_dot_directory(ctx);
+		target_dir = handle_dot_directory();
 	else
 		target_dir = ft_strdup(cmd->args[1]);
 	return (target_dir);
@@ -32,14 +31,12 @@ char	*get_target_directory(t_ctx *ctx, t_command *cmd)
 /**
  * @brief Gets the current PWD directory from environment
  *
- * @param ctx Context for shell environment
  * @return char* Current PWD or NULL if not found
  */
-static char	*get_current_pwd(t_ctx *ctx)
+static char	*get_current_pwd(void)
 {
 	char	*pwd;
 
-	(void)ctx;
 	pwd = getcwd(NULL, 0);
 	if (pwd)
 		return (pwd);
@@ -82,7 +79,7 @@ int	builtin_cd(t_ctx *ctx, t_command *cmd)
 
 	if (cmd->arg_count > 1)
 		return (error(NULL, "cd", ERR_TOO_MANY_ARGS), 1);
-	old_pwd = get_current_pwd(ctx);
+	old_pwd = get_current_pwd();
 	target_dir = get_target_directory(ctx, cmd);
 	if (!target_dir)
 		return (free(old_pwd), 1);

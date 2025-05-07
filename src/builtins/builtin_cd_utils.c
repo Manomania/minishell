@@ -6,13 +6,12 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/24 16:47:07 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 16:44:15 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:07:52 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 #include "error.h"
-#include "minishell.h"
 
 /**
  * @brief Gets the old PWD directory from environment
@@ -66,7 +65,7 @@ char	*get_home_dir(t_ctx *ctx)
 t_env	*update_pwd_variable(t_env *env_node, char *new_pwd)
 {
 	t_env	*old_pwd_node;
-	t_bool	pwd_found;
+	bool	pwd_found;
 
 	old_pwd_node = NULL;
 	pwd_found = false;
@@ -109,16 +108,17 @@ void	update_oldpwd_variable(t_env *old_pwd_node, char *old_pwd)
 /**
  * @brief Handles cd . when current directory doesn't exist
  *
- * @param ctx Context for shell environment
  * @return char* Directory path or NULL if not found
  */
-char	*handle_dot_directory(t_ctx *ctx)
+char	*handle_dot_directory(void)
 {
 	char	*pwd;
 
-	(void)ctx;
 	pwd = getcwd(NULL, 0);
-	if (!pwd)
+	if (pwd)
+	{
+		free(pwd);
 		return (ft_strdup("."));
-	return (pwd);
+	}
+	return (ft_strdup("."));
 }

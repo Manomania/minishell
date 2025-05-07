@@ -6,13 +6,11 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:59:39 by elagouch          #+#    #+#             */
-/*   Updated: 2025/04/29 17:35:16 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "error.h"
 #include "minishell.h"
-#include <sys/stat.h>
 
 /**
  * @brief Checks if a file is executable
@@ -22,7 +20,7 @@
  * @param path Path to the file to check
  * @return true if file is executable, false otherwise
  */
-static t_bool	is_executable_file(const char *path)
+static bool	is_executable_file(const char *path)
 {
 	struct stat	path_stat;
 

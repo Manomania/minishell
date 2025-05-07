@@ -5,12 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/21 16:01:00 by maximart          #+#    #+#             */
-/*   Updated: 2025/04/21 16:02:34 by elagouch         ###   ########.fr       */
+/*   Created: 2025/04/21 16:01:00 by elagouch          #+#    #+#             */
+/*   Updated: 2025/05/06 14:24:50 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "lexer.h"
 
 /**
  * @brief Sets the quote flags in lexer structure
@@ -56,8 +56,7 @@ char	*create_quoted_content(t_lexer *lexer, int start, int end)
  * @param quote_char Quote character if in quoted mode, 0 otherwise
  * @return char* Updated result string or NULL on error
  */
-char	*handle_word_part_by_type(t_lexer *lexer, char *result,
-		char quote_char)
+char	*handle_word_part_by_type(t_lexer *lexer, char *result, char quote_char)
 {
 	char	*new_result;
 	char	*part;

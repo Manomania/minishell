@@ -6,13 +6,13 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 14:56:48 by elagouch          #+#    #+#             */
-/*   Updated: 2025/05/05 15:32:56 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:08:49 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "env.h"
 #include "error.h"
-#include "minishell.h"
-#include <sys/stat.h>
+#include "path.h"
 
 /**
  * @brief Checks if a string contains path components
@@ -23,7 +23,7 @@
  * @param str String to check for path components
  * @return true if the string contains path components, false otherwise
  */
-t_bool	is_path(const char *str)
+bool	is_path(const char *str)
 {
 	int	i;
 

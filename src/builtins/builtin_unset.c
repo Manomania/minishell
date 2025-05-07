@@ -6,21 +6,19 @@
 /*   By: elagouch <elagouch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 09:56:32 by elagouch          #+#    #+#             */
-/*   Updated: 2025/03/28 11:17:45 by elagouch         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:00:13 by elagouch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "builtins.h"
 #include "error.h"
-#include "minishell.h"
 
 /**
  * @brief Checks if a string is a valid environment variable name
  *
  * @param name String to check
- * @return t_bool true if valid, false otherwise
+ * @return bool true if valid, false otherwise
  */
-static t_bool	is_valid_env_name(char *name)
+static bool	is_valid_env_name(char *name)
 {
 	int	i;
 
@@ -43,9 +41,9 @@ static t_bool	is_valid_env_name(char *name)
  *
  * @param env_list Pointer to environment list
  * @param key Key to remove
- * @return t_bool true if removed, false if not found
+ * @return bool true if removed, false if not found
  */
-t_bool	remove_env_var(t_env **env_list, char *key)
+bool	remove_env_var(t_env **env_list, char *key)
 {
 	t_env	*current;
 	t_env	*prev;
