@@ -38,10 +38,10 @@ SRC_F				= \
 						execution/heredoc_signals \
 						execution/heredoc_utils \
 						execution/heredoc_utils2 \
+						execution/redir_cleanup \
 						execution/redirection \
 						execution/redirection_input \
 						execution/redirection_output \
-						execution/redir_cleanup \
 						free/free_2d_array \
 						free/free_command \
 						free/free_ctx \
